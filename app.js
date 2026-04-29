@@ -222,7 +222,7 @@ function getDefaultTrades() {
 }
 
 // Initialize TRADES from localStorage
-let TRADES = loadTrades();
+var TRADES = loadTrades();
 
 TRADES = TRADES.map(t => {
   const isImported = String(t.setup || '').toLowerCase() === 'imported';
@@ -257,11 +257,11 @@ function calculateCombinedCounts(trades) {
 TRADES = calculateCombinedCounts(TRADES);
 
 // Persistent filter lists — user edits (add/remove) survive across opens
-let fpSymbolList  = [...new Set(TRADES.map(t => t.symbol))].sort();
-let fpSessionList = [...new Set(TRADES.map(t => t.session))].sort();
+var fpSymbolList  = [...new Set(TRADES.map(t => t.symbol))].sort();
+var fpSessionList = [...new Set(TRADES.map(t => t.session))].sort();
 
 // Note: currentDir, selectedRating, currentDetailTrade already defined at top
-let filteredTrades = [...TRADES];
+var filteredTrades = [...TRADES];
 let dirFilter = 'all';
 window._tradeLogDrilldownActive = false;
 
@@ -405,6 +405,14 @@ function switchView(el) {
         console.log('  → Initializing trade log...');
         // Always re-apply filters when entering the trade log so filteredTrades is never stale
         if (typeof applyFilters === 'function') applyFilters();
+        // Ensure the trade log table is rendered after navigation, even if the initial page-load render occurred while the view was hidden.
+        const renderTlog = () => {
+          if (typeof renderTrades === 'function') {
+            renderTrades(Array.isArray(filteredTrades) ? filteredTrades : [...TRADES]);
+          }
+        };
+        requestAnimationFrame(renderTlog);
+        setTimeout(renderTlog, 80);
         if (typeof initTlogScrollIndicator === 'function') setTimeout(() => initTlogScrollIndicator(), 50);
         setTimeout(() => recoverEmptyTradeLogIfStale(), 80);
         console.log('  ✓ Trade log initialized');
@@ -730,6 +738,14 @@ function renderTrades(trades) {
   const pageTrades = displayTrades.slice(start, start + TRADES_PER_PAGE);
 
   const tb = $('trade-tbody');
+  if (!tb) {
+    console.warn('renderTrades: trade-tbody element not found, retrying');
+    requestAnimationFrame(() => {
+      const tbRetry = $('trade-tbody');
+      if (tbRetry) renderTrades(trades);
+    });
+    return;
+  }
   tb.innerHTML = '';
 
   // Manage select checkbox column in thead
@@ -1566,9 +1582,14 @@ function applyFilters() {
   if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 8px var(--ac-80), 0 0 16px var(--ac-40)' : '';
   if (filterBtn) filterBtn.style.borderColor = hasFilter ? 'var(--ac-60)' : '';
 
-  filteredTrades = res;
-  currentPage = 1;
-  renderTrades(res);
+  if (!res || res.length === 0) {
+  console.log("Filter broke — fallback to all trades");
+  res = getDashboardTrades();
+}
+
+filteredTrades = res;
+currentPage = 1;
+renderTrades(res);
 }
 
 // Restore saved filter state from localStorage
@@ -1888,7 +1909,7 @@ function deleteCurrentTrade() {
   
   filteredTrades = [...TRADES];
   closeDetail();
-  renderTrades(filteredTrades);
+  renderTrades(getDashboardTrades());
   populateDashboard();
   refreshAdvAnalytics();
   
@@ -4811,7 +4832,7 @@ function _proceedSaveTrade(acctVal) {
     checkAndCreateNextPhase(accountName);
     
     filteredTrades = [...TRADES];
-    renderTrades(filteredTrades);
+    renderTrades(getDashboardTrades());
     populateDashboard();
     refreshAdvAnalytics();
     
@@ -4976,7 +4997,7 @@ function saveAccounts() {
   }
 }
 
-const ACCOUNTS = loadAccounts();
+var ACCOUNTS = loadAccounts();
 saveAccounts();  // Ensure any loaded/cleaned data is saved back
 let acctOpen = false;
 // selectedAcct already defined at top of file
@@ -6732,7 +6753,7 @@ function enableSelectMode() {
   if (btn) { btn.classList.add('active'); btn.style.boxShadow=''; btn.style.borderColor=''; btn.style.color=''; btn.style.background=''; }
   const lbl = $('options-btn-label');
   if (lbl) lbl.textContent = '';
-  renderTrades(filteredTrades);
+  renderTrades(getDashboardTrades());
   updateSelBar();
 }
 
@@ -6748,7 +6769,7 @@ function disableSelectMode() {
   if (btn) { btn.classList.remove('active'); }
   const lbl = $('options-btn-label');
   if (lbl) lbl.textContent = '';
-  renderTrades(filteredTrades);
+  renderTrades(getDashboardTrades());
   updateSelBar();
 }
 
@@ -6832,7 +6853,7 @@ function selDeleteSelected() {
   saveTradesToStorage();
   applyFilters();
   disableSelectMode();
-  renderTrades(filteredTrades);
+  renderTrades(getDashboardTrades());
   populateDashboard();
   refreshAdvAnalytics();
   showUndoToast(count);
@@ -6857,7 +6878,7 @@ function selUndoDelete() {
   undoSnapshot.trades.forEach(t => TRADES.push(t));
   saveTradesToStorage();
   filteredTrades = [...undoSnapshot.filtered];
-  renderTrades(filteredTrades);
+  renderTrades(getDashboardTrades());
   populateDashboard();
   refreshAdvAnalytics();
   updateSelBar();
@@ -7132,7 +7153,7 @@ function applyBulkEdit() {
   });
 
   filteredTrades = [...TRADES];
-  renderTrades(filteredTrades);
+  renderTrades(getDashboardTrades());
   populateDashboard();
   refreshAdvAnalytics();
   closeBulkEdit();
