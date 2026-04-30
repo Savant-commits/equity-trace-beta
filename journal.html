@@ -4832,15 +4832,15 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- â•â• IMPORT TRADES MODAL â•â• -->
+<!-- IMPORT TRADES MODAL  -->
 <div id="import-modal-overlay" onclick="if(event.target===this)closeImportModal()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);align-items:center;justify-content:center;overflow-y:auto;padding:40px 16px">
   <div onclick="event.stopPropagation()" style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:100%;max-width:600px;box-shadow:0 32px 80px rgba(0,0,0,.6);display:flex;flex-direction:column;max-height:90vh;overflow:hidden">
     
     <!-- Header -->
     <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
       <div>
-        <div style="font-family:var(--font-display);font-weight:700;font-size:16px;color:var(--text)">Import Trades</div>
-        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:3px">Support CSV & JSON from trading accounts</div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:28px;color:var(--text)">Import Trades</div>
+        <div style="font-size:14px;font-weight:500;color:var(--text3);font-family:var(--font-mono);margin-top:3px">Support CSV, HTML & JSON from trading accounts</div>
       </div>
       <button onclick="closeImportModal()" style="width:28px;height:28px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s" onmouseenter="this.style.color='var(--text)';this.style.borderColor='var(--ac-40)'" onmouseleave="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
         <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
@@ -4849,92 +4849,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Body -->
     <div style="padding:24px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;flex:1">
-      
-      <!-- Format selector -->
-      <div>
-        <div style="font-size:11px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Format</div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="import-format-buttons">
-          <button onclick="setImportFormat('csv')" class="import-format-btn" style="padding:10px;border-radius:8px;border:1.5px solid var(--ac-40);background:transparent;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text2);transition:all .2s" data-format="csv">CSV (Generic)</button>
-          <button onclick="setImportFormat('ctrader')" class="import-format-btn" style="padding:10px;border-radius:8px;border:1.5px solid var(--ac-40);background:transparent;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text2);transition:all .2s" data-format="ctrader">cTrader</button>
-          <button onclick="setImportFormat('mt4')" class="import-format-btn" style="padding:10px;border-radius:8px;border:1.5px solid var(--ac-40);background:transparent;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text2);transition:all .2s" data-format="mt4">MetaTrader 4/5</button>
-          <button onclick="setImportFormat('json')" class="import-format-btn" style="padding:10px;border-radius:8px;border:1.5px solid var(--ac-40);background:transparent;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text2);transition:all .2s" data-format="json">JSON</button>
-        </div>
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px" id="import-format-buttons">
       </div>
 
       <!-- File upload -->
       <div>
-        <div style="font-size:11px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Select File</div>
+        <div style="font-size:14px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Select File</div>
         <div id="import-file-dropzone" onclick="importFileClick()" ondragover="event.preventDefault();event.stopPropagation();this.style.borderColor='var(--purple)';this.style.background='var(--ac-20)'" ondragleave="event.preventDefault();this.style.borderColor='var(--ac-25)';this.style.background='var(--bg3)'" ondrop="event.preventDefault();event.stopPropagation();this.style.borderColor='var(--ac-25)';this.style.background='var(--bg3)';handleImportDrop(event)" style="border:2px dashed var(--ac-25);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3)" onmouseenter="this.style.borderColor='var(--ac-50)';this.style.background='var(--bg4)'" onmouseleave="this.style.borderColor='var(--ac-25)';this.style.background='var(--bg3)'">
-          <input type="file" id="import-file-input" style="display:none" accept=".csv,.json,.txt" onchange="handleImportFile(this)">
+          <input type="file" id="import-trades-file-input" style="display:none" accept=".csv,.json,.txt,.html,.htm" onchange="handleImportTradesFile(this)">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style="margin:0 auto 8px;opacity:.6"><path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-          <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Drag & drop file here or click to browse</div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Accepted: CSV, JSON (max 5MB)</div>
+          <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:4px">Drag & drop file here or click to browse</div>
+          <div style="font-size:10px;font-weight:500;color:var(--text3);font-family:var(--font-mono)">Accepted: CSV, HTML, JSON (max 5MB)</div>
         </div>
         <div id="import-file-name" style="margin-top:8px;font-size:11px;color:var(--purple);font-family:var(--font-mono);display:none"></div>
       </div>
 
       <!-- Account selector -->
-      <div>
-        <div style="font-size:11px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Target Account *</div>
-        <select id="import-target-account" style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:var(--font-body);font-size:12px;color:var(--text);outline:none;cursor:pointer">
-          <option value="">Select account to import into...</option>
-        </select>
+      <div style="position:relative">
+        <div style="font-size:14px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Target Account</div>
+        <div id="import-account-trigger" onclick="toggleImportAccountDropdown(event)" style="display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text);transition:border-color .15s">
+          <span id="import-account-label" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text3)">Select account to import into...</span>
+          <span id="import-account-arrow" style="margin-left:10px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:transform .2s"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </div>
+        <input type="hidden" id="import-target-account" value="">
+        <div id="import-account-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);left:0;width:100%;background:var(--bg2);border:1px solid var(--ac-20);border-radius:12px;overflow:hidden;z-index:100001;box-shadow:0 16px 48px rgba(0,0,0,.35)">
+          <div id="import-account-list" style="max-height:240px;overflow-y:auto"></div>
+        </div>
       </div>
 
-      <!-- Broker auto-import -->
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-          <div style="font-size:10px;letter-spacing:.1em;color:var(--purple);font-family:var(--font-mono);text-transform:uppercase;font-weight:600">Broker Auto Import (Beta)</div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">Auto-sync while app is open</div>
+      <!-- Source timezone selector --> 
+      <div style="position:relative">
+        <div style="font-size:14px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Import Source Timezone</div>
+        <div id="import-timezone-trigger" onclick="toggleImportTimezoneDropdown(event)" style="display:flex;align-items:center;justify-content:space-between;width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:11px 14px;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text);transition:border-color .15s">
+          <span id="import-timezone-label" style="flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text3)">Select the timezone from your broker export...</span>
+          <span id="import-timezone-arrow" style="margin-left:10px;color:var(--text3);display:flex;align-items:center;justify-content:center;transition:transform .2s"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         </div>
-
-        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px">
-          <select id="broker-auto-provider" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text);font-family:var(--font-body);outline:none">
-            <option value="custom">Custom REST / Bridge</option>
-            <option value="ctrader">cTrader (via bridge)</option>
-            <option value="mt5">MetaTrader 4/5 (via bridge)</option>
-            <option value="tradovate">Tradovate (via bridge)</option>
-          </select>
-
-          <input id="broker-auto-name" type="text" placeholder="Connection name (optional)" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text);font-family:var(--font-body);outline:none" />
-
-          <select id="broker-auto-account" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text);font-family:var(--font-body);outline:none">
-            <option value="">Select account to auto-import into...</option>
-          </select>
-
-          <select id="broker-auto-interval" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text);font-family:var(--font-body);outline:none">
-            <option value="1">Every 1 min</option>
-            <option value="3">Every 3 min</option>
-            <option value="5" selected>Every 5 min</option>
-            <option value="10">Every 10 min</option>
-            <option value="15">Every 15 min</option>
-          </select>
+        <input type="hidden" id="import-source-timezone" value="UTC+00:00">
+        <div id="import-timezone-dropdown" style="display:none;position:fixed;left:0;top:0;width:100%;background:var(--bg2);border:1px solid var(--ac-20);border-radius:12px;overflow:hidden;z-index:100001;box-shadow:0 16px 48px rgba(0,0,0,.35)">
+          <div style="padding:10px 14px 0;background:var(--bg2);border-bottom:1px solid rgba(255,255,255,.06)">
+            <input id="import-timezone-search" type="text" placeholder="Search timezones..." autocomplete="off" oninput="filterImportTimezoneOptions(this.value)" onkeydown="importTimezoneSearchKey(event)" style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:12px;padding:10px 12px;outline:none;box-sizing:border-box" />
+          </div>
+          <div id="import-timezone-list" style="max-height:240px;overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0"></div>
         </div>
-
-        <div style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
-          <input id="broker-auto-endpoint" type="url" placeholder="Broker endpoint URL (must return JSON trades)" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text);font-family:var(--font-body);outline:none" />
-          <input id="broker-auto-token" type="password" placeholder="API token / Bearer token (optional)" style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text);font-family:var(--font-body);outline:none" />
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button onclick="brokerClearForm()" style="padding:6px 12px;border-radius:7px;background:var(--bg4);border:1px solid var(--border);color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--font-mono)">Clear</button>
-          <button onclick="saveBrokerConnectionFromForm()" style="padding:6px 12px;border-radius:7px;background:var(--purple);border:none;color:#fff;font-size:11px;cursor:pointer;font-family:var(--font-mono);font-weight:600">Connect + Enable</button>
-        </div>
-
-        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:8px;line-height:1.45">
-          The endpoint should return an array of trades or an object with trades/data array. Tokens are stored locally in your browser storage.
-        </div>
-
-        <div id="broker-auto-list" style="margin-top:10px;display:flex;flex-direction:column;gap:8px"></div>
-      </div>
-
-      <!-- Source timezone selector -->
-      <div>
-        <div style="font-size:11px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Import Source Timezone</div>
-        <select id="import-source-timezone" onchange="setImportSourceTimezone(this.value)" style="width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:9px 12px;font-family:var(--font-body);font-size:12px;color:var(--text);outline:none;cursor:pointer">
-          <option value="UTC+00:00">UTC+00:00</option>
-        </select>
-        <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:6px">Session tagging uses EST windows. Pick the timezone used in the broker export file.</div>
+        <div style="font-size:11px;font-weight:500;color:var(--text3);font-family:var(--font-mono);margin-top:6px">Session tagging uses EST windows. Pick the timezone used in the broker export file.</div>
       </div>
 
       <!-- Parse options -->
@@ -4969,8 +4926,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     <!-- Footer -->
     <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0">
-      <button onclick="closeImportModal()" style="padding:8px 18px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);font-size:12px;color:var(--text2);cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-40)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Cancel</button>
-      <button id="import-submit-btn" onclick="confirmImportTrades()" style="padding:8px 22px;border-radius:8px;background:var(--purple);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:opacity .15s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'"disabled>Import Trades</button>
+      <button onclick="closeImportModal()" style="padding:8px 18px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);font-size:14px;color:var(--text2);cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-40)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Cancel</button>
+      <button id="import-submit-btn" onclick="confirmImportTrades()" style="padding:8px 22px;border-radius:8px;background:var(--purple);border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:opacity .15s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'"disabled>Import Trades</button>
     </div>
   </div>
 </div>

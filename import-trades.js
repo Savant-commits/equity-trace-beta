@@ -5,6 +5,7 @@ let _importFormat = 'csv';
 let _importFile = null;
 let _importedTrades = [];
 let _importTargetAccount = '';
+let _importTimezoneOptions = [];
 const _AUTO_IMPORT_STORAGE_KEY = 'etBrokerAutoImportConnections';
 let _brokerConnections = [];
 let _brokerPollTimers = {};
@@ -22,7 +23,7 @@ function openImportModal() {
     _importedTrades = [];
     _importTargetAccount = '';
 
-    const fileInput = $('import-file-input');
+    const fileInput = $('import-trades-file-input');
     if (fileInput) fileInput.value = '';
 
     $$('.import-format-btn').forEach(btn => {
@@ -49,16 +50,11 @@ function openImportModal() {
     $('import-error').style.display = 'none';
   }
 
-  const accountSelect = $('import-target-account');
-  accountSelect.innerHTML = '<option value="">Select account to import into...</option>';
-  if (Array.isArray(ACCOUNTS)) {
-    ACCOUNTS.forEach(a => {
-      const opt = document.createElement('option');
-      opt.value = a.phase || a.key || '';
-      opt.textContent = `${a.firm || 'Account'} - ${a.phase || a.key || ''}`;
-      accountSelect.appendChild(opt);
-    });
-  }
+  const accountInput = $('import-target-account');
+  const accountLabel = $('import-account-label');
+  if (accountInput) accountInput.value = '';
+  if (accountLabel) accountLabel.textContent = 'Select account to import into...';
+  populateImportAccountOptions();
 
   populateBrokerAccountOptions();
   renderBrokerConnections();
@@ -68,6 +64,7 @@ function openImportModal() {
     populateImportTimezoneOptions();
     const saved = localStorage.getItem('etImportSourceTimezone') || 'UTC+00:00';
     tzSel.value = saved;
+    updateImportTimezoneLabel(saved);
   }
 
   setTimeout(() => adjustContrastForBackgroundShift(), 50);
@@ -81,6 +78,74 @@ function closeImportModal() {
   // They are cleared only when openImportModal() finishes a fresh open
   // without a previous file, or after a successful import.
 }
+
+function populateImportAccountOptions() {
+  const list = $('import-account-list');
+  if (!list) return;
+
+  list.innerHTML = '';
+  if (!Array.isArray(ACCOUNTS) || ACCOUNTS.length === 0) {
+    list.innerHTML = '<div style="padding:14px 16px;color:var(--text3);font-size:12px">No accounts available. Create one before importing.</div>';
+    return;
+  }
+
+  ACCOUNTS.forEach(a => {
+    const accountValue = a.phase || a.key || '';
+    const accountLabel = `${a.firm || 'Account'} - ${a.phase || a.key || ''}`;
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.style.cssText = 'width:100%;text-align:left;padding:14px 16px;border:none;background:transparent;color:var(--text);font-family:var(--font-body);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:background .15s';
+    item.onmouseenter = function() { this.style.background = 'var(--bg4)'; };
+    item.onmouseleave = function() { this.style.background = 'transparent'; };
+    item.onclick = function() { selectImportTargetAccount(accountValue, accountLabel); };
+    item.innerHTML = `<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;flex:1;color:var(--text)">${accountLabel}</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M6 10l3-3 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    list.appendChild(item);
+  });
+}
+
+function selectImportTargetAccount(value, label) {
+  const accountInput = $('import-target-account');
+  const accountLabel = $('import-account-label');
+  const dropdown = $('import-account-dropdown');
+  const arrow = $('import-account-arrow');
+
+  if (accountInput) accountInput.value = value;
+  if (accountLabel) {
+    accountLabel.textContent = label || 'Select account to import into...';
+    accountLabel.style.color = value ? 'var(--text)' : 'var(--text3)';
+  }
+  if (dropdown) dropdown.style.display = 'none';
+  if (arrow) arrow.style.transform = 'rotate(0deg)';
+}
+
+function toggleImportAccountDropdown(event) {
+  event.stopPropagation();
+  const dropdown = $('import-account-dropdown');
+  const arrow = $('import-account-arrow');
+  if (!dropdown) return;
+
+  const isOpen = dropdown.style.display === 'block';
+  dropdown.style.display = isOpen ? 'none' : 'block';
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+document.addEventListener('click', function(e) {
+  const accountDropdown = $('import-account-dropdown');
+  const accountTrigger = $('import-account-trigger');
+  const accountArrow = $('import-account-arrow');
+  if (accountDropdown && accountTrigger && !accountTrigger.contains(e.target) && !accountDropdown.contains(e.target)) {
+    accountDropdown.style.display = 'none';
+    if (accountArrow) accountArrow.style.transform = 'rotate(0deg)';
+  }
+
+  const tzDropdown = $('import-timezone-dropdown');
+  const tzTrigger = $('import-timezone-trigger');
+  const tzArrow = $('import-timezone-arrow');
+  if (tzDropdown && tzTrigger && !tzTrigger.contains(e.target) && !tzDropdown.contains(e.target)) {
+    tzDropdown.style.display = 'none';
+    if (tzArrow) tzArrow.style.transform = 'rotate(0deg)';
+  }
+});
 
 // ── Format Selection ──
 function setImportFormat(format) {
@@ -101,7 +166,7 @@ function setImportFormat(format) {
 
 // ── File Input Handling ──
 function importFileClick() {
-  const fileInput = $('import-file-input');
+  const fileInput = $('import-trades-file-input');
   if (!fileInput) return;
   // Clear current value so picking the same file again still fires onchange.
   fileInput.value = '';
@@ -111,11 +176,11 @@ function importFileClick() {
 function handleImportDrop(e) {
   const files = e.dataTransfer ? e.dataTransfer.files : null;
   if (files && files.length > 0) {
-    handleImportFile({ files: files });
+    handleImportTradesFile({ files: files });
   }
 }
 
-function handleImportFile(input) {
+function handleImportTradesFile(input) {
   if (!input.files || input.files.length === 0) return;
 
   const file = input.files[0];
@@ -140,11 +205,14 @@ function parseImportFile() {
     try {
       const content = e.target.result;
       let trades = [];
+      const fileFormat = detectImportFormat(_importFile);
 
-      if (_importFormat === 'json') {
+      if (fileFormat === 'json') {
         trades = parseJSON(content);
+      } else if (fileFormat === 'html') {
+        trades = parseHTML(content);
       } else {
-        trades = parseCSV(content, _importFormat);
+        trades = parseCSV(content, fileFormat);
       }
 
       if (!trades.length) {
@@ -247,6 +315,49 @@ function normalizeHeader(h) {
     .trim()
     .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ');
+}
+
+function detectImportFormat(file) {
+  if (!file || !file.name) return 'csv';
+  const name = String(file.name).toLowerCase();
+  if (name.endsWith('.json')) return 'json';
+  if (name.endsWith('.html') || name.endsWith('.htm')) return 'html';
+  return 'csv';
+}
+
+function parseHTML(content) {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(content, 'text/html');
+  const tables = Array.from(doc.querySelectorAll('table'));
+  if (!tables.length) return [];
+
+  const table = tables.sort((a, b) => (b.rows.length || 0) - (a.rows.length || 0))[0];
+  const rows = Array.from(table.querySelectorAll('tr')).filter(row => row.querySelectorAll('th,td').length > 0);
+  if (!rows.length) return [];
+
+  let headerCells = Array.from(rows[0].querySelectorAll('th'));
+  if (!headerCells.length) {
+    headerCells = Array.from(rows[0].querySelectorAll('td'));
+  }
+
+  const headers = headerCells.map(cell => normalizeHeader(cell.textContent));
+  if (!headers.length) return [];
+
+  const trades = [];
+  for (let i = 1; i < rows.length; i++) {
+    const cells = Array.from(rows[i].querySelectorAll('td,th'));
+    if (!cells.length) continue;
+
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = cells[index] ? cells[index].textContent.trim() : '';
+    });
+
+    const trade = mapCSVRow(headers, row, 'html');
+    if (trade) trades.push(trade);
+  }
+
+  return trades;
 }
 
 function toRowMap(headers, values) {
@@ -469,15 +580,24 @@ function setImportSourceTimezone(tz) {
   try {
     if (typeof saveSetting === 'function') saveSetting('importTimezone', tz);
   } catch (_) {}
+  updateImportTimezoneLabel(tz);
+}
+
+function updateImportTimezoneLabel(tz, labelText) {
+  const input = $('import-source-timezone');
+  const label = $('import-timezone-label');
+  if (input) input.value = tz || input.value || 'UTC+00:00';
+  if (!label) return;
+  label.textContent = labelText || (tz ? tz : 'Select the timezone from your broker export...');
+  label.style.color = tz ? 'var(--text)' : 'var(--text3)';
 }
 
 function populateImportTimezoneOptions() {
-  const sel = $('import-source-timezone');
-  if (!sel) return;
+  const hiddenInput = $('import-source-timezone');
+  const list = $('import-timezone-list');
+  if (!hiddenInput || !list) return;
 
-  const current = localStorage.getItem('etImportSourceTimezone') || 'UTC+00:00';
-  sel.innerHTML = '';
-
+  const current = localStorage.getItem('etImportSourceTimezone') || hiddenInput.value || 'UTC+00:00';
   const cityByOffset = {
     '-12:00': 'Baker Island',
     '-11:00': 'Pago Pago',
@@ -528,38 +648,139 @@ function populateImportTimezoneOptions() {
     return `UTC${sign}${hh}:${mm}`;
   };
 
+  const options = [];
   for (let h = -12; h <= 14; h++) {
     const val = makeOffset(h * 60);
-    const opt = document.createElement('option');
-    opt.value = val;
     const key = val.replace('UTC', '');
-    opt.textContent = `${val} (${cityByOffset[key] || 'Local'})`;
-    sel.appendChild(opt);
+    options.push({ value: val, label: `${val} (${cityByOffset[key] || 'Local'})` });
   }
 
-  // Common non-hour offsets
   [
     -570, -210, 210, 270, 330, 345, 390, 525, 570, 630, 765, 825
   ].forEach(mins => {
     const val = makeOffset(mins);
-    if ([...sel.options].some(o => o.value === val)) return;
-    const opt = document.createElement('option');
-    opt.value = val;
+    if (options.some(o => o.value === val)) return;
     const key = val.replace('UTC', '');
-    opt.textContent = `${val} (${cityByOffset[key] || 'Local'})`;
-    sel.appendChild(opt);
+    options.push({ value: val, label: `${val} (${cityByOffset[key] || 'Local'})` });
   });
 
-  // Keep a few named zones for convenience
   ['America/New_York', 'Europe/London', 'Europe/Berlin', 'Asia/Kolkata', 'UTC'].forEach(tz => {
-    if ([...sel.options].some(o => o.value === tz)) return;
-    const opt = document.createElement('option');
-    opt.value = tz;
-    opt.textContent = tz;
-    sel.appendChild(opt);
+    if (options.some(o => o.value === tz)) return;
+    options.push({ value: tz, label: tz });
   });
 
-  sel.value = [...sel.options].some(o => o.value === current) ? current : 'UTC+00:00';
+  _importTimezoneOptions = options;
+  renderImportTimezoneOptions('');
+
+  const selected = options.find(o => o.value === current) || options.find(o => o.value === 'UTC+00:00');
+  if (selected) {
+    hiddenInput.value = selected.value;
+    updateImportTimezoneLabel(selected.value, selected.label);
+  }
+}
+
+function renderImportTimezoneOptions(filter) {
+  const list = $('import-timezone-list');
+  if (!list) return;
+
+  const query = String(filter || '').trim().toLowerCase();
+  const filtered = !_importTimezoneOptions.length ? [] : _importTimezoneOptions.filter(option => option.label.toLowerCase().includes(query));
+
+  list.innerHTML = '';
+  if (!filtered.length) {
+    list.innerHTML = '<div style="padding:14px 16px;color:var(--text3);font-size:12px">No matching timezones found.</div>';
+    return;
+  }
+
+  filtered.forEach(option => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.style.cssText = 'width:100%;text-align:left;padding:12px 14px;border:none;background:transparent;color:var(--text);font-family:var(--font-body);font-size:13px;cursor:pointer;display:block;transition:background .15s';
+    item.onmouseenter = function() { this.style.background = 'var(--bg4)'; };
+    item.onmouseleave = function() { this.style.background = 'transparent'; };
+    item.onclick = function() { selectImportSourceTimezone(option.value, option.label); };
+    item.innerHTML = `<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;color:var(--text)">${option.label}</span>`;
+    list.appendChild(item);
+  });
+}
+
+function selectImportSourceTimezone(value, label) {
+  const hiddenInput = $('import-source-timezone');
+  const dropdown = $('import-timezone-dropdown');
+  const arrow = $('import-timezone-arrow');
+  const search = $('import-timezone-search');
+
+  if (hiddenInput) hiddenInput.value = value;
+  updateImportTimezoneLabel(value, label);
+  setImportSourceTimezone(value);
+
+  if (dropdown) dropdown.style.display = 'none';
+  if (arrow) arrow.style.transform = 'rotate(0deg)';
+  if (search) {
+    search.value = '';
+    renderImportTimezoneOptions('');
+  }
+}
+
+function filterImportTimezoneOptions(query) {
+  renderImportTimezoneOptions(query);
+}
+
+function importTimezoneSearchKey(event) {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  const list = $('import-timezone-list');
+  if (!list || !list.firstChild) return;
+  const firstButton = list.querySelector('button');
+  if (firstButton) firstButton.click();
+}
+
+function positionImportTimezoneDropdown() {
+  const dropdown = $('import-timezone-dropdown');
+  const trigger = $('import-timezone-trigger');
+  if (!dropdown || !trigger) return;
+
+  const rect = trigger.getBoundingClientRect();
+  dropdown.style.width = Math.max(rect.width, 260) + 'px';
+  dropdown.style.left = rect.left + 'px';
+  dropdown.style.maxHeight = '260px';
+  dropdown.style.overflowY = 'auto';
+
+  const dropdownHeight = 260;
+  const aboveSpace = rect.top - 12;
+  const belowSpace = window.innerHeight - rect.bottom - 12;
+
+  if (aboveSpace >= dropdownHeight + 8 || aboveSpace > belowSpace) {
+    dropdown.style.top = 'auto';
+    dropdown.style.bottom = (window.innerHeight - rect.top + 4) + 'px';
+  } else {
+    dropdown.style.bottom = 'auto';
+    dropdown.style.top = (rect.bottom + 4) + 'px';
+  }
+}
+
+function toggleImportTimezoneDropdown(event) {
+  event.stopPropagation();
+  const dropdown = $('import-timezone-dropdown');
+  const arrow = $('import-timezone-arrow');
+  const search = $('import-timezone-search');
+  if (!dropdown) return;
+
+  const isOpen = dropdown.style.display === 'block';
+  if (isOpen) {
+    dropdown.style.display = 'none';
+    if (arrow) arrow.style.transform = 'rotate(0deg)';
+    return;
+  }
+
+  renderImportTimezoneOptions('');
+  positionImportTimezoneDropdown();
+  dropdown.style.display = 'block';
+  if (arrow) arrow.style.transform = 'rotate(180deg)';
+  if (search) {
+    search.value = '';
+    setTimeout(() => search.focus(), 0);
+  }
 }
 
 function _parseUtcOffsetMinutes(tz) {
@@ -722,7 +943,7 @@ function confirmImportTrades() {
   // Clear state after successful import
   _importedTrades = [];
   _importFile = null;
-  const fileInput = $('import-file-input');
+  const fileInput = $('import-trades-file-input');
   if (fileInput) fileInput.value = '';
   closeImportModal();
 

@@ -440,11 +440,12 @@ function switchView(el) {
 // ── UPDATE TRADE LOG STAT CARDS FROM filteredTrades ──
 function updateTlCards(trades) {
   const total  = trades.length;
-  const wins   = trades.filter(t => t.pnl > 0);
-  const losses = trades.filter(t => t.pnl < 0);
+  const wins   = trades.filter(t => getTradeResult(t) === 'win');
+  const losses = trades.filter(t => getTradeResult(t) === 'loss');
   const winCount  = wins.length;
   const lossCount = losses.length;
-  const winRate   = total > 0 ? ((winCount / total) * 100).toFixed(1) : '0.0';
+  const decidedTrades = winCount + lossCount;
+  const winRate   = decidedTrades > 0 ? ((winCount / decidedTrades) * 100).toFixed(1) : '0.0';
   const grossPnl  = trades.reduce((s, t) => s + t.pnl + (t.comm || 0), 0);
   const totalComm = trades.reduce((s, t) => s + (t.comm || 0), 0);
   const netPnl    = trades.reduce((s, t) => s + t.pnl, 0);
@@ -1559,8 +1560,9 @@ function applyFilters() {
   if (quickIds)           res = res.filter(t => quickIds.has(String(t.id)));
   else {
   if (dir !== 'all')      res = res.filter(t => t.dir === dir);
-  if (result === 'win')   res = res.filter(t => t.pnl > 0);
-  if (result === 'loss')  res = res.filter(t => t.pnl < 0);
+  if (result === 'win')   res = res.filter(t => getTradeResult(t) === 'win');
+  if (result === 'loss')  res = res.filter(t => getTradeResult(t) === 'loss');
+  if (result === 'be')    res = res.filter(t => getTradeResult(t) === 'be');
   if (quickSym)           res = res.filter(t => t.symbol.toUpperCase() === quickSym.toUpperCase());
   else if (symbols.length > 0) res = res.filter(t => symbols.includes(t.symbol));
   if (quickSession)       res = res.filter(t => (t.session||'').toLowerCase() === quickSession.toLowerCase());
@@ -6268,10 +6270,11 @@ function populateDashboard() {
   const total = groupedT.length;  // Count grouped trades as 1
   
   // For metrics, use grouped trades
-  const wins  = groupedT.filter(t => t.pnl > 0);
-  const losses = groupedT.filter(t => t.pnl < 0);
-  const breakEvens = groupedT.filter(t => t.pnl === 0);
-  const winRate = total ? ((wins.length / total) * 100).toFixed(1) : 0;
+  const wins  = groupedT.filter(t => getTradeResult(t) === 'win');
+  const losses = groupedT.filter(t => getTradeResult(t) === 'loss');
+  const breakEvens = groupedT.filter(t => getTradeResult(t) === 'be');
+  const decidedTrades = wins.length + losses.length;
+  const winRate = decidedTrades ? ((wins.length / decidedTrades) * 100).toFixed(1) : 0;
   const netPnl  = groupedT.reduce((s, t) => s + t.pnl, 0);
   const grossPnl = groupedT.reduce((s, t) => s + (t.pnl + (t._combinedComm || t.comm||0)), 0);
   const totalComm = groupedT.reduce((s, t) => s + (t._combinedComm || t.comm||0), 0);
@@ -6317,7 +6320,8 @@ function populateDashboard() {
   const sorted = [...groupedT].sort((a,b) => (b.date+b.time).localeCompare(a.date+a.time));
   let streak = 0, streakType = null;
   for (const t of sorted) {
-    const result = t.pnl > 0 ? 'W' : t.pnl < 0 ? 'L' : 'BE';
+    const res = getTradeResult(t);
+    const result = res === 'win' ? 'W' : res === 'loss' ? 'L' : 'BE';
     if (streakType === null && result !== 'BE') { streakType = result; streak = 1; }
     else if (result === streakType) streak++;
     else break;
@@ -7816,7 +7820,8 @@ function calculateConsistencyRules(accountName) {
     });
 
     const totalTrades = trades.length;
-    const winRate = totalTrades > 0 ? (totalWinTrades / totalTrades) * 100 : 0;
+    const decidedTrades = totalWinTrades + totalLossTrades;
+    const winRate = decidedTrades > 0 ? (totalWinTrades / decidedTrades) * 100 : 0;
     const profitFactor = totalLosses > 0 ? totalWins / totalLosses : (totalWins > 0 ? Infinity : 0);
     const avgWin = totalWinTrades > 0 ? totalWins / totalWinTrades : 0;
     const avgLoss = totalLossTrades > 0 ? totalLosses / totalLossTrades : 0;
