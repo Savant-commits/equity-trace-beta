@@ -1445,6 +1445,7 @@ const DEFAULT_SETTINGS = {
   timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
   displayTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
   tradingTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+  calendarTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
   importTimezone: 'UTC+00:00',
   dateFormat: 'YYYY-MM-DD',
   timeFormat: '24h',
@@ -1518,6 +1519,7 @@ function loadSettings() {
     merged.timezone = merged.displayTimezone;
     merged.tradingTimezone = s.tradingTimezone || merged.displayTimezone || DEFAULT_SETTINGS.tradingTimezone;
     merged.importTimezone = s.importTimezone || localStorage.getItem('etImportSourceTimezone') || DEFAULT_SETTINGS.importTimezone;
+    merged.calendarTimezone = s.calendarTimezone || merged.displayTimezone || DEFAULT_SETTINGS.calendarTimezone;
     return merged;
   } catch(e) { return {...DEFAULT_SETTINGS}; }
 }
@@ -2566,8 +2568,8 @@ function exportReport(fmt) {
     {icon:'📋', label:'Trade Journal',      sub:'All your trades',        view:'tradelog'},
     {icon:'📈', label:'Analytics',          sub:'Charts & heatmap',       view:'analytics'},
     {icon:'🔬', label:'Advanced Analytics', sub:'Equity curve & streaks', view:'advanalytics'},
-    {icon:'📖', label:'Entry Models',           sub:'Your trading rules',     view:'playbook'},
     {icon:'📅', label:'Calendar',           sub:'Calendar view',          view:'calendar'},
+    {icon:'📖', label:'Entry Models',       sub:'Your trading rules',     view:'playbook'},
     {icon:'📑', label:'Reports',            sub:'Monthly summaries',      view:'reports'},
     {icon:'⚙️',  label:'Settings',           sub:'Preferences',            view:'settings'},
   ];
@@ -3344,3 +3346,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initProfileUI();
   }, 400);
 });
+

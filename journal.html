@@ -665,14 +665,14 @@ window.addEventListener('DOMContentLoaded', function() {
     <div class="nav-item" data-view="advanalytics" onclick="if(typeof switchView==='function') { console.log('Clicked advanalytics'); switchView(this); } else { console.error('switchView not defined'); }">
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><polyline points="1,13 4,8 7,10 10,4 13,6 15,2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/></svg></span><span class="nav-text"> Trend Report</span>
     </div>
+    <div class="nav-item" onclick="if(typeof switchView==='function') { console.log('Clicked calendar'); switchView(this); } else { console.error('switchView not defined'); }" data-view="calendar">
+      <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5" opacity=".9"/></svg></span><span class="nav-text"> Calendar</span>
+    </div>
     <div class="nav-item" data-view="playbook" onclick="if(typeof switchView==='function') { console.log('Clicked playbook'); switchView(this); } else { console.error('switchView not defined'); }">
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3C8 3 5 2 2 3v9c3-1 6 0 6 0V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity=".9"/><path d="M8 3c0 0 3-1 6 0v9c-3-1-6 0-6 0V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity=".9"/></svg></span><span class="nav-text"> Entry Models</span>
     </div>
     <div class="nav-item" data-view="accounts" onclick="if(typeof switchView==='function') { console.log('Clicked accounts'); switchView(this); } else { console.error('switchView not defined'); }">
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".9"/></svg></span><span class="nav-text"> Accounts</span>
-    </div>
-    <div class="nav-item" onclick="if(typeof switchView==='function') { console.log('Clicked calendar'); switchView(this); } else { console.error('switchView not defined'); }" data-view="calendar">
-      <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5" opacity=".9"/></svg></span><span class="nav-text"> Calendar</span>
     </div>
     <div class="nav-item" onclick="if(typeof switchView==='function') { console.log('Clicked reports'); switchView(this); } else { console.error('switchView not defined'); }" data-view="reports">
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="8" y1="1.5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><polyline points="5,4.5 8,1.5 11,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".9"/></svg></span><span class="nav-text"> Reports</span>
@@ -692,7 +692,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <button id="mob-ham-btn" onclick="toggleMobileSidebar()" aria-label="Open navigation">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect y="2" width="16" height="2" rx="1" fill="currentColor"/><rect y="7" width="16" height="2" rx="1" fill="currentColor"/><rect y="12" width="16" height="2" rx="1" fill="currentColor"/></svg>
     </button>
-    <div style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:6px 13px">
+    <div id="live-date-wrap" style="display:flex;align-items:center;gap:6px;font-family:var(--font-mono);background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:6px 13px">
       <svg width="10" height="10" viewBox="0 0 16 16" fill="var(--text3)"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
       <span id="live-date" style="font-size:13.5px;color:var(--text);letter-spacing:.03em;font-weight:600"></span>
       <span style="color:var(--text3)"> - </span>
@@ -2215,16 +2215,23 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- â”€â”€ Calendar Header â”€â”€ -->
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
         <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Performance Calendar</div>
-        <div style="display:flex;align-items:center;gap:8px">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div style="position:relative;width:220px" id="cal-acct-bar"></div>
           <button onclick="calNav(-1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">‹</button>
           <div id="cal-month-label" style="font-family:var(--font-display);font-weight:600;font-size:15px;min-width:140px;text-align:center"></div>
           <button onclick="calNav(1)" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">›</button>
           <button onclick="calGoToday()" id="cal-today-btn" style="background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:11px;font-family:var(--font-mono);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">TODAY</button>
+          <div id="cal-tz-switcher-wrap" style="position:relative;">
+            <button onclick="toggleCalTzSwitcher(event)" id="cal-tz-btn" title="Calendar timezone" style="display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border2);color:var(--text2);padding:5px 12px;border-radius:7px;cursor:pointer;font-size:11px;font-family:var(--font-mono);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
+              <span id="cal-tz-label">UTC</span>
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div id="cal-tz-switcher-dd" style="display:none;position:absolute;top:calc(100% + 6px);right:0;min-width:240px;max-height:300px;overflow:auto;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.35);z-index:300">
+              <div id="cal-tz-switcher-list" style="padding:6px"></div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- â”€â”€ Account Selector â”€â”€ -->
-      <div style="position:relative;width:fit-content" id="cal-acct-bar"></div>
 
       <!-- â”€â”€ Monthly Stats Bar â”€â”€ -->
       <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px" id="cal-stats-bar">
@@ -3105,11 +3112,12 @@ window.addEventListener('DOMContentLoaded', function() {
                   <li><code>1</code> - Dashboard</li>
                   <li><code>2</code> - Trade Journal</li>
                   <li><code>3</code> - Analytics</li>
-                  <li><code>4</code> - Advanced Analytics</li>
-                  <li><code>5</code> - Entry Models (Playbook)</li>
-                  <li><code>6</code> - Calendar</li>
-                  <li><code>7</code> - Reports</li>
-                  <li><code>8</code> - Settings</li>
+                  <li><code>4</code> - Trend Report</li>
+                  <li><code>5</code> - Calendar</li>
+                  <li><code>6</code> - Entry Models (Playbook)</li>
+                  <li><code>7</code> - Accounts</li>
+                  <li><code>8</code> - Reports</li>
+                  <li><code>9</code> - Settings</li>
                   <li><code>Cmd+K</code> / <code>Ctrl+K</code> - Command palette</li>
                   <li><code>Backspace</code> - Close detail panel / go back</li>
                   <li><code>Ctrl+Enter</code> - Save trade (when form is open)</li>
@@ -3705,20 +3713,24 @@ window.addEventListener('DOMContentLoaded', function() {
             <kbd style="background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 2px 0 var(--border3)">4</kbd>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;background:var(--bg4)">
-            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Entry Models</span>
+            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Calendar</span>
             <kbd style="background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 2px 0 var(--border3)">5</kbd>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;background:var(--bg4)">
-            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Calendar</span>
+            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Entry Models</span>
             <kbd style="background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 2px 0 var(--border3)">6</kbd>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;background:var(--bg4)">
-            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Reports</span>
+            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Accounts</span>
             <kbd style="background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 2px 0 var(--border3)">7</kbd>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;background:var(--bg4)">
-            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Settings</span>
+            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Reports</span>
             <kbd style="background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 2px 0 var(--border3)">8</kbd>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;background:var(--bg4)">
+            <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Settings</span>
+            <kbd style="background:var(--bg2);border:1px solid var(--border2);border-radius:5px;padding:2px 7px;font-family:var(--font-mono);font-size:11px;color:var(--text);box-shadow:0 2px 0 var(--border3)">9</kbd>
           </div>
           <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:7px;background:var(--bg4)">
             <span style="font-size:11.5px;color:var(--text2);font-family:var(--font-body)">Page back</span>

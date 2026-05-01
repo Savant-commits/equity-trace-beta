@@ -14,7 +14,11 @@ function initAccountCalendarModule() {
 
   function calInit() {
     const now = new Date();
-    if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
+    const currentTz = getCalendarTimezone();
+    const nowParts = (typeof _formatPartsInTimezone === 'function')
+      ? _formatPartsInTimezone(now, currentTz)
+      : { year: now.getFullYear(), month: now.getMonth() + 1 };
+    if (calYear === undefined) { calYear = nowParts.year; calMonth = nowParts.month - 1; }
     // Populate account selector (reuses same buildAnAccountBar as Analytics)
     const bar = $('cal-acct-bar');
     if (bar && typeof buildAnAccountBar === 'function') bar.innerHTML = buildAnAccountBar();
@@ -34,7 +38,64 @@ function initAccountCalendarModule() {
   };
 
   window.calNav = function(dir) { calMonth += dir; if (calMonth > 11) { calMonth = 0; calYear++; } if (calMonth < 0) { calMonth = 11; calYear--; } renderCal(); };
-  window.calGoToday = function() { const n = new Date(); calYear = n.getFullYear(); calMonth = n.getMonth(); renderCal(); };
+  window.calGoToday = function() {
+    const now = new Date();
+    const tz = getCalendarTimezone();
+    const nowParts = (typeof _formatPartsInTimezone === 'function')
+      ? _formatPartsInTimezone(now, tz)
+      : { year: now.getFullYear(), month: now.getMonth() + 1 };
+    calYear = nowParts.year;
+    calMonth = nowParts.month - 1;
+    renderCal();
+  };
+  window.toggleCalTzSwitcher = function(event) {
+    event.stopPropagation();
+    const dd = $('cal-tz-switcher-dd');
+    if (!dd) return;
+    if (dd.style.display === 'block') { dd.style.display = 'none'; return; }
+    const list = $('cal-tz-switcher-list');
+    if (!list) return;
+    list.innerHTML = '';
+    const current = getCalendarTimezone();
+    TZ_GROUPS.forEach(group => {
+      const grpLabel = document.createElement('div');
+      grpLabel.style.cssText = 'font-size:9px;letter-spacing:.1em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;padding:8px 10px 4px;';
+      grpLabel.textContent = group.group;
+      list.appendChild(grpLabel);
+      group.zones.forEach(zone => {
+        const btn = document.createElement('div');
+        const isActive = zone.tz === current;
+        btn.style.cssText = `display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:11px;font-family:var(--font-body);color:${isActive?'#b891f5':'var(--text2)'};background:${isActive?'var(--ac-15)':'transparent'};transition:background .1s`;
+        btn.innerHTML = `<span>${zone.label}</span>${isActive?'<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#b891f5" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}`;
+        btn.onmouseenter = () => { if (!isActive) btn.style.background = 'var(--ac-08)'; };
+        btn.onmouseleave = () => { if (!isActive) btn.style.background = 'transparent'; };
+        btn.onclick = () => { selectCalTz(zone.tz); };
+        list.appendChild(btn);
+      });
+    });
+    dd.style.display = 'block';
+    setTimeout(() => {
+      document.addEventListener('click', closeCalTzSwitcher);
+    }, 0);
+  };
+
+  function closeCalTzSwitcher(e) {
+    const wrap = $('cal-tz-switcher-wrap');
+    const dd = $('cal-tz-switcher-dd');
+    if (!wrap || !dd) return;
+    if (!wrap.contains(e.target)) {
+      dd.style.display = 'none';
+      document.removeEventListener('click', closeCalTzSwitcher);
+    }
+  }
+
+  function selectCalTz(tz) {
+    if (typeof saveSetting === 'function') saveSetting('calendarTimezone', tz);
+    renderCalendarTimezoneLabel();
+    renderCal();
+    const dd = $('cal-tz-switcher-dd');
+    if (dd) dd.style.display = 'none';
+  };
 
   function getAcctTrades() {
     const all = (typeof TRADES !== 'undefined') ? TRADES : [];
@@ -50,12 +111,37 @@ function initAccountCalendarModule() {
     return acctName ? all.filter(t => (t.account||'') === acctName) : all;
   }
 
-  function buildDayMap(trades) {
+  function getCalendarTimezone() {
+    try {
+      const s = (typeof loadSettings === 'function') ? loadSettings() : {};
+      return s.calendarTimezone || s.displayTimezone || s.timezone || 'UTC';
+    } catch (_) {
+      return 'UTC';
+    }
+  }
+
+  function getTradeCalendarDate(trade, calendarTz) {
+    if (!trade || !trade.date) return '';
+    if (!trade.time) return trade.date;
+    if (typeof convertTradeDateTimeBetweenZones !== 'function') return trade.date;
+    try {
+      const journalTz = (typeof getJournalTimezone === 'function')
+        ? getJournalTimezone()
+        : ((typeof loadSettings === 'function') ? loadSettings().tradingTimezone || loadSettings().displayTimezone || loadSettings().timezone : 'UTC');
+      const converted = convertTradeDateTimeBetweenZones(trade.date, trade.time, journalTz, calendarTz);
+      return converted.date || trade.date;
+    } catch (_) {
+      return trade.date;
+    }
+  }
+
+  function buildDayMap(trades, calendarTz) {
     const map = {};
     trades.forEach(t => {
-      if (!map[t.date]) map[t.date] = { pnl: 0, trades: 0 };
-      map[t.date].pnl += t.pnl;
-      map[t.date].trades++;
+      const dateKey = getTradeCalendarDate(t, calendarTz) || t.date || '';
+      if (!map[dateKey]) map[dateKey] = { pnl: 0, trades: 0 };
+      map[dateKey].pnl += t.pnl;
+      map[dateKey].trades++;
     });
     return map;
   }
@@ -65,21 +151,28 @@ function initAccountCalendarModule() {
     return (v >= 0 ? '+$' : '-$') + abs;
   }
 
+  function renderCalendarTimezoneLabel() {
+    const label = $('cal-tz-label');
+    if (label) label.textContent = _tzShortLabel(getCalendarTimezone());
+  }
+
   function renderCal() {
     const label = $('cal-month-label');
     if (label) label.textContent = MONTHS[calMonth] + ' ' + calYear;
+    renderCalendarTimezoneLabel();
 
+    const calendarTz = getCalendarTimezone();
     const trades = getAcctTrades();
-    const dayMap = buildDayMap(trades);
+    const dayMap = buildDayMap(trades, calendarTz);
 
     // Monthly trades
     const monthTrades = trades.filter(t => {
-      const d = new Date(t.date);
-      return d.getFullYear() === calYear && d.getMonth() === calMonth;
+      const ds = getTradeCalendarDate(t, calendarTz);
+      return ds.startsWith(`${calYear}-${String(calMonth+1).padStart(2,'0')}-`);
     });
 
     // Monthly stats
-    const tradedDays = new Set(monthTrades.map(t => t.date));
+    const tradedDays = new Set(monthTrades.map(t => getTradeCalendarDate(t, calendarTz)));
     let winDays = 0, lossDays = 0, beakDays = 0, monthPnl = 0;
     tradedDays.forEach(d => {
       const p = dayMap[d]?.pnl || 0;
@@ -113,8 +206,10 @@ function initAccountCalendarModule() {
     const lastDay = new Date(calYear, calMonth + 1, 0);
     const startDow = (firstDay.getDay() + 6) % 7; // 0=Mon
     const totalDays = lastDay.getDate();
-    const today = new Date();
-    const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+    const todayParts = (typeof _formatPartsInTimezone === 'function')
+      ? _formatPartsInTimezone(new Date(), getCalendarTimezone())
+      : { year: new Date().getFullYear(), month: new Date().getMonth() + 1, day: new Date().getDate() };
+    const todayStr = `${todayParts.year}-${String(todayParts.month).padStart(2,'0')}-${String(todayParts.day).padStart(2,'0')}`;
 
     // Build weeks array
     const cells = [];

@@ -368,9 +368,19 @@ function switchView(el) {
     const acctWrap = $('acct-dropdown-wrap');
     if (acctWrap) acctWrap.style.display = (v === 'dashboard' || v === 'tradelog') ? '' : 'none';
 
-    // Show Add Trade button only on Dashboard (page 1) and Trade Log (page 2)
+    // Topbar visibility rules
+    const liveDateWrap = $('live-date-wrap');
+    const tzSwitcher = $('tz-switcher-wrap');
+    const topbarRight = document.querySelector('.topbar-right');
+    const importBtn = $('import-trades-btn');
     const addTradeBtn = $('add-trade-btn-topbar');
-    if (addTradeBtn) addTradeBtn.style.display = (v === 'dashboard' || v === 'tradelog') ? '' : 'none';
+    const showTopbarButtons = (v === 'dashboard' || v === 'tradelog' || v === 'accounts');
+    const showTzSwitcher = (v === 'dashboard' || v === 'accounts');
+    if (liveDateWrap) liveDateWrap.style.display = v === 'dashboard' ? '' : 'none';
+    if (tzSwitcher) tzSwitcher.style.display = showTzSwitcher ? '' : 'none';
+    if (topbarRight) topbarRight.style.display = showTopbarButtons ? '' : 'none';
+    if (importBtn) importBtn.style.display = showTopbarButtons ? '' : 'none';
+    if (addTradeBtn) addTradeBtn.style.display = showTopbarButtons ? '' : 'none';
 
     // Initialize view-specific content
     try {
@@ -1328,6 +1338,7 @@ function closeFilterPanel() {
     if (btn) btn.classList.remove('active');
     updateFilterBtnState();
     document.removeEventListener('click', filterPanelOutsideClick);
+    if (typeof trcUpdateHover === 'function') trcUpdateHover();
   }
 }
 
@@ -1363,6 +1374,10 @@ function toggleFilterPanel() {
     updateFilterBtnState();
     document.removeEventListener('click', filterPanelOutsideClick);
   } else {
+    if (hasActiveFilters()) {
+      resetFilters();
+      return;
+    }
     panel.style.maxHeight = '400px';
     panel.style.opacity = '1';
     panel.style.padding = '14px 18px';
@@ -1485,8 +1500,18 @@ function updateFilterBtnState() {
   const filterBtn = $('filter-panel-btn');
   const filterDot = $('filter-dot');
   if (filterDot) filterDot.style.display = 'none';
-  if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 8px var(--ac-80), 0 0 16px var(--ac-40)' : '';
+  if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 12px var(--ac-80), 0 0 28px var(--ac-40)' : '';
   if (filterBtn) filterBtn.style.borderColor = hasFilter ? 'var(--ac-60)' : '';
+}
+
+function hasActiveFilters() {
+  const dir     = document.querySelector('.fpill[data-group="dir"].active')?.dataset.val || 'all';
+  const result  = document.querySelector('.fpill[data-group="result"].active')?.dataset.val || 'all';
+  const symbols  = [...$$('.fpill[data-group="symbol"].active')];
+  const sessions = [...$$('.fpill[data-group="session"].active')];
+  const emotionsActive = [...$$('.fpill[data-group="emotion"].active')];
+  const acctFilter = $('fp-account')?.value || '';
+  return dir !== 'all' || result !== 'all' || symbols.length > 0 || sessions.length > 0 || emotionsActive.length > 0 || calFromVal || calToVal || acctFilter;
 }
 
 function resetFilters() {
@@ -1521,6 +1546,7 @@ function resetFilters() {
   // search bar removed
   applyFilters();
   closeFilterPanel();
+  if (typeof trcUpdateHover === 'function') trcUpdateHover();
 }
 
 function filterDir(el, dir) {
@@ -1581,7 +1607,7 @@ function applyFilters() {
   const filterBtn = $('filter-panel-btn');
   const filterDot = $('filter-dot');
   if (filterDot) filterDot.style.display = 'none';
-  if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 8px var(--ac-80), 0 0 16px var(--ac-40)' : '';
+  if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 12px var(--ac-80), 0 0 28px var(--ac-40)' : '';
   if (filterBtn) filterBtn.style.borderColor = hasFilter ? 'var(--ac-60)' : '';
 
   if (!res || res.length === 0) {
@@ -3095,9 +3121,16 @@ function animateCounter(el, targetVal, prefix='', suffix='', duration=600) {
   requestAnimationFrame(tick);
 }
 
-function anNavigateBestWorst(which) {
-  const card = $('an-' + which + '-card');
-  const id = card && card.dataset.tradeId;
+function anNavigateBestWorst(whichOrId, toastLabel) {
+  let id = null;
+  if (whichOrId === 'best' || whichOrId === 'worst') {
+    const card = $('an-' + whichOrId + '-card');
+    id = card && card.dataset.tradeId;
+    toastLabel = toastLabel || (whichOrId === 'best' ? '🏆 Best trade' : '⚠️ Worst trade');
+  } else {
+    id = String(whichOrId || '');
+    toastLabel = toastLabel || 'Selected trade';
+  }
   if (!id) return;
   const trade = TRADES.find(t => String(t.id) === id);
   if (!trade) return;
@@ -3117,7 +3150,7 @@ function anNavigateBestWorst(which) {
       }
     }, 120);
   }, 60);
-  showToast((which === 'best' ? '🏆 Best' : '⚠️ Worst') + ' trade — ' + trade.symbol, 'info', '', 2000);
+  showToast(toastLabel + ' — ' + trade.symbol, 'info', '', 2000);
 }
 
 function updateAnalyticsCards() {
@@ -5398,10 +5431,10 @@ function switchCapView(view) {
 function renderAcctList() {
   const allRow = `
     <div onclick="selectAcct(-1)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;transition:background .12s;background:${selectedAcct===-1?'var(--ac-10)':'transparent'};border-left:2px solid ${selectedAcct===-1?'var(--purple)':'transparent'}" onmouseenter="this.style.background='var(--ac-07)'" onmouseleave="this.style.background='${selectedAcct===-1?'var(--ac-10)':'transparent'}'">
-      <div style="width:28px;height:28px;border-radius:7px;background:var(--ac-18);border:1px solid var(--ac-30);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:var(--font-mono);color:var(--purple);flex-shrink:0">∑</div>
+      <div style="width:28px;height:28px;border-radius:7px;background:var(--ac-18);border:1px solid var(--ac-30);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;font-family:var(--font-mono);color:var(--purple);flex-shrink:0">∑</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:13.5px;font-weight:600;color:${selectedAcct===-1?'var(--text)':'var(--text2)'}">All Accounts</div>
-        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Combined view</div>
+        <div style="font-size:14.5px;font-weight:600;color:${selectedAcct===-1?'var(--text)':'var(--text2)'}">All Accounts</div>
+        <div style="font-size:12px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Combined view</div>
       </div>
       ${selectedAcct===-1?'<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
     </div>`;
@@ -5438,11 +5471,11 @@ function renderAcctList() {
           <span title="${dotTitle}" style="position:absolute;bottom:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:${dotColor};border:1.5px solid var(--bg2)"></span>
         </div>
         <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
-          <div style="font-size:13.5px;font-weight:600;color:${isSelected?'var(--text)':'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
-          <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap">${phaseLabel}</div>
+          <div style="font-size:14.5px;font-weight:600;color:${isSelected?'var(--text)':'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
+          <div style="font-size:12px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap">${phaseLabel}</div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0;margin-left:8px">
-          <span style="font-size:13px;font-weight:700;font-family:var(--font-mono);color:var(--text)">$${(a.startBal||0).toLocaleString()}</span>
+          <span style="font-size:14px;font-weight:600;font-family:var(--font-mono);color:var(--text)">$${(a.startBal||0).toLocaleString()}</span>
           ${isSelected?'<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':'<span style="height:12px"></span>'}
         </div>
       </div>
@@ -5450,10 +5483,10 @@ function renderAcctList() {
   }
 
   const sectionLabel = (label, count) =>
-    `<div style="padding:6px 14px 4px;font-size:26px;font-weight:600;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;display:flex;align-items:center;gap:10px">
+    `<div style="padding:6px 14px 4px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;display:flex;align-items:center;gap:10px">
       <span>${label}</span>
       <span style="flex:1;height:1px;background:var(--border)"></span>
-      <span style="background:var(--bg5);color:var(--text3);border-radius:10px;padding:3px 8px;font-size:18px">${count}</span>
+      <span style="background:var(--bg5);color:var(--text3);border-radius:10px;padding:3px 8px;font-size:11px">${count}</span>
     </div>`;
 
   let html = allRow;
@@ -5660,10 +5693,10 @@ function renderTopbarAcctList() {
 
   const allRowHtml = `
     <div onclick="selectAcctFromTopbar(-1)" style="display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;transition:background .12s;border-radius:8px;background:${selectedAcct===-1?'var(--ac-12)':'transparent'};" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${selectedAcct===-1?'var(--ac-12)':'transparent'}'">
-      <div style="width:30px;height:30px;border-radius:8px;background:var(--ac-18);border:1px solid var(--ac-30);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-mono);color:var(--purple);flex-shrink:0">∑</div>
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--ac-18);border:1px solid var(--ac-30);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--font-mono);color:var(--purple);flex-shrink:0">∑</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:12px;font-weight:600;color:var(--text)">All Accounts</div>
-        <div style="font-size:9.5px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Combined portfolio view</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text)">All Accounts</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Combined portfolio view</div>
       </div>
       ${selectedAcct===-1?'<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
     </div>`;
@@ -5680,8 +5713,8 @@ function renderTopbarAcctList() {
           <span style="position:absolute;bottom:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:${dotColor};border:1.5px solid var(--bg2)"></span>
         </div>
         <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:600;color:${isSelected?'var(--text)':'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
-          <div style="font-size:9.5px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">${formatAccountPhase(a)} · ${a.balance}</div>
+          <div style="font-size:14px;font-weight:600;color:${isSelected?'var(--text)':'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">${formatAccountPhase(a)} · ${a.balance}</div>
         </div>
         <div style="flex-shrink:0">
           ${isSelected?'<svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="margin-top:2px"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
@@ -7423,11 +7456,11 @@ document.addEventListener('keydown', function(e) {
     case '4':
       document.querySelector('[data-view="advanalytics"]')?.click(); break;
     case '5':
-      document.querySelector('[data-view="playbook"]')?.click(); break;
-    case '6':
-      document.querySelector('[data-view="accounts"]')?.click(); break;
-    case '7':
       document.querySelector('[data-view="calendar"]')?.click(); break;
+    case '6':
+      document.querySelector('[data-view="playbook"]')?.click(); break;
+    case '7':
+      document.querySelector('[data-view="accounts"]')?.click(); break;
     case '8':
       document.querySelector('[data-view="reports"]')?.click(); break;
     case '9':

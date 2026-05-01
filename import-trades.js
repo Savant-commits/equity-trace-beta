@@ -98,9 +98,40 @@ function populateImportAccountOptions() {
     item.onmouseenter = function() { this.style.background = 'var(--bg4)'; };
     item.onmouseleave = function() { this.style.background = 'transparent'; };
     item.onclick = function() { selectImportTargetAccount(accountValue, accountLabel); };
-    item.innerHTML = `<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;flex:1;color:var(--text)">${accountLabel}</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M6 10l3-3 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+    item.innerHTML = `<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;flex:1;color:var(--text)">${accountLabel}</span>${renderImportAccountStatusBadge(a)}<svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><path d="M6 10l3-3 3 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
     list.appendChild(item);
   });
+}
+
+function getImportAccountStatus(account) {
+  const acctName = account.key || account.phase || '';
+  const acctTrades = Array.isArray(window.TRADES) ? TRADES.filter(t => (t.account || '') === acctName) : [];
+  const netPnl = acctTrades.reduce((sum, t) => sum + (parseNumber(t.pnl || t.PnL || 0)), 0);
+  const startBal = account.startBal || 0;
+  const maxDrawdown = account.maxDrawdown || 8;
+  const dailyLoss = account.dailyLoss || 4;
+  const profitTarget = account.profitTarget || 0;
+  const ml = startBal * (maxDrawdown / 100);
+  const dl = startBal * (dailyLoss / 100);
+  const dayMap = {};
+  acctTrades.forEach(t => { dayMap[t.date] = (dayMap[t.date] || 0) + (t.pnl || 0); });
+  const worstDay = Math.min(0, ...Object.values(dayMap).concat([0]));
+  if (ml > 0 && netPnl <= -ml) return 'breached';
+  if (dl > 0 && Math.abs(worstDay) >= dl) return 'breached';
+  const pt = startBal * (profitTarget / 100);
+  if (profitTarget > 0 && netPnl >= pt) return 'passed';
+  return 'active';
+}
+
+function renderImportAccountStatusBadge(account) {
+  const status = getImportAccountStatus(account);
+  if (status === 'breached') {
+    return '<span style="font-size:9px;font-family:var(--font-mono);font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.3);white-space:nowrap;flex-shrink:0">BREACHED</span>';
+  }
+  if (status === 'passed') {
+    return '<span style="font-size:9px;font-family:var(--font-mono);font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--ac-12);color:#b891f5;border:1px solid var(--ac-30);white-space:nowrap;flex-shrink:0">PASSED</span>';
+  }
+  return '<span style="font-size:9px;font-family:var(--font-mono);font-weight:700;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:rgba(46,204,138,.12);color:var(--green);border:1px solid rgba(46,204,138,.25);white-space:nowrap;flex-shrink:0">ACTIVE</span>';
 }
 
 function selectImportTargetAccount(value, label) {
@@ -537,11 +568,15 @@ function normalizeDate(dateStr) {
     }
 
     const d = new Date(c, month - 1, day);
-    if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];
+    if (!isNaN(d.getTime())) {
+      return `${c}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
   }
 
   const d2 = new Date(raw);
-  if (!isNaN(d2.getTime())) return d2.toISOString().split('T')[0];
+  if (!isNaN(d2.getTime())) {
+    return `${d2.getFullYear()}-${String(d2.getMonth() + 1).padStart(2, '0')}-${String(d2.getDate()).padStart(2, '0')}`;
+  }
 
   return '';
 }

@@ -1716,12 +1716,28 @@ function initSymbolBreakdown() {
   const nets    = symbols.map(s => parseFloat(map[s].net.toFixed(2)));
   const bestSym  = symbols[0];
   const worstSym = symbols[symbols.length - 1];
+  const bestTrade = anTrades.reduce((best,t) => t.pnl > best.pnl ? t : best, anTrades[0]);
+  const worstTrade = anTrades.reduce((worst,t) => t.pnl < worst.pnl ? t : worst, anTrades[0]);
 
   // Pills
   const setEl = (id, txt, color) => { const el = $(id); if(el){el.textContent=txt; if(color)el.style.color=color;} };
   setEl('sb-pill-symbols', symbols.length + ' symbol' + (symbols.length !== 1 ? 's' : ''));
   setEl('sb-pill-best',  'Best ' + bestSym,  'var(--green)');
   setEl('sb-pill-worst', 'Worst ' + worstSym, 'var(--red)');
+  const bestPill = $('sb-pill-best');
+  const worstPill = $('sb-pill-worst');
+  if (bestPill && bestTrade) {
+    bestPill.dataset.tradeId = String(bestTrade.id);
+    bestPill.title = 'Jump to best trade in Trade Log';
+    bestPill.style.cursor = 'pointer';
+    bestPill.onclick = () => anNavigateBestWorst(bestPill.dataset.tradeId, '🏆 Best trade');
+  }
+  if (worstPill && worstTrade) {
+    worstPill.dataset.tradeId = String(worstTrade.id);
+    worstPill.title = 'Jump to worst trade in Trade Log';
+    worstPill.style.cursor = 'pointer';
+    worstPill.onclick = () => anNavigateBestWorst(worstPill.dataset.tradeId, '⚠️ Worst trade');
+  }
 
   const isDark  = !document.documentElement.classList.contains('light');
   const isMed2  = document.documentElement.classList.contains('medium');
