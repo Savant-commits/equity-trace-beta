@@ -3693,6 +3693,97 @@ function initAnalyticsCharts() {
     }
   };
 
+  const sessionZones = [
+    { name: 'Asia', start: 19, end: 24 },
+    { name: 'True Day Open', start: 0, end: 2 },
+    { name: 'London', start: 2, end: 5 },
+    { name: 'NY AM', start: 7, end: 10 },
+    { name: 'London Close', start: 10, end: 12 },
+    { name: 'NY PM', start: 12, end: 16 }
+  ];
+
+  const activeSessionZones = sessionZones.filter(zone =>
+    hourEntries.some(entry => entry.hour >= zone.start && entry.hour < zone.end)
+  );
+
+  const sessionDividerPlugin = {
+    id: 'sessionDividers',
+    afterDraw(chart) {
+      const { ctx, chartArea, scales: { x } } = chart;
+      const labelHours = hourEntries.map(e => e.hour);
+      const labelPixel = i => x.getPixelForValue(i);
+      const boundaryForHour = h => {
+        if (!labelHours.length) return null;
+        if (h <= labelHours[0]) return chartArea.left;
+        if (h >= labelHours[labelHours.length - 1]) return chartArea.right;
+        for (let i = 0; i < labelHours.length - 1; i++) {
+          const start = labelHours[i];
+          const end = labelHours[i + 1];
+          if (h === start) return labelPixel(i);
+          if (h > start && h < end) {
+            const ratio = (h - start) / (end - start);
+            return labelPixel(i) + ratio * (labelPixel(i + 1) - labelPixel(i));
+          }
+        }
+        return null;
+      };
+
+      const lineColor = isLightMode ? 'rgba(17,23,34,.12)' : 'rgba(241,245,255,.12)';
+      const textColor = isLightMode ? 'rgba(17,23,34,.45)' : 'rgba(241,245,255,.45)';
+      ctx.save();
+      ctx.setLineDash([2, 4]);
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 1;
+      activeSessionZones.forEach(zone => {
+        const xPos = boundaryForHour(zone.end);
+        if (xPos === null || xPos <= chartArea.left || xPos >= chartArea.right) return;
+        ctx.beginPath();
+        ctx.moveTo(xPos, chartArea.top);
+        ctx.lineTo(xPos, chartArea.bottom);
+        ctx.stroke();
+      });
+
+      ctx.fillStyle = textColor;
+      ctx.font = '10px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      const labelY = chartArea.top - 6;
+
+      const drawWrappedText = (text, x, y, maxWidth, lineHeight) => {
+        if (maxWidth <= 0) return;
+        const words = text.split(' ');
+        const lines = [];
+        let currentLine = words[0] || '';
+
+        for (let i = 1; i < words.length; i++) {
+          const word = words[i];
+          const width = ctx.measureText(`${currentLine} ${word}`).width;
+          if (width <= maxWidth) {
+            currentLine += ` ${word}`;
+          } else {
+            lines.push(currentLine);
+            currentLine = word;
+          }
+        }
+        lines.push(currentLine);
+
+        lines.forEach((line, index) => {
+          ctx.fillText(line, x, y - (lines.length - 1 - index) * lineHeight);
+        });
+      };
+
+      activeSessionZones.forEach(zone => {
+        const startX = boundaryForHour(zone.start) ?? chartArea.left;
+        const endX = boundaryForHour(zone.end) ?? chartArea.right;
+        if (endX <= chartArea.left || startX >= chartArea.right) return;
+        const centerX = Math.min(Math.max((startX + endX) / 2, chartArea.left + 20), chartArea.right - 20);
+        const zoneWidth = Math.abs(endX - startX) - 20;
+        drawWrappedText(zone.name, centerX, labelY, Math.max(zoneWidth, 40), 12);
+      });
+      ctx.restore();
+    }
+  };
+
   hourChartInstance = new Chart(hCtx, {
     type: 'bar',
     data: {
@@ -3716,6 +3807,7 @@ function initAnalyticsCharts() {
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 800, easing: 'easeOutQuart' },
+      layout: { padding: { top: 36, bottom: 24 } },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -3752,7 +3844,7 @@ function initAnalyticsCharts() {
         evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
       }
     },
-    plugins: [zeroLinePlugin]
+    plugins: [zeroLinePlugin, sessionDividerPlugin]
   });
 }
 

@@ -761,10 +761,6 @@ window.addEventListener('DOMContentLoaded', function() {
         <div style="display:flex;align-items:center;gap:20px">
           <div class="banner-right" id="banner-right-stats">
             <div>
-              <div class="bstat-label">Equity</div>
-              <div class="bstat-val" id="banner-equity" style="color:var(--green)">-</div>
-            </div>
-            <div>
               <div class="bstat-label">Balance</div>
               <div class="bstat-val" id="banner-balance" style="color:var(--green)">-</div>
             </div>
@@ -1705,7 +1701,7 @@ window.addEventListener('DOMContentLoaded', function() {
             <div class="panel-title"><span class="panel-title-accent"></span>Best Trading Hours</div>
             <div class="panel-head-meta" id="ph-meta-hours">- active hours</div>
           </div>
-          <div class="chart-wrap" style="height:270px">
+          <div class="chart-wrap" style="height:340px">
             <canvas id="hourChart"></canvas>
           </div>
         </div>
@@ -1896,7 +1892,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div class="panel-title">
               <span class="panel-title-accent"></span>
               Equity Curve
-              <span style="font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em;margin-left:6px;font-weight:400">01 / 07</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px">
               <!-- Period filter -->
@@ -1959,7 +1954,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--blue)"></span>
               Monthly P&L
-              <span style="font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em;margin-left:6px;font-weight:400">02 / 07</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px">
               <div style="display:flex;align-items:center;gap:6px">
@@ -2032,7 +2026,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--blue2,#4d8ef0)"></span>
               Win / Loss Streaks
-              <span style="font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em;margin-left:6px;font-weight:400">05 / 07</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
               <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--green2);color:var(--green);border:1px solid rgba(46,204,138,.25)" id="st-pill-win">Best W -</span>
@@ -2091,7 +2084,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--purple)"></span>
               Symbol Breakdown
-              <span style="font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em;margin-left:6px;font-weight:400">04 / 07</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
               <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)" id="sb-pill-symbols">- symbols</span>
@@ -2141,7 +2133,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--amber)"></span>
               R-Multiple Distribution
-              <span style="font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em;margin-left:6px;font-weight:400">03 / 07</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
               <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--green2);color:var(--green);border:1px solid rgba(46,204,138,.25)" id="rm-pill-avg">Avg 0R</span>
@@ -2160,7 +2151,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <!-- Stat row -->
-          <div style="display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border)">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)">
             <div style="padding:12px 20px;border-right:1px solid var(--border)">
               <div class="stat-lbl">Avg R</div>
               <div style="font-family:var(--font-display);font-weight:700;font-size:18px" id="rm-stat-avg">-</div>
@@ -2172,10 +2163,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div style="padding:12px 20px;border-right:1px solid var(--border)">
               <div class="stat-lbl">Best R</div>
               <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--green)" id="rm-stat-best">-</div>
-            </div>
-            <div style="padding:12px 20px;border-right:1px solid var(--border)">
-              <div class="stat-lbl">Worst R</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--red)" id="rm-stat-worst">-</div>
             </div>
             <div style="padding:12px 20px">
               <div class="stat-lbl">No SL Set</div>

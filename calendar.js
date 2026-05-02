@@ -1446,15 +1446,16 @@ function initRMultiple() {
 
   if (!rValues.length) {
     if (rmChartInst) { rmChartInst.destroy(); rmChartInst = null; }
-    ['rm-stat-avg','rm-stat-exp','rm-stat-best','rm-stat-worst','rm-stat-nosl',
+    ['rm-stat-avg','rm-stat-exp','rm-stat-best','rm-stat-nosl',
      'rm-pill-avg','rm-pill-exp','rm-pill-trades'].forEach(id => { setEl(id,'—'); });
     return;
   }
 
   const rs     = rValues.map(v => v.r);
+  const displayRValues = rValues.filter(v => v.r > 0);
+  const displayRs = displayRValues.map(v => v.r);
   const avgR   = rs.reduce((s,v) => s+v, 0) / rs.length;
   const bestR  = Math.max(...rs);
-  const worstR = Math.min(...rs);
   const wins   = rs.filter(v => v > 0);
   const losses = rs.filter(v => v <= 0);
   const winRate   = wins.length / rs.length;
@@ -1469,7 +1470,6 @@ function initRMultiple() {
   setEl('rm-stat-avg',    avgR.toFixed(2) + 'R',    avgR >= 0 ? 'var(--green)' : 'var(--red)');
   setEl('rm-stat-exp',    expectancy.toFixed(2) + 'R', expectancy >= 0 ? 'var(--green)' : 'var(--red)');
   setEl('rm-stat-best',   '+' + bestR.toFixed(2) + 'R',  'var(--green)');
-  setEl('rm-stat-worst',  worstR.toFixed(2) + 'R',       'var(--red)');
   setEl('rm-stat-nosl',   noSL + ' trade' + (noSL!==1?'s':''));
 
   // Build histogram in 0.5R buckets, clamped to ±6R max range
@@ -1485,7 +1485,7 @@ function initRMultiple() {
     hi: parseFloat(((minBucket + i + 1) * bucketSize).toFixed(2)),
     count: 0, trades: []
   }));
-  rValues.forEach(({ r, trade }) => {
+  displayRValues.forEach(({ r, trade }) => {
     const cr  = Math.max(-CLAMP, Math.min(CLAMP, r));
     const idx = buckets.findIndex(b => cr >= b.lo && cr < b.hi);
     if (idx !== -1) { buckets[idx].count++; buckets[idx].trades.push(trade); }
@@ -1519,11 +1519,10 @@ function initRMultiple() {
 
   const plotW = W - PAD_L - PAD_R;
 
-  // Sort trades by R value descending, keep best 5 (positive only) and worst 5 (negative only)
-  const allSorted = [...rValues].sort((a, b) => b.r - a.r);
-  const best5  = allSorted.filter(v => v.r > 0).slice(0, 5);
-  const worst5Sorted = allSorted.filter(v => v.r <= 0).slice(-5).sort((a, b) => a.r - b.r);
-  const sorted = [...best5, ...worst5Sorted];
+  // Sort winning trades by R value descending, keep top 5 winners only
+  const allSorted = [...displayRValues].sort((a, b) => b.r - a.r);
+  const best5  = allSorted.slice(0, 5);
+  const sorted = best5;
   const allR = sorted.map(v => v.r);
   const maxAbs = Math.max(...allR.map(Math.abs), 1);
   const rToW = r => (Math.abs(r) / maxAbs) * (plotW / 2);
@@ -1548,7 +1547,7 @@ function initRMultiple() {
   c.textAlign = 'center';
   c.fillText('0R', midX, PAD_T - 2);
 
-  // Best 5 / Worst 5 section labels
+  // Top winners section label
   c.font = "8px 'JetBrains Mono', monospace";
   c.fillStyle = 'rgba(46,204,138,0.5)';
   c.textAlign = 'left';
@@ -1558,20 +1557,6 @@ function initRMultiple() {
     const { r, trade } = rv;
     const isWin = r > 0;
     const y = PAD_T + i * ROW_H;
-
-    // Separator between best 5 and worst 5
-    if (i === best5.length) {
-      const sepY = y - 5;
-      c.strokeStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
-      c.lineWidth = 1;
-      c.setLineDash([4, 4]);
-      c.beginPath(); c.moveTo(PAD_L - 60, sepY); c.lineTo(W - PAD_R + 60, sepY); c.stroke();
-      c.setLineDash([]);
-      c.font = "8px 'JetBrains Mono', monospace";
-      c.fillStyle = isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)';
-      c.textAlign = 'center';
-      c.fillText('· · · WORST 5 · · ·', W / 2, sepY - 3);
-    }
     const barW = rToW(r);
     const barX = r >= 0 ? midX : midX - barW;
     const barH = ROW_H - 6;
@@ -1845,6 +1830,7 @@ function initSymbolBreakdown() {
     const avg = d.net / d.trades;
     const wrColor  = parseInt(wr) >= 50 ? 'var(--green)' : 'var(--red)';
     const netColor = net >= 0 ? 'var(--green)' : 'var(--red)';
+    const bestColor = d.best >= 0 ? 'var(--green)' : 'var(--red)';
     const dot = net >= 0
       ? `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;flex-shrink:0"></span>`
       : `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);margin-right:6px;flex-shrink:0"></span>`;
@@ -1854,7 +1840,7 @@ function initSymbolBreakdown() {
       <td style="padding:7px 10px;text-align:right;color:${wrColor};font-weight:600">${wr}%</td>
       <td style="padding:7px 10px;text-align:right;color:${netColor};font-weight:600">${fmtD(net)}</td>
       <td style="padding:7px 10px;text-align:right;color:${avg>=0?'var(--green)':'var(--red)'}">${fmtD(avg)}</td>
-      <td style="padding:7px 0 7px 10px;text-align:right;color:var(--green)">+$${d.best.toFixed(2)}</td>
+      <td style="padding:7px 0 7px 10px;text-align:right;color:${bestColor};font-weight:600">${fmtD(d.best)}</td>
     </tr>`;
   }).join('');
 }
@@ -1868,6 +1854,22 @@ function initStreaks() {
   if (!timeline || !streakList) return;
 
   const setEl = (id, txt, color) => { const el = $(id); if(el){el.textContent=txt; if(color)el.style.color=color;} };
+  const bindStreakPill = (id, streak, label) => {
+    const el = $(id);
+    if (!el) return;
+    if (!streak || !streak.units?.length) {
+      el.style.cursor = 'default';
+      el.onclick = null;
+      el.title = '';
+      return;
+    }
+    const ids = streak.units.flatMap(u => u.trades.map(t => t.id));
+    el.style.cursor = 'pointer';
+    el.title = label + ' — Click to view in Trade Log';
+    el.onclick = () => {
+      navigateToLog({ type: 'ids', value: ids });
+    };
+  };
 
   const anTrades = getAnTrades();
   if (!anTrades.length) {
@@ -1883,8 +1885,8 @@ function initStreaks() {
   );
 
   // ── FILTER OUT BREAK EVEN TRADES ──
-  // Remove trades where PnL is 0 (Break Even) — they don't count in streaks
-  const tradesWithoutBE = trades.filter(t => t.pnl !== 0);
+  // Remove BE trades based on the global trade result classifier — they don't count in streaks
+  const tradesWithoutBE = trades.filter(t => getTradeResult(t) !== 'be');
 
   // ── GROUP COMBINED TRADES ──
   // Create combined units: group trades with same date, session, entry, direction
@@ -1931,10 +1933,10 @@ function initStreaks() {
 
   // Build streak segments from combined units
   const streaks = [];
-  let cur = { type: combinedUnits[0].pnl >= 0 ? 'W' : 'L', units: [combinedUnits[0]] };
+  let cur = { type: getTradeResult(combinedUnits[0]) === 'win' ? 'W' : 'L', units: [combinedUnits[0]] };
   for (let i = 1; i < combinedUnits.length; i++) {
     const unit = combinedUnits[i];
-    const type = unit.pnl >= 0 ? 'W' : 'L';
+    const type = getTradeResult(unit) === 'win' ? 'W' : 'L';
     if (type === cur.type) {
       cur.units.push(unit);
     } else {
@@ -1961,6 +1963,12 @@ function initStreaks() {
   setEl('st-pill-win',  'Best W ' + bestWin,   'var(--green)');
   setEl('st-pill-loss', 'Worst L ' + worstLoss, 'var(--red)');
   setEl('st-pill-cur',  'Now ' + curLabel, curStreak.type === 'W' ? 'var(--green)' : 'var(--red)');
+
+  const bestWinStreak = streaks.find(s => s.type === 'W' && s.units.length === bestWin);
+  const worstLossStreak = streaks.find(s => s.type === 'L' && s.units.length === worstLoss);
+  bindStreakPill('st-pill-win', bestWinStreak, 'Best win streak');
+  bindStreakPill('st-pill-loss', worstLossStreak, 'Worst loss streak');
+  bindStreakPill('st-pill-cur', curStreak, 'Current streak');
 
   // --- Timeline bars (use all individual trades for granularity) ---
   const allPnls   = trades.map(t => Math.abs(t.pnl));
