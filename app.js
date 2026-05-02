@@ -800,9 +800,9 @@ function renderTrades(trades) {
       <td><span style="font-family:var(--font-mono);font-size:11.5px">${t.date}</span><br><span style="font-size:10px;color:var(--text3)">${typeof formatTradeTime === 'function' ? formatTradeTime(t.time) : t.time}</span></td>
       <td>
         <div class="sym-cell">
-          <div>
-            <div class="sym-name">${t.symbol}${t.combined_count > 1 ? `<span style="font-family:var(--font-mono);font-size:9px;background:var(--ac-35);color:var(--ac-80);padding:2px 6px;border-radius:3px;margin-left:5px;display:inline-block">x${t.combined_count}</span>` : ''}</div>
-            <div class="sym-type">${t.type}</div>
+          <div class="sym-name">
+            <span class="sym-code">${t.symbol}</span>
+            ${t.combined_count > 1 ? `<span class="sym-badge">x${t.combined_count}</span>` : ''}
           </div>
         </div>
       </td>
@@ -978,7 +978,7 @@ function toggleListDropdown(type) {
       b.style.color = '#a97de8';
     }
     b.onclick = () => fpillClick(b);
-    b.style.cssText += `;display:flex;align-items:center;justify-content:space-between;width:100%;border:none;border-radius:0;padding:8px 14px;border-bottom:${i < persistentList.length-1 ? '1px solid rgba(255,255,255,.05)' : 'none'};font-size:12px;font-family:var(--font-body);color:${activeVals.includes(s)?'#a97de8':'#fff'};text-align:left;cursor:pointer;transition:background .15s`;
+    b.style.cssText += `;display:flex;align-items:center;justify-content:space-between;width:100%;border:none;border-radius:0;padding:8px 14px;border-bottom:${i < persistentList.length-1 ? '1px solid rgba(255,255,255,.05)' : 'none'};font-size:12px;font-family:var(--font-body);color:${activeVals.includes(s)?'#a97de8':'var(--text2)'};text-align:left;cursor:pointer;transition:background .15s`;
     b.innerHTML = `<span>${s}</span><div style="display:flex;align-items:center;gap:8px"><span class="tl-check" style="opacity:${activeVals.includes(s)?'1':'0'};color:var(--purple);font-size:11px">✓</span><span class="tl-trash" onclick="removeListItem(event,this)" style="opacity:0;color:var(--text3);font-size:11px;cursor:pointer;transition:all .15s;padding:2px 4px;border-radius:4px" onmouseenter="this.style.color='var(--red)';this.style.background='rgba(232,80,74,.1)'" onmouseleave="this.style.color='var(--text3)';this.style.background='transparent'" style="display:flex"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></div>`;
     b.onmouseenter = () => { if (!b.classList.contains('active')) b.style.background = 'var(--ac-08)'; b.querySelector('.tl-trash').style.opacity='1'; };
     b.onmouseleave = () => { if (!b.classList.contains('active')) b.style.background = b.classList.contains('active') ? 'var(--purple2)' : 'transparent'; b.querySelector('.tl-trash').style.opacity='0'; };
@@ -994,14 +994,14 @@ function toggleListDropdown(type) {
         <div style="padding:7px 8px 5px;border-top:1px solid var(--ac-20)">
           <div style="display:flex;align-items:center;gap:6px;background:var(--bg5);border:1px solid var(--ac-35);border-radius:7px;padding:5px 10px">
             <svg width="11" height="11" viewBox="0 0 16 16" fill="var(--ac-70)"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.156a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/></svg>
-            <input id="fp-symbol-new-input" placeholder="Search symbol..." oninput="symbolSearch(this.value)" onkeydown="symbolSearchKey(event)" autocomplete="off" style="flex:1;background:none;border:none;color:#fff;font-size:11px;font-family:var(--font-mono);outline:none;min-width:0"/>
+            <input id="fp-symbol-new-input" placeholder="Search symbol..." oninput="symbolSearch(this.value)" onkeydown="symbolSearchKey(event)" autocomplete="off" style="flex:1;background:none;border:none;color:var(--text);font-size:11px;font-family:var(--font-mono);outline:none;min-width:0"/>
           </div>
         </div>
         <div style="padding:4px 8px 6px;border-top:1px solid rgba(255,255,255,.04)">
-          <button onclick="cancelAddSymbol()" style="width:100%;background:none;border:none;color:var(--text3);font-size:10px;font-family:var(--font-body);cursor:pointer;padding:2px 0;transition:color .15s;letter-spacing:.05em" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'"><span style="display:inline-flex;align-items:center;gap:4px"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Close</span></button>
+          <button onclick="cancelAddSymbol()" style="width:100%;background:none;border:none;color:var(--text2);font-size:10px;font-family:var(--font-body);cursor:pointer;padding:2px 0;transition:color .15s;letter-spacing:.05em" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text2)'"><span style="display:inline-flex;align-items:center;gap:4px"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Close</span></button>
         </div>
       </div>
-      <button id="fp-symbol-add-btn" onclick="showAddSymbol()" style="width:100%;display:flex;align-items:center;gap:6px;background:none;border:none;padding:7px 10px;color:var(--ac-80);font-size:11px;font-family:var(--font-body);cursor:pointer;transition:color .15s" onmouseenter="this.style.color='var(--purple)'" onmouseleave="this.style.color='var(--ac-80)'">
+      <button id="fp-symbol-add-btn" onclick="showAddSymbol()" style="width:100%;display:flex;align-items:center;gap:6px;background:none;border:none;padding:7px 10px;color:var(--text2);font-size:11px;font-family:var(--font-body);cursor:pointer;transition:color .15s" onmouseenter="this.style.color='var(--purple)'" onmouseleave="this.style.color='var(--text2)'">
         <span style="font-size:15px;line-height:1">+</span><span>Add Symbol</span>
       </button>
     `;
@@ -1015,15 +1015,15 @@ function toggleListDropdown(type) {
         <div style="padding:7px 8px 5px">
           <div style="display:flex;align-items:center;gap:6px;background:var(--bg5);border:1px solid var(--ac-35);border-radius:7px;padding:5px 10px">
             <svg width="11" height="11" viewBox="0 0 16 16" fill="var(--ac-70)"><path d="M2 5h12M2 8h12M2 11h7" stroke="var(--ac-70)" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg>
-            <input id="fp-session-new-input" placeholder="e.g. London, Asia..." onkeydown="sessionInputKey(event)" autocomplete="off" style="flex:1;background:none;border:none;color:#fff;font-size:11px;font-family:var(--font-body);outline:none;min-width:0"/>
+            <input id="fp-session-new-input" placeholder="e.g. London, Asia..." onkeydown="sessionInputKey(event)" autocomplete="off" style="flex:1;background:none;border:none;color:var(--text);font-size:11px;font-family:var(--font-body);outline:none;min-width:0"/>
             <button onclick="confirmAddSession()" style="background:var(--ac-20);border:1px solid var(--ac-40);border-radius:5px;color:var(--ac-90);font-size:10px;padding:2px 7px;cursor:pointer;font-family:var(--font-body);white-space:nowrap" onmouseenter="this.style.background='var(--ac-35)'" onmouseleave="this.style.background='var(--ac-20)'">Add</button>
           </div>
         </div>
         <div style="padding:4px 8px 6px;border-top:1px solid rgba(255,255,255,.04)">
-          <button onclick="cancelAddSession()" style="width:100%;background:none;border:none;color:var(--text3);font-size:10px;font-family:var(--font-body);cursor:pointer;padding:2px 0;transition:color .15s;letter-spacing:.05em" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'"><span style="display:inline-flex;align-items:center;gap:4px"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Close</span></button>
+          <button onclick="cancelAddSession()" style="width:100%;background:none;border:none;color:var(--text2);font-size:10px;font-family:var(--font-body);cursor:pointer;padding:2px 0;transition:color .15s;letter-spacing:.05em" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text2)'"><span style="display:inline-flex;align-items:center;gap:4px"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Close</span></button>
         </div>
       </div>
-      <button id="fp-session-add-btn" onclick="showAddSession()" style="width:100%;display:flex;align-items:center;gap:6px;background:none;border:none;padding:7px 10px;color:var(--ac-80);font-size:11px;font-family:var(--font-body);cursor:pointer;transition:color .15s" onmouseenter="this.style.color='var(--purple)'" onmouseleave="this.style.color='var(--ac-80)'">
+      <button id="fp-session-add-btn" onclick="showAddSession()" style="width:100%;display:flex;align-items:center;gap:6px;background:none;border:none;padding:7px 10px;color:var(--text2);font-size:11px;font-family:var(--font-body);cursor:pointer;transition:color .15s" onmouseenter="this.style.color='var(--purple)'" onmouseleave="this.style.color='var(--text2)'">
         <span style="font-size:15px;line-height:1">+</span><span>Custom</span>
       </button>
     `;
@@ -1178,7 +1178,7 @@ function symbolSearch(q) {
     .slice(0, 8);
 
   if (!matches.length) {
-    results.innerHTML = '<div style="padding:10px 12px;color:var(--text3);font-size:11px;font-family:\'JetBrains Mono\',monospace;text-align:center">No results found</div>';
+    results.innerHTML = '<div style="padding:10px 12px;color:var(--text2);font-size:11px;font-family:\'JetBrains Mono\',monospace;text-align:center">No results found</div>';
     return;
   }
 
@@ -1190,14 +1190,14 @@ function symbolSearch(q) {
   results.innerHTML = matches.map((m,idx) => {
     const isFirst = idx === 0;
     const bg = isFirst ? firstBg : 'transparent';
-    const color = typeColors[m.t] || 'var(--text3)';
+    const color = typeColors[m.t] || 'var(--text2)';
     return `<div onclick="addSymbolFromSearch('${m.s}')" data-idx="${idx}"
       style="display:flex;align-items:center;justify-content:space-between;padding:7px 12px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.03);transition:background .1s;background:${bg}"
       onmouseenter="this.style.background='var(--ac-08)';symbolSearchIndex=${idx}"
       onmouseleave="this.style.background='${bg}'">
       <div>
-        <div style="font-size:12px;font-family:var(--font-mono);color:#fff;font-weight:500">${m.s}</div>
-        <div style="font-size:10px;color:var(--text3);margin-top:1px">${m.n}</div>
+        <div style="font-size:12px;font-family:var(--font-mono);color:var(--text);font-weight:500">${m.s}</div>
+        <div style="font-size:10px;color:var(--text2);margin-top:1px">${m.n}</div>
       </div>
       <span style="font-size:9px;font-family:var(--font-mono);color:${color};background:rgba(255,255,255,.05);padding:2px 6px;border-radius:4px;letter-spacing:.05em">${m.t}</span>
     </div>`;
@@ -1232,8 +1232,8 @@ function addSymbolFromSearch(sym) {
     const b = document.createElement('button');
     b.className = 'fpill'; b.dataset.group = 'symbol'; b.dataset.val = sym;
     b.onclick = () => fpillClick(b);
-    b.style.cssText = `display:flex;align-items:center;justify-content:space-between;width:100%;border:none;border-radius:0;padding:8px 14px;background:transparent;border-bottom:${scrollArea.children.length > 0 ? '1px solid rgba(255,255,255,.05)' : 'none'};font-size:12px;font-family:var(--font-body);color:#fff;text-align:left;cursor:pointer;transition:background .15s`;
-    b.innerHTML = `<span>${sym}</span><div style="display:flex;align-items:center;gap:8px"><span class="tl-check" style="opacity:0;color:var(--purple);font-size:11px">✓</span><span class="tl-trash" onclick="removeListItem(event,this)" style="opacity:0;color:var(--text3);font-size:11px;cursor:pointer;transition:all .15s;padding:2px 4px;border-radius:4px" onmouseenter="this.style.color='var(--red)';this.style.background='rgba(232,80,74,.1)'" onmouseleave="this.style.color='var(--text3)';this.style.background='transparent'" style="display:flex"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></div>`;
+    b.style.cssText = `display:flex;align-items:center;justify-content:space-between;width:100%;border:none;border-radius:0;padding:8px 14px;background:transparent;border-bottom:${scrollArea.children.length > 0 ? '1px solid rgba(255,255,255,.05)' : 'none'};font-size:12px;font-family:var(--font-body);color:var(--text2);text-align:left;cursor:pointer;transition:background .15s`;
+    b.innerHTML = `<span>${sym}</span><div style="display:flex;align-items:center;gap:8px"><span class="tl-check" style="opacity:0;color:var(--purple);font-size:11px">✓</span><span class="tl-trash" onclick="removeListItem(event,this)" style="opacity:0;color:var(--text2);font-size:11px;cursor:pointer;transition:all .15s;padding:2px 4px;border-radius:4px" onmouseenter="this.style.color='var(--red)';this.style.background='rgba(232,80,74,.1)'" onmouseleave="this.style.color='var(--text2)';this.style.background='transparent'" style="display:flex"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></div>`;
     b.onmouseenter = () => { if (!b.classList.contains('active')) b.style.background = 'var(--ac-08)'; b.querySelector('.tl-trash').style.opacity='1'; };
     b.onmouseleave = () => { if (!b.classList.contains('active')) b.style.background = 'transparent'; b.querySelector('.tl-trash').style.opacity='0'; };
     scrollArea.prepend(b);
@@ -1310,8 +1310,8 @@ function confirmAddSession() {
   const b = document.createElement('button');
   b.className = 'fpill'; b.dataset.group = 'session'; b.dataset.val = val;
   b.onclick = () => fpillClick(b);
-  b.style.cssText = `display:flex;align-items:center;justify-content:space-between;width:100%;border:none;border-radius:0;padding:8px 14px;background:transparent;border-bottom:${scrollArea.children.length > 0 ? '1px solid rgba(255,255,255,.05)' : 'none'};font-size:12px;font-family:var(--font-body);color:#fff;text-align:left;cursor:pointer;transition:background .15s`;
-  b.innerHTML = `<span>${val}</span><div style="display:flex;align-items:center;gap:8px"><span class="tl-check" style="opacity:0;color:var(--purple);font-size:11px">✓</span><span class="tl-trash" onclick="removeListItem(event,this)" style="opacity:0;color:var(--text3);font-size:11px;cursor:pointer;transition:all .15s;padding:2px 4px;border-radius:4px" onmouseenter="this.style.color='var(--red)';this.style.background='rgba(232,80,74,.1)'" onmouseleave="this.style.color='var(--text3)';this.style.background='transparent'" style="display:flex"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></div>`;
+  b.style.cssText = `display:flex;align-items:center;justify-content:space-between;width:100%;border:none;border-radius:0;padding:8px 14px;background:transparent;border-bottom:${scrollArea.children.length > 0 ? '1px solid rgba(255,255,255,.05)' : 'none'};font-size:12px;font-family:var(--font-body);color:var(--text2);text-align:left;cursor:pointer;transition:background .15s`;
+  b.innerHTML = `<span>${val}</span><div style="display:flex;align-items:center;gap:8px"><span class="tl-check" style="opacity:0;color:var(--purple);font-size:11px">✓</span><span class="tl-trash" onclick="removeListItem(event,this)" style="opacity:0;color:var(--text2);font-size:11px;cursor:pointer;transition:all .15s;padding:2px 4px;border-radius:4px" onmouseenter="this.style.color='var(--red)';this.style.background='rgba(232,80,74,.1)'" onmouseleave="this.style.color='var(--text2)';this.style.background='transparent'" style="display:flex"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></span></div>`;
   b.onmouseenter = () => { if (!b.classList.contains('active')) b.style.background = 'var(--ac-08)'; b.querySelector('.tl-trash').style.opacity='1'; };
   b.onmouseleave = () => { if (!b.classList.contains('active')) b.style.background = 'transparent'; b.querySelector('.tl-trash').style.opacity='0'; };
   scrollArea.prepend(b);
@@ -1492,16 +1492,15 @@ function updateFilterBtnState() {
   const result  = document.querySelector('.fpill[data-group="result"].active')?.dataset.val || 'all';
   const symbols  = [...$$('.fpill[data-group="symbol"].active')];
   const sessions = [...$$('.fpill[data-group="session"].active')];
-  const pnlMin  = NaN;
-  const pnlMax  = NaN;
   const acctFilter = $('fp-account')?.value || '';
   const emotionsActive = [...$$('.fpill[data-group="emotion"].active')];
-  const hasFilter = dir !== 'all' || result !== 'all' || symbols.length > 0 || sessions.length > 0 || emotionsActive.length > 0 || calFromVal || calToVal || acctFilter;
+  const hasFilter = dir !== 'all' || result !== 'all' || symbols.length > 0 || sessions.length > 0 || emotionsActive.length > 0 || calFromVal || calToVal || acctFilter || window._symbolQuickFilter || window._sessionQuickFilter || window._streakIdFilter;
   const filterBtn = $('filter-panel-btn');
   const filterDot = $('filter-dot');
   if (filterDot) filterDot.style.display = 'none';
   if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 12px var(--ac-80), 0 0 28px var(--ac-40)' : '';
   if (filterBtn) filterBtn.style.borderColor = hasFilter ? 'var(--ac-60)' : '';
+  if (filterBtn) filterBtn.classList.toggle('has-filter', hasFilter);
 }
 
 function hasActiveFilters() {
@@ -1511,7 +1510,7 @@ function hasActiveFilters() {
   const sessions = [...$$('.fpill[data-group="session"].active')];
   const emotionsActive = [...$$('.fpill[data-group="emotion"].active')];
   const acctFilter = $('fp-account')?.value || '';
-  return dir !== 'all' || result !== 'all' || symbols.length > 0 || sessions.length > 0 || emotionsActive.length > 0 || calFromVal || calToVal || acctFilter;
+  return dir !== 'all' || result !== 'all' || symbols.length > 0 || sessions.length > 0 || emotionsActive.length > 0 || calFromVal || calToVal || acctFilter || window._symbolQuickFilter || window._sessionQuickFilter || window._streakIdFilter;
 }
 
 function resetFilters() {
@@ -1609,6 +1608,7 @@ function applyFilters() {
   if (filterDot) filterDot.style.display = 'none';
   if (filterBtn) filterBtn.style.boxShadow = hasFilter ? '0 0 12px var(--ac-80), 0 0 28px var(--ac-40)' : '';
   if (filterBtn) filterBtn.style.borderColor = hasFilter ? 'var(--ac-60)' : '';
+  if (filterBtn) filterBtn.classList.toggle('has-filter', hasFilter);
 
   if (!res || res.length === 0) {
   console.log("Filter broke — fallback to all trades");
@@ -2784,13 +2784,13 @@ function applyCustomRange() {
 
 function getAnTrades() {
   if (typeof ACCOUNTS === 'undefined' || !ACCOUNTS || ACCOUNTS.length === 0) {
-    return TRADES || [];
+    return groupCombinedTrades(TRADES || []);
   }
   // '__all__' or empty → return all trades
-  if (!anCurrentAccount || anCurrentAccount === '__all__') {
-    return TRADES || [];
-  }
-  return (TRADES || []).filter(t => (t.account || '') === anCurrentAccount);
+  const base = (!anCurrentAccount || anCurrentAccount === '__all__')
+    ? (TRADES || [])
+    : (TRADES || []).filter(t => (t.account || '') === anCurrentAccount);
+  return groupCombinedTrades(base);
 }
 
 // Per-card "This week" period filter
@@ -3360,7 +3360,7 @@ function renderSetupDistrib(setupArr) {
     : (typeof selectedAcct !== 'undefined' && selectedAcct >= 0 && ACCOUNTS[selectedAcct]
         ? (ACCOUNTS[selectedAcct].key || ACCOUNTS[selectedAcct].phase)
         : '');
-  const sourceTrades = acctName ? TRADES.filter(t => (t.account||'') === acctName) : TRADES;
+  const sourceTrades = acctName ? getAnTrades().filter(t => (t.account||'') === acctName) : getAnTrades();
   const pbNamesDistrib = new Set((typeof getPbList === 'function' ? getPbList() : PB_DEFAULTS).map(p => p.name));
   const setupIdMap = {};
   sourceTrades.forEach(t => {
@@ -3527,7 +3527,7 @@ function initAnalyticsCharts() {
   // ── Day of week heatmap (live) ──
   const ALL_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
   // Preserve existing filter — only set default on first load
-  if (!window._dayFilter) window._dayFilter = new Set(['Mon','Tue','Wed','Thu','Fri']);
+  if (!window._dayFilter) window._dayFilter = new Set(ALL_DAYS);
   window._dayMapData = {};
 
   const dayTrades = getAnTradesForCard('day');
@@ -3542,7 +3542,7 @@ function initAnalyticsCharts() {
   const checks = $('day-filter-checks');
   if(checks) checks.innerHTML = ALL_DAYS.map(d=>`
     <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:2px 0">
-      <input type="checkbox" data-day="${d}" ${d!=='Sat'&&d!=='Sun'?'checked':''} onchange="dayFilterChange()" style="accent-color:var(--purple);width:12px;height:12px;cursor:pointer">
+      <input type="checkbox" data-day="${d}" checked onchange="dayFilterChange()" style="accent-color:var(--purple);width:12px;height:12px;cursor:pointer">
       <span style="font-family:var(--font-mono);font-size:10px;color:var(--text2)">${d}</span>
     </label>`).join('');
 
@@ -3650,34 +3650,69 @@ function initAnalyticsCharts() {
 
   // ── Theme-aware axis colors ──
   const isLightMode = document.documentElement.classList.contains('light');
-  const axisTickColor = isLightMode ? 'rgba(10,11,16,.6)' : 'rgba(221,225,239,.4)';
-  const gridColor = isLightMode ? 'rgba(0,0,0,.06)' : 'rgba(255,255,255,.03)';
+  const axisTickColor = isLightMode ? '#111216' : '#f1f5ff';
+  const gridColor = isLightMode ? 'rgba(0,0,0,.08)' : 'rgba(255,255,255,.05)';
 
   // ── Best trading hours (premium bar chart) ──
   const hourMap = {};
   trades.forEach(t => {
-    const h = parseInt(t.time.split(':')[0]);
-    const label = h < 12 ? h+'am' : h===12?'12pm':(h-12)+'pm';
-    if(!hourMap[label]) hourMap[label]=0;
-    hourMap[label]+=t.pnl;
+    const h = parseInt(t.time.split(':')[0], 10);
+    const label = h === 0 ? '12am' : h < 12 ? h + 'am' : h === 12 ? '12pm' : (h - 12) + 'pm';
+    if (!hourMap[label]) hourMap[label] = 0;
+    hourMap[label] += t.pnl;
   });
-  const hourLabels = Object.keys(hourMap);
-  const hourData   = Object.values(hourMap);
+  const hourEntries = Object.entries(hourMap)
+    .map(([label, pnl]) => {
+      const hour = label.endsWith('am')
+        ? label === '12am' ? 0 : parseInt(label, 10)
+        : label === '12pm' ? 12 : parseInt(label, 10) + 12;
+      return { label, pnl, hour };
+    })
+    .sort((a, b) => a.hour - b.hour);
+  const hourLabels = hourEntries.map(e => e.label);
+  const hourData   = hourEntries.map(e => e.pnl);
   const mh = $('ph-meta-hours');
-  if(mh) mh.textContent = hourLabels.length + ' active hour' + (hourLabels.length!==1?'s':'');
+  if (mh) mh.textContent = hourLabels.length + ' active hour' + (hourLabels.length !== 1 ? 's' : '');
   const hCtx = $('hourChart').getContext('2d');
   if (hourChartInstance) { hourChartInstance.destroy(); hourChartInstance = null; }
+  const zeroLinePlugin = {
+    id: 'zeroLine',
+    afterDraw(chart) {
+      const { ctx, chartArea: { left, right }, scales: { y } } = chart;
+      const zeroY = y.getPixelForValue(0);
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash([4, 4]);
+      ctx.moveTo(left, zeroY);
+      ctx.lineTo(right, zeroY);
+      ctx.strokeStyle = isLightMode ? 'rgba(34,34,34,.4)' : 'rgba(255,255,255,.25)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+  };
+
   hourChartInstance = new Chart(hCtx, {
     type: 'bar',
-    data: { labels: hourLabels, datasets: [{
-      data: hourData,
-      backgroundColor: hourData.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(232,80,74,.7)'),
-      hoverBackgroundColor: hourData.map(v => v >= 0 ? (isLightMode?'rgba(26,158,98,.8)':'rgba(46,204,138,.6)') : (isLightMode?'rgba(214,60,55,.8)':'rgba(232,80,74,.6)')),
-      borderColor: hourData.map(v => v >= 0 ? '#2ecc8a' : '#e8504a'),
-      borderWidth: 1.5,
-      borderRadius: { topLeft: 5, topRight: 5, bottomLeft: 0, bottomRight: 0 },
-      borderSkipped: false,
-    }]},
+    data: {
+      labels: hourLabels,
+      datasets: [{
+        data: hourData,
+        backgroundColor: hourData.map(v => v >= 0 ? 'rgba(46,204,138,.7)' : 'rgba(232,80,74,.7)'),
+        hoverBackgroundColor: hourData.map(v => v >= 0
+          ? (isLightMode ? 'rgba(26,158,98,.8)' : 'rgba(46,204,138,.6)')
+          : (isLightMode ? 'rgba(214,60,55,.8)' : 'rgba(232,80,74,.6)')),
+        borderColor: hourData.map(v => v >= 0 ? '#2ecc8a' : '#e8504a'),
+        borderWidth: 1.5,
+        borderRadius: hourData.map(v => v >= 0
+          ? { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 }
+          : { topLeft: 0, topRight: 0, bottomLeft: 6, bottomRight: 6 }),
+        borderSkipped: false,
+        maxBarThickness: 18,
+        barThickness: 14,
+      }]
+    },
     options: {
       responsive: true, maintainAspectRatio: false,
       animation: { duration: 800, easing: 'easeOutQuart' },
@@ -3689,21 +3724,21 @@ function initAnalyticsCharts() {
           borderWidth: 1,
           padding: 10,
           titleFont: { family: 'JetBrains Mono', size: 10 },
-          bodyFont:  { family: 'JetBrains Mono', size: 11 },
+          bodyFont: { family: 'JetBrains Mono', size: 11 },
           titleColor: isLightMode ? 'rgba(10,11,16,.5)' : 'rgba(221,225,239,.5)',
-          bodyColor:  isLightMode ? '#1a1d2e' : '#dde1ef',
+          bodyColor: isLightMode ? '#1a1d2e' : '#dde1ef',
           callbacks: { label: ctx => (ctx.raw >= 0 ? '+' : '-') + '\$' + Math.abs(ctx.raw).toFixed(2) }
         }
       },
       scales: {
         x: {
           grid: { display: false },
-          ticks: { color: axisTickColor, font: { family: 'JetBrains Mono', size: 9 } },
+          ticks: { color: axisTickColor, font: { family: 'JetBrains Mono', size: 11 }, autoSkip: false, maxRotation: 0 },
           border: { display: false }
         },
         y: {
           grid: { color: gridColor },
-          ticks: { color: axisTickColor, font: { family: 'JetBrains Mono', size: 9 }, callback: v => (v >= 0 ? '+' : '') + '\$' + v },
+          ticks: { color: axisTickColor, font: { family: 'JetBrains Mono', size: 11 }, callback: v => (v >= 0 ? '+' : '') + '\$' + v },
           border: { display: false }
         }
       },
@@ -3716,7 +3751,8 @@ function initAnalyticsCharts() {
       onHover: (evt, elements) => {
         evt.native.target.style.cursor = elements.length ? 'pointer' : 'default';
       }
-    }
+    },
+    plugins: [zeroLinePlugin]
   });
 }
 
@@ -4581,15 +4617,13 @@ function calcPnl() {
   const gross = calcGross(entry, exit, size, currentDir, sym, accountName);
   const net   = gross - comm;
   const info  = getInstrumentInfo(sym);
-  const leverage = getAccountLeverage(accountName, info.type);
-  const leverageStr = leverage > 1 ? ` · ${leverage}:1 leverage` : ' · no leverage';
 
   if (display) {
     display.textContent = (net >= 0 ? '+$' : '-$') + Math.abs(net).toFixed(2);
     display.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
   }
   if (el) {
-    el.textContent = info.label + leverageStr;
+    el.textContent = info.label;
     el.style.color = net >= 0 ? 'var(--green)' : 'var(--red)';
   }
 }
