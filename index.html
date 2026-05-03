@@ -7,6 +7,13 @@
 <meta name="description" content="Equity Trace is a modern trading journal for serious traders. Import trades, review performance, track playbooks, and protect capital — all in one premium workspace."/>
 <link rel="icon" type="image/png" href="logo.png">
 <meta name="theme-color" content="#995dff">
+<!-- PWA Support -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Equity Trace">
+<link rel="apple-touch-icon" href="logo.png">
 
 <!-- Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -958,6 +965,119 @@ function resetNum(el){
   });
   dash.addEventListener('mouseleave',()=>{dash.style.transform=''});
 })();
+
+// ══ PWA INSTALL PROMPT ══
+(function(){
+  let deferredPrompt;
+  let installPromptShown = false;
+  
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone === true ||
+                       localStorage.getItem('pwa-dismissed') === 'true';
+    
+    if (!installPromptShown && !isInstalled) {
+      setTimeout(() => {
+        showInstallPrompt();
+        installPromptShown = true;
+      }, 5000);
+    }
+  });
+  
+  function showInstallPrompt() {
+    const promptHtml = `
+      <div id="pwa-install-prompt" style="position:fixed;bottom:20px;right:20px;max-width:360px;background:linear-gradient(135deg,#995dff 0%,#7d48d9 100%);border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(153,93,255,0.4);z-index:10000;animation:slideIn 0.3s ease-out">
+        <div style="display:flex;align-items:start;gap:12px">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </div>
+          <div style="flex:1">
+            <h3 style="color:#fff;font-size:16px;font-weight:600;margin-bottom:4px">Install Equity Trace</h3>
+            <p style="color:rgba(255,255,255,0.9);font-size:14px;line-height:1.4;margin-bottom:12px">Access your trading journal anytime, even offline. Install for the best experience.</p>
+            <div style="display:flex;gap:8px">
+              <button id="pwa-install-btn" style="background:#fff;color:#995dff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s">Install</button>
+              <button id="pwa-dismiss-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s">Not now</button>
+            </div>
+          </div>
+          <button id="pwa-close-btn" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:4px;margin:-4px;line-height:1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', promptHtml);
+    const style = document.createElement('style');
+    style.textContent = '@keyframes slideIn{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes slideOut{from{transform:translateY(0);opacity:1}to{transform:translateY(100px);opacity:0}}#pwa-install-btn:hover{background:#f5f5f5;transform:translateY(-1px)}#pwa-dismiss-btn:hover{background:rgba(255,255,255,0.3)}';
+    document.head.appendChild(style);
+    
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`Install: ${outcome}`);
+      deferredPrompt = null;
+      removePrompt();
+    });
+    
+    const dismissPrompt = () => {
+      localStorage.setItem('pwa-dismissed', 'true');
+      removePrompt();
+    };
+    
+    const removePrompt = () => {
+      const p = document.getElementById('pwa-install-prompt');
+      if (p) {
+        p.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => p.remove(), 300);
+      }
+    };
+    
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', dismissPrompt);
+    document.getElementById('pwa-close-btn').addEventListener('click', dismissPrompt);
+  }
+  
+  window.addEventListener('appinstalled', () => {
+    console.log('PWA installed');
+    const p = document.getElementById('pwa-install-prompt');
+    if (p) p.remove();
+  });
+})();
+
+// ══ PWA SERVICE WORKER REGISTRATION ══
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registered:', registration.scope);
+        
+        // Check for updates periodically
+        setInterval(() => {
+          registration.update();
+        }, 60000); // Check every minute
+      })
+      .catch(err => {
+        console.log('ServiceWorker registration failed:', err);
+      });
+  });
+}
+
+// ══ PWA INSTALL PROMPT ══
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // You can show your custom install button here
+  console.log('PWA install prompt available');
+});
+
+window.addEventListener('appinstalled', () => {
+  console.log('PWA installed successfully');
+  deferredPrompt = null;
+});
 </script>
 </body>
 </html>
+

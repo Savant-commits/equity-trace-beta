@@ -3345,5 +3345,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     initProfileUI();
   }, 400);
+
+  // If the app starts with Trend Report already active, ensure the advanced analytics panels refresh.
+  if (document.querySelector('.view.active')?.id === 'view-advanalytics' && typeof refreshAdvAnalytics === 'function') {
+    requestAnimationFrame(() => refreshAdvAnalytics());
+  }
 });
 

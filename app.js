@@ -406,6 +406,7 @@ function switchView(el) {
         if (typeof initRMultiple === 'function') setTimeout(() => initRMultiple(), 100);
         if (typeof initSymbolBreakdown === 'function') setTimeout(() => initSymbolBreakdown(), 150);
         if (typeof initStreaks === 'function') setTimeout(() => initStreaks(), 200);
+        if (typeof refreshAdvAnalytics === 'function') setTimeout(() => refreshAdvAnalytics(), 250);
         console.log('  ✓ Advanced analytics initialized');
       }
     } catch(eaa) { console.warn('  ! Advanced analytics error:', eaa); }
@@ -2833,6 +2834,7 @@ function cardPeriodSet(cardId, period, btn) {
   if (cardId === 'day')     rebuildDayCard();
   if (cardId === 'setup')   rebuildSetupCard();
   if (cardId === 'session') rebuildSessionCard();
+  if (cardId === 'heatmap' && typeof renderTimePerformanceHeatmap === 'function') renderTimePerformanceHeatmap();
 }
 
 function rebuildDayCard() {
@@ -3593,6 +3595,7 @@ function initAnalyticsCharts() {
       <span style="font-family:var(--font-mono);font-size:10px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px">${name}</span>
     </label>`).join('');
   renderSessionDistrib(sessionArr);
+  if (typeof renderTimePerformanceHeatmap === 'function') renderTimePerformanceHeatmap();
 
   // ── Instrument breakdown (live) ──
   const instrMap = {};
@@ -5875,20 +5878,15 @@ function updateTopbarAcctLabel() {
   const logoWrap = $('topbar-acct-logo');
   if (selectedAcct === -1) {
     if (nameEl) nameEl.textContent = 'All Accounts';
-    if (logoWrap) logoWrap.innerHTML = '<div style="width:22px;height:22px;border-radius:6px;background:var(--ac-18);border:1px solid var(--ac-30);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--purple);font-weight:700">∑</div>';
-    if (subEl) { subEl.textContent = 'Portfolio view'; subEl.style.color = 'var(--purple)'; }
+    if (logoWrap) { logoWrap.innerHTML = ''; logoWrap.style.display = 'none'; }
+    if (subEl) { subEl.textContent = ''; }
   } else {
     const a = ACCOUNTS[selectedAcct];
     if (nameEl) nameEl.textContent = a.firm;
     if (subEl) { subEl.textContent = a.phase + ' · ' + a.balance; subEl.style.color = 'var(--purple)'; }
     if (logoWrap) {
-      const lu = getFirmLogo(a.firm);
-      if (lu) {
-        logoWrap.innerHTML = `<img src="${lu}" alt="" style="width:22px;height:22px;object-fit:contain;border-radius:6px;padding:1px" onerror="this.remove()">`;
-      } else {
-        const letter = (a.firm||'?').charAt(0).toUpperCase();
-        logoWrap.innerHTML = `<div style="width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#6b1fd4,#4d8ef0);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff">${letter}</div>`;
-      }
+      logoWrap.style.display = 'none';
+      logoWrap.innerHTML = '';
     }
   }
 }

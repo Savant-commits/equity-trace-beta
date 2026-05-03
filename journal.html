@@ -8,6 +8,12 @@
 <link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236b1fd4'/%3E%3Cpolyline points='4,22 10,14 15,18 21,8 28,12' stroke='%232ecc8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">>
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236b1fd4'/%3E%3Cpolyline points='4,22 10,14 15,18 21,8 28,12' stroke='%232ecc8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 <meta name="theme-color" content="#995dff">
+<!-- PWA Support -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Equity Trace">
 <title>Equity Trace - Journal</title>
 
 <!-- Google Fonts -->
@@ -192,10 +198,14 @@ body:has(#landing-screen:not([style*="display:none"]):not([style*="display: none
 .ls .ls-hero h1 span{font-style:normal;color:var(--purple)}
 .ls .ls-hero p{font-size:15px;color:var(--text2);max-width:460px;margin:0 auto 28px;line-height:1.72}
 .ls .ls-hero-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.ls .btn-primary{background:var(--purple);color:#fff;font-size:13px;font-weight:600;padding:10px 22px;border-radius:9px;border:none;cursor:pointer;font-family:var(--font-body);transition:all .2s;box-shadow:0 8px 22px var(--ac-30)}
-.ls .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 28px var(--ac-40)}
+.ls .btn-primary{background:var(--bg4);color:#fff;font-size:13px;font-weight:600;padding:10px 22px;border-radius:9px;border:none;cursor:pointer;font-family:var(--font-body);transition:all .2s;box-shadow:0 8px 22px var(--ac-30)}
+.ls .btn-primary:hover{transform:translateY(-1px);box-shadow:0 12px 28px var(--ac-40);background:var(--bg5)}
 .ls .btn-ghost{background:transparent;color:var(--text2);font-size:13px;padding:10px 22px;border-radius:9px;border:0.5px solid var(--border2);cursor:pointer;font-family:var(--font-body);transition:border-color .2s}
 .ls .btn-ghost:hover{border-color:var(--border3)}
+.topbar-action-btn{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;min-width:42px;background:var(--bg4);border:1px solid var(--border);border-radius:14px;color:var(--text2);font-family:var(--font-body);font-size:20px;font-weight:700;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,color .18s,border-color .18s;line-height:1;padding:0;box-shadow:0 10px 18px rgba(0,0,0,.1)}
+.topbar-action-btn:hover{transform:translateY(-1px) scale(1.04);border-color:var(--ac-40);color:var(--text);background:var(--bg5);box-shadow:0 14px 24px rgba(0,0,0,.16)}
+.topbar-hero-outline{display:inline-flex;align-items:center;gap:8px;background:var(--bg4);border:1px solid var(--border);border-radius:14px;padding:6px 8px;min-height:42px;cursor:pointer;transition:transform .18s,box-shadow .18s,background .18s,color .18s,border-color .18s;box-shadow:0 10px 18px rgba(0,0,0,.1)}
+.topbar-hero-outline:hover{transform:translateY(-1px) scale(1.02);background:var(--bg5);border-color:var(--ac-40);box-shadow:0 14px 24px rgba(0,0,0,.16)}
 .ls .hero-stats{display:flex;justify-content:center;gap:32px;margin-top:36px;padding-top:28px;border-top:0.5px solid var(--border);flex-wrap:wrap}
 .ls .hstat-num{font-size:22px;font-weight:700;font-family:var(--font-display);letter-spacing:-.8px}
 .ls .hstat-label{font-size:11px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
@@ -715,11 +725,14 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <div class="topbar-right">
-              <button id="import-trades-btn" onclick="openImportModal()" style="display:flex;align-items:center;gap:6px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:8px 14px;cursor:pointer;font-family:var(--font-body);font-size:12px;color:var(--text2);transition:all .15s;white-space:nowrap" onmouseenter="this.style.borderColor='var(--ac-40)';this.style.color='var(--text)';this.style.background='var(--bg5)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)';this.style.background='var(--bg4)'" title="Import trades from CSV or JSON">
-                <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v9M4 8l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 13h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-                Import Trades
-              </button>
-              <button id="add-trade-btn-topbar" class="add-trade-btn" onclick="openModal()" title="Add Trade  (press N)">Add Trade <span style="font-size:9px;opacity:.55;font-family:var(--font-mono);background:rgba(255,255,255,.12);border-radius:4px;padding:1px 5px;margin-left:3px">N</span></button>
+              <button id="import-trades-btn" class="topbar-action-btn" onclick="openImportModal()" title="Import trades from CSV or JSON">⤵</button>
+              <button id="add-trade-btn-topbar" class="topbar-action-btn" onclick="openModal()" title="Add Trade">+</button>
+              <div onclick="goToSettings()" class="topbar-hero-outline" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;padding:6px 8px;min-height:42px" title="Edit profile">
+                <div id="topbar-avatar" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:rgba(255,255,255,.9)">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
+                </div>
+                <div id="topbar-profile-name" style="font-size:12px;font-weight:600;color:var(--text2);font-family:var(--font-body);white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis">Trader</div>
+              </div>
     </div>
   </header>
 
@@ -727,63 +740,34 @@ window.addEventListener('DOMContentLoaded', function() {
   <div class="view active" id="view-dashboard">
     <div class="content">
 
-      <!-- BANNER -->
-      <div class="banner">
-        <div class="banner-left">
-          <div class="banner-text" style="position:relative">
-            <!-- Account Switcher Button (moved from topbar) -->
-            <div style="position:relative" id="topbar-acct-wrap">
-              <button id="topbar-acct-btn" onclick="toggleTopbarAcctDropdown()" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--ac-18),rgba(77,142,240,.1));border:1px solid var(--ac-35);border-radius:10px;padding:8px 22px 8px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;font-family:var(--font-body);min-width:170px" onmouseenter="this.style.borderColor='var(--ac-70)';this.style.background='linear-gradient(135deg,var(--ac-28),rgba(77,142,240,.18))'" onmouseleave="this.style.borderColor='var(--ac-35)';this.style.background='linear-gradient(135deg,var(--ac-18),rgba(77,142,240,.1))'">
-                <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
-                  <span id="topbar-acct-logo" style="display:flex;align-items:center;flex-shrink:0"></span>
-                  <span id="topbar-acct-name" style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:.01em;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis">FTM Prop Firm</span>
-                  <span id="topbar-acct-sub" style="font-size:12px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.03em;opacity:.95">Phase 2  -  $25k</span>
-                </div>
-                <svg id="topbar-acct-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" style="transition:transform .25s;color:var(--text3);margin-left:2px"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--ac-06));pointer-events:none;border-radius:10px"></div>
-              </button>
-              <!-- Topbar Account Dropdown -->
-              <div id="topbar-acct-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--bg2);border:1px solid var(--ac-25);border-radius:13px;min-width:270px;overflow:hidden;z-index:100000;box-shadow:0 16px 48px rgba(0,0,0,.7),0 0 0 1px var(--ac-10),inset 0 1px 0 rgba(255,255,255,.04)">
-                <div style="padding:10px 14px 8px;display:flex;align-items:center;justify-content:flex-start;border-bottom:1px solid var(--ac-12)">
-                  <span style="font-size:10.5px;letter-spacing:.12em;color:var(--text2);font-family:var(--font-mono);text-transform:uppercase;opacity:.95">Switch Account</span>
-                </div>
-                <div id="topbar-acct-list" style="max-height:320px;overflow-y:auto;padding:6px"></div>
-                <div style="padding:8px 10px;border-top:1px solid var(--ac-10)">
-                  <button onclick="openAddAccountModal();closeTopbarAcctDropdown()" style="width:100%;background:var(--ac-07);border:1px dashed var(--ac-28);border-radius:8px;padding:8px;color:var(--purple);font-size:11.5px;cursor:pointer;font-family:var(--font-body);transition:all .15s;opacity:.8;display:flex;align-items:center;justify-content:center;gap:6px" onmouseenter="this.style.opacity='1';this.style.background='var(--ac-16)'" onmouseleave="this.style.opacity='.8';this.style.background='var(--ac-07)'">
-                    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
-                    Add Account
-                  </button>
-                </div>
+      <!-- STAT CARDS -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-left:6px;margin-right:6px;gap:12px;flex-wrap:wrap">
+        <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Overview</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="position:relative" id="topbar-acct-wrap">
+            <button id="topbar-acct-btn" onclick="toggleTopbarAcctDropdown()" style="display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,var(--ac-18),rgba(77,142,240,.1));border:1px solid var(--ac-35);border-radius:10px;padding:8px 16px 8px 12px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;font-family:var(--font-body);min-width:170px" onmouseenter="this.style.borderColor='var(--ac-70)';this.style.background='linear-gradient(135deg,var(--ac-28),rgba(77,142,240,.18))'" onmouseleave="this.style.borderColor='var(--ac-35)';this.style.background='linear-gradient(135deg,var(--ac-18),rgba(77,142,240,.1))'">
+              <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px">
+                <span id="topbar-acct-logo" style="display:flex;align-items:center;flex-shrink:0"></span>
+                <span id="topbar-acct-name" style="font-size:14px;font-weight:700;color:var(--text);letter-spacing:.01em;white-space:nowrap;max-width:150px;overflow:hidden;text-overflow:ellipsis">FTM Prop Firm</span>
+                <span id="topbar-acct-sub" style="font-size:12px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.03em;opacity:.95">Phase 2  -  $25k</span>
+              </div>
+              <svg id="topbar-acct-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" style="transition:transform .25s;color:var(--text3);margin-left:2px"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--ac-06));pointer-events:none;border-radius:10px"></div>
+            </button>
+            <div id="topbar-acct-dropdown" style="display:none;position:absolute;top:calc(100% + 8px);right:0;left:auto;background:var(--bg2);border:1px solid var(--ac-25);border-radius:13px;min-width:270px;overflow:hidden;z-index:100000;box-shadow:0 16px 48px rgba(0,0,0,.7),0 0 0 1px var(--ac-10),inset 0 1px 0 rgba(255,255,255,.04)">
+              <div style="padding:10px 14px 8px;display:flex;align-items:center;justify-content:flex-start;border-bottom:1px solid var(--ac-12)">
+                <span style="font-size:10.5px;letter-spacing:.12em;color:var(--text2);font-family:var(--font-mono);text-transform:uppercase;opacity:.95">Switch Account</span>
+              </div>
+              <div id="topbar-acct-list" style="max-height:320px;overflow-y:auto;padding:6px"></div>
+              <div style="padding:8px 10px;border-top:1px solid var(--ac-10)">
+                <button onclick="openAddAccountModal();closeTopbarAcctDropdown()" style="width:100%;background:var(--ac-07);border:1px dashed var(--ac-28);border-radius:8px;padding:8px;color:var(--purple);font-size:11.5px;cursor:pointer;font-family:var(--font-body);transition:all .15s;opacity:.8;display:flex;align-items:center;justify-content:center;gap:6px" onmouseenter="this.style.opacity='1';this.style.background='var(--ac-16)'" onmouseleave="this.style.opacity='.8';this.style.background='var(--ac-07)'">
+                  <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                  Add Account
+                </button>
               </div>
             </div>
           </div>
         </div>
-        <div style="display:flex;align-items:center;gap:20px">
-          <div class="banner-right" id="banner-right-stats">
-            <div>
-              <div class="bstat-label">Balance</div>
-              <div class="bstat-val" id="banner-balance" style="color:var(--green)">-</div>
-            </div>
-            <div>
-              <div class="bstat-label">Account Size</div>
-              <div class="bstat-val" id="banner-acct-size" style="color:var(--purple)">-</div>
-            </div>
-          </div>
-          <!-- Divider - always visible -->
-          <div style="width:1px;background:var(--border2);align-self:stretch"></div>
-          <!-- Profile chip - always visible regardless of account selection -->
-          <div onclick="goToSettings()" style="display:flex;align-items:center;gap:9px;cursor:pointer;padding:4px 2px;transition:opacity .15s;flex-shrink:0" onmouseenter="this.style.opacity='.75'" onmouseleave="this.style.opacity='1'" title="Edit profile">
-            <div id="banner-avatar" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:rgba(255,255,255,.9)">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
-            </div>
-            <div id="banner-profile-name" style="font-size:12px;font-weight:600;color:var(--text);font-family:var(--font-body);white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis">Trader</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STAT CARDS -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-left:6px;margin-right:6px">
-        <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Overview</div>
       </div>
       <div class="stat-row" id="stat-row">
         
@@ -1260,7 +1244,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
             <div style="margin-top:10px">
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-                <span id="tl-wl-loss" style="font-size:10px;font-family:var(--font-mono);color:var(--red);letter-spacing:.06em">13L</span>
+                <span id="tl-wl-loss" style="font-size:10px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em">13L</span>
                 <span style="font-size:9px;font-family:var(--font-mono);color:var(--text);letter-spacing:.08em;text-transform:uppercase">loss · win</span>
                 <span id="tl-wl-win" style="font-size:10px;font-family:var(--font-mono);color:var(--green);letter-spacing:.06em">15W</span>
               </div>
@@ -2127,68 +2111,34 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
 
-        <!-- â”€â”€ 04 R-MULTIPLE DISTRIBUTION â”€â”€ -->
-        <div class="panel" style="grid-column:span 2">
+        <!-- â”€â”€ 04 PERFORMANCE BY TIME â”€â”€ -->
+        <div class="panel" style="grid-column:span 2;min-width:0">
           <div class="panel-head" style="padding:14px 20px 13px">
             <div class="panel-title">
-              <span class="panel-title-accent" style="background:var(--amber)"></span>
-              R-Multiple Distribution
+              <span class="panel-title-accent" style="background:var(--blue2)"></span>
+              Performance by Time
             </div>
-            <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--green2);color:var(--green);border:1px solid rgba(46,204,138,.25)" id="rm-pill-avg">Avg 0R</span>
-              <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)" id="rm-pill-exp">Exp 0R</span>
-              <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)" id="rm-pill-trades">0 trades</span>
-              <!-- Symbol filter -->
-              <div style="position:relative" id="rm-sym-wrap">
-                <button onclick="toggleRmSymFilter()" id="rm-sym-btn" style="display:flex;align-items:center;gap:5px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:3px 9px;color:var(--text2);font-size:10px;font-family:var(--font-mono);cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">
-                  <span id="rm-sym-label">All Pairs</span>
-                  <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                </button>
-                <div id="rm-sym-dd" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:8px;min-width:140px;z-index:200;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.4)" id="rm-sym-dropdown">
-                  <div style="padding:6px" id="rm-sym-list"></div>
-                </div>
-              </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <select id="time-heatmap-period" onchange="cardPeriodSet('heatmap', this.value);" style="font-size:10px;font-family:var(--font-mono);color:var(--text);padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg4);min-width:120px">
+                <option value="all">Overall</option>
+                <option value="week">This week</option>
+              </select>
+              <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)" id="time-heatmap-pill-tz">TZ</span>
             </div>
           </div>
-          <!-- Stat row -->
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)">
-            <div style="padding:12px 20px;border-right:1px solid var(--border)">
-              <div class="stat-lbl">Avg R</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:18px" id="rm-stat-avg">-</div>
-            </div>
-            <div style="padding:12px 20px;border-right:1px solid var(--border)">
-              <div class="stat-lbl">Expectancy</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:18px" id="rm-stat-exp">-</div>
-            </div>
-            <div style="padding:12px 20px;border-right:1px solid var(--border)">
-              <div class="stat-lbl">Best R</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--green)" id="rm-stat-best">-</div>
-            </div>
-            <div style="padding:12px 20px">
-              <div class="stat-lbl">No SL Set</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--text3)" id="rm-stat-nosl">-</div>
-            </div>
+          <div style="padding:20px 20px 12px;overflow-x:auto;overflow-y:hidden;">
+            <div id="time-heatmap" style="display:grid;grid-template-columns:72px repeat(24,minmax(0,1fr));gap:2px;min-width:1080px;"></div>
           </div>
-          <!-- Chart -->
-          <div style="padding:24px 24px 8px;position:relative;overflow:visible">
-            <canvas id="rm-chart" style="height:200px !important"></canvas>
-            <div id="rm-tooltip" style="display:none;position:absolute;pointer-events:none;background:var(--bg2);border:1px solid rgba(245,166,35,.3);border-radius:8px;padding:8px 12px;font-family:var(--font-mono);font-size:10px;z-index:50;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)">
-              <div style="color:var(--text3);margin-bottom:3px" id="rm-tt-range"></div>
-              <div style="color:var(--text);font-weight:600" id="rm-tt-count"></div>
-              <div style="color:var(--text2);margin-top:2px" id="rm-tt-pct"></div>
-            </div>
-          </div>
-          <!-- Legend -->
-          <div style="display:flex;align-items:center;justify-content:center;gap:20px;padding:12px 20px 16px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:10px;padding:0 20px 18px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:6px">
-              <div style="width:16px;height:8px;border-radius:3px;background:var(--green);opacity:.8"></div>
-              <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Win</span>
+              <div style="width:12px;height:12px;border-radius:3px;background:rgba(46,204,138,.8)"></div>
+              <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Profit</span>
             </div>
             <div style="display:flex;align-items:center;gap:6px">
-              <div style="width:16px;height:8px;border-radius:3px;background:var(--red);opacity:.8"></div>
+              <div style="width:12px;height:12px;border-radius:3px;background:rgba(232,80,74,.8)"></div>
               <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Loss</span>
             </div>
-            <div style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">Trades without SL excluded</div>
+            <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">Values are average PnL for each day/hour cell</span>
           </div>
         </div>
 
@@ -2891,7 +2841,7 @@ window.addEventListener('DOMContentLoaded', function() {
           .faq-q-arrow{color:var(--text3);font-size:0;transition:transform .2s;flex-shrink:0;margin-top:2px;width:10px;display:flex;align-items:center;justify-content:center}
           .faq-q-arrow::before{content:'>';font-size:10px;line-height:1}
           .faq-a{display:none;margin-top:10px;font-family:var(--font-body);font-size:12px;color:var(--text2);line-height:1.7;padding-left:20px}
-          .faq-a code{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:var(--font-mono);font-size:11px;color:var(--purple)}
+          .faq-a code{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:var(--font-mono);font-size:11px;color:var(--purple)!important}
           .faq-a ul{padding-left:16px;margin-top:4px}
           .faq-a ul li{margin-bottom:4px}
           .faq-item.open .faq-q-arrow{transform:rotate(90deg)}
@@ -5314,6 +5264,19 @@ async function reloadAppDataFromSupabase() {
   } catch(e) {
     console.error('reloadAppDataFromSupabase error:', e);
   }
+}
+
+// ══ PWA SERVICE WORKER REGISTRATION ══
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registered:', registration.scope);
+      })
+      .catch(err => {
+        console.log('ServiceWorker registration failed:', err);
+      });
+  });
 }
 </script>
 

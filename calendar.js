@@ -552,17 +552,47 @@ function refreshAdvAnalytics() {
   const equityPanel = document.querySelector('#advan-grid .panel');
   const isAll = !anCurrentAccount || anCurrentAccount === '__all__';
   if (equityPanel) equityPanel.style.display = isAll ? 'none' : '';
-  if (!isAll) initEquityCurve(ecCurrentPeriod || 'all');
+
+  try {
+    if (!isAll) initEquityCurve(ecCurrentPeriod || 'all');
+  } catch (err) {
+    console.warn('refreshAdvAnalytics: initEquityCurve failed', err);
+  }
+
   // Reset month filter on account change
   _mpSelectedMonths.clear();
   const clearBtn = $('mp-clear-btn');
   if (clearBtn) clearBtn.style.display = 'none';
   const chipsEl = $('mp-month-chips');
   if (chipsEl) chipsEl.dataset.built = ''; // force chip rebuild
-  initMonthlyPnL();
-  initRMultiple();
-  initSymbolBreakdown();
-  initStreaks();
+
+  try {
+    initMonthlyPnL();
+  } catch (err) {
+    console.warn('refreshAdvAnalytics: initMonthlyPnL failed', err);
+  }
+
+  try {
+    initRMultiple();
+  } catch (err) {
+    console.warn('refreshAdvAnalytics: initRMultiple failed', err);
+  }
+
+  try {
+    initSymbolBreakdown();
+  } catch (err) {
+    console.warn('refreshAdvAnalytics: initSymbolBreakdown failed', err);
+  }
+
+  try {
+    initStreaks();
+  } catch (err) {
+    console.warn('refreshAdvAnalytics: initStreaks failed', err);
+  }
+
+  if (typeof renderTimePerformanceHeatmap === 'function') {
+    requestAnimationFrame(() => renderTimePerformanceHeatmap());
+  }
 }
 
 // ══════════════════════════════════════════════
@@ -1343,9 +1373,221 @@ function initMonthlyPnL() {
 }
 
 // ══════════════════════════════════════════════
-// ── ADVANCED ANALYTICS — 04 R-MULTIPLE ──
+// ── ADVANCED ANALYTICS — 04 PnL DISTRIBUTION + TIME HEATMAP ──
 // ══════════════════════════════════════════════
 let rmChartInst = null;
+let pnlDistChartInst = null;
+
+function getPnlChartCategories() {
+  return ['Large Win', 'Small Win', 'Small Loss', 'Large Loss'];
+}
+
+function parseTradeNumber(value) {
+  if (value == null) return NaN;
+  if (typeof value === 'number') return value;
+  const cleaned = String(value).trim().replace(/[^0-9+\-.eE]/g, '');
+  if (cleaned === '' || cleaned === '+' || cleaned === '-' ) return NaN;
+  const parsed = Number(cleaned);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
+function formatCurrency(value) {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '$0';
+  const sign = value >= 0 ? '+' : '-';
+  return sign + '$' + Math.abs(value).toFixed(0);
+}
+
+function renderPnlDistributionChart() {
+  const canvas = $('pnlDistChart');
+  const trades = (typeof getAnTrades === 'function' ? getAnTrades() : TRADES) || [];
+  const filtered = trades.filter(t => {
+    if (!t || t.pnl == null || String(t.pnl).trim() === '') return false;
+    return !Number.isNaN(parseTradeNumber(t.pnl));
+  });
+  const pnlValues = filtered.map(t => parseTradeNumber(t.pnl));
+  const totalAbs = pnlValues.reduce((sum, pnl) => sum + Math.abs(pnl), 0);
+  const avgAbs = filtered.length ? totalAbs / filtered.length : 0;
+  const categories = getPnlChartCategories();
+  const categorySums = { 'Large Win': 0, 'Small Win': 0, 'Small Loss': 0, 'Large Loss': 0 };
+
+  filtered.forEach(t => {
+    const pnl = parseTradeNumber(t.pnl);
+    if (pnl > 0) {
+      categorySums[pnl > avgAbs ? 'Large Win' : 'Small Win'] += pnl;
+    } else if (pnl < 0) {
+      categorySums[pnl < -avgAbs ? 'Large Loss' : 'Small Loss'] += pnl;
+    }
+  });
+
+  const values = categories.map(cat => Math.abs(categorySums[cat] || 0));
+  const colors = ['#2ecc71', '#7dda9f', '#f79c92', '#e8504a'];
+  const totalAbsText = totalAbs ? '$' + totalAbs.toFixed(0) : '$0';
+
+  const labelTrades = $('pnl-dist-pill-trades');
+  const labelAvg = $('pnl-dist-pill-avg');
+  if (labelTrades) labelTrades.textContent = filtered.length + ' trades';
+  if (labelAvg) labelAvg.textContent = 'Avg |PnL| ' + (avgAbs ? '$' + avgAbs.toFixed(0) : '$0');
+
+  if (!canvas) return;
+  if (pnlDistChartInst) { pnlDistChartInst.destroy(); pnlDistChartInst = null; }
+
+  pnlDistChartInst = new Chart(canvas.getContext('2d'), {
+    type: 'pie',
+    data: {
+      labels: categories,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderColor: 'var(--bg)',
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const label = ctx.label || '';
+              const raw = ctx.raw || 0;
+              const pct = totalAbs ? ((raw / totalAbs) * 100).toFixed(1) + '%' : '0%';
+              const pnl = formatCurrency(categorySums[label] || 0);
+              return `${label}: ${pnl} (${pct})`;
+            },
+            footer: () => 'Total abs PnL: ' + totalAbsText
+          }
+        }
+      }
+    }
+  });
+}
+
+function renderTimePerformanceHeatmap() {
+  const tzLabel = $('time-heatmap-pill-tz');
+  const periodEl = $('time-heatmap-period');
+  const timeHeatmap = $('time-heatmap');
+  const trades = (typeof getAnTradesForCard === 'function' ? getAnTradesForCard('heatmap') : (typeof getAnTrades === 'function' ? getAnTrades() : TRADES)) || [];
+  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const zone = (typeof getJournalTimezone === 'function' ? getJournalTimezone() : 'UTC');
+  if (periodEl) periodEl.value = (window._anCardPeriod && window._anCardPeriod.heatmap) || 'all';
+  if (tzLabel) tzLabel.textContent = zone;
+
+  const grid = {};
+  days.forEach(day => {
+    grid[day] = Array.from({ length: 24 }, () => ({ sum: 0, count: 0, ids: [] }));
+  });
+
+  trades.forEach(t => {
+    if (!t || t.pnl == null || String(t.pnl).trim() === '') return;
+    const pnl = parseTradeNumber(t.pnl);
+    if (!Number.isFinite(pnl)) return;
+
+    const rawDate = t.date || t.tradeDate || t.openDate || t.closeDate || t.entryDate || t['open_date'] || t['close_date'] || t['trade_date'] || '';
+    const rawTime = t.time || t.entryTime || t.openTime || t.closeTime || t.tradeTime || t['open_time'] || t['close_time'] || t['entry_time'] || '';
+    if (!rawDate || !rawTime) return;
+
+    let dateStr = rawDate;
+    let timeStr = rawTime;
+    if (typeof convertTradeDateTimeBetweenZones === 'function') {
+      const sourceTz = (typeof getImportSourceTimezone === 'function' ? getImportSourceTimezone() : '') || zone || 'UTC';
+      try {
+        const converted = convertTradeDateTimeBetweenZones(rawDate, rawTime, sourceTz, zone);
+        dateStr = converted.date || rawDate;
+        timeStr = converted.time || rawTime;
+      } catch (_) {
+        dateStr = rawDate;
+        timeStr = rawTime;
+      }
+    }
+
+    const timeMatch = String(timeStr).trim().match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+    if (!timeMatch) return;
+    let hour = parseInt(timeMatch[1], 10);
+    const minute = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
+    const ampm = timeMatch[3] ? timeMatch[3].toLowerCase() : null;
+    if (ampm) {
+      if (hour === 12) hour = ampm === 'am' ? 0 : 12;
+      else if (ampm === 'pm') hour += 12;
+    }
+    if (!Number.isFinite(hour) || hour < 0 || hour > 23) return;
+
+    let d = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
+    let dayName;
+    if (d) {
+      const dayIndex = new Date(Date.UTC(parseInt(d[1], 10), parseInt(d[2], 10) - 1, parseInt(d[3], 10))).getUTCDay();
+      dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
+    } else {
+      const parsedDate = new Date(dateStr);
+      if (Number.isNaN(parsedDate.getTime())) return;
+      const dayIndex = parsedDate.getUTCDay();
+      dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
+    }
+    if (!grid[dayName]) return;
+    grid[dayName][hour].sum += pnl;
+    grid[dayName][hour].count += 1;
+    if (t.id != null) grid[dayName][hour].ids.push(String(t.id));
+  });
+
+  let maxAbs = 0;
+  days.forEach(day => {
+    grid[day].forEach(cell => {
+      const avg = cell.count ? cell.sum / cell.count : 0;
+      cell.avg = avg;
+      maxAbs = Math.max(maxAbs, Math.abs(avg));
+    });
+  });
+  maxAbs = Math.max(maxAbs, 1);
+
+  if (!timeHeatmap) return;
+  const hourLabels = [''].concat(Array.from({ length: 24 }, (_, i) => `${i}`));
+  const header = hourLabels.map(label => {
+    return `<div class="hour-label">${label}</div>`;
+  }).join('');
+
+  const rows = days.map(day => {
+    const cells = grid[day].map((cell, hour) => {
+      const avg = cell.count ? cell.avg : null;
+      const absAvg = Math.abs(avg);
+      const intensity = avg === 0 ? 0 : Math.min(0.92, Math.max(0.12, absAvg / maxAbs * 0.85));
+      let bg;
+      let color;
+      if (avg > 0) {
+        bg = `rgba(46,204,138,${intensity})`;
+        color = '#fff';
+      } else if (avg < 0) {
+        bg = `rgba(232,80,74,${intensity})`;
+        color = '#fff';
+      } else if (cell.count > 0) {
+        bg = `rgba(139,92,246,${Math.min(0.8, Math.max(0.18, intensity || 0.25))})`;
+        color = '#fff';
+      } else {
+        bg = 'rgba(255,255,255,0.08)';
+        color = 'var(--text3)';
+      }
+      const text = avg !== null ? (avg === 0 ? '$0' : `${avg > 0 ? '+' : ''}$${avg.toFixed(0)}`) : '-';
+      const title = avg !== null
+        ? `${day} ${hour.toString().padStart(2, '0')}h · avg ${text} · ${cell.count} trade${cell.count === 1 ? '' : 's'}`
+        : `${day} · no trades`;
+      const clickable = cell.count > 0 && cell.ids.length > 0;
+      const cellIds = clickable ? cell.ids.join(',') : '';
+      const glow = cell.count ? bg : 'transparent';
+      return `<div class="trade-cell" title="${title}"${clickable ? ` data-ids="${cellIds}" onclick="navigateToLog({type:'ids',value:this.dataset.ids?this.dataset.ids.split(','):[]})"` : ''} style="--trade-glow:${glow};color:${color};background:${bg};">${cell.count ? text : '-'}</div>`;
+    }).join('');
+    return `<div style="display:contents"><div class="day-label">${day}</div>${cells}</div>`;
+  }).join('');
+
+  const hasTradeData = days.some(day => grid[day].some(cell => cell.count > 0));
+  if (!hasTradeData) {
+    timeHeatmap.innerHTML = `<div style="padding:40px 0 20px;grid-column:span 25;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:11px">No trades with valid date/time found for the selected data set.</div>`;
+    return;
+  }
+
+  timeHeatmap.innerHTML = header + rows;
+}
 
 // ── R-Multiple symbol filter ──
 const _rmSymFilters = {}; // per-account: { [acctName]: Set }
