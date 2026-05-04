@@ -371,14 +371,27 @@ function switchView(el) {
     // Topbar visibility rules
     const liveDateWrap = $('live-date-wrap');
     const tzSwitcher = $('tz-switcher-wrap');
+    const topbar = document.querySelector('.topbar');
     const topbarRight = document.querySelector('.topbar-right');
+    const authUserBadge = document.getElementById('auth-user-badge');
     const importBtn = $('import-trades-btn');
     const addTradeBtn = $('add-trade-btn-topbar');
     const showTopbarButtons = (v === 'dashboard' || v === 'tradelog' || v === 'accounts');
-    const showTzSwitcher = (v === 'dashboard' || v === 'accounts');
+    const showTzSwitcher = (v === 'dashboard');
+    const useTradeLogTopbarStyle = (v === 'tradelog' || v === 'analytics' || v === 'advanalytics' || v === 'calendar' || v === 'playbook' || v === 'accounts' || v === 'reports' || v === 'settings');
+    const showProfileInTopbar = !useTradeLogTopbarStyle;
+    const showAuthBadge = (v === 'dashboard');
     if (liveDateWrap) liveDateWrap.style.display = v === 'dashboard' ? '' : 'none';
     if (tzSwitcher) tzSwitcher.style.display = showTzSwitcher ? '' : 'none';
-    if (topbarRight) topbarRight.style.display = showTopbarButtons ? '' : 'none';
+    if (topbar) topbar.style.height = useTradeLogTopbarStyle ? '10px' : '';
+    if (topbarRight) topbarRight.style.display = showProfileInTopbar ? '' : 'none';
+    if (authUserBadge) {
+      if (showAuthBadge) {
+        authUserBadge.style.display = '';
+      } else {
+        authUserBadge.remove();
+      }
+    }
     if (importBtn) importBtn.style.display = showTopbarButtons ? '' : 'none';
     if (addTradeBtn) addTradeBtn.style.display = showTopbarButtons ? '' : 'none';
 
@@ -2918,6 +2931,25 @@ function anSetAccount(acct) {
   if (activeView?.id === 'view-advanalytics') { refreshAdvAnalytics(); }
 }
 
+function toggleAnAcctDropdown(btn) {
+  const dd = btn.nextElementSibling;
+  const open = btn.dataset.open === 'true';
+  if (open) {
+    dd.style.display = 'none';
+    btn.dataset.open = 'false';
+  } else {
+    dd.style.display = 'block';
+    btn.dataset.open = 'true';
+    setTimeout(() => document.addEventListener('click', function h(e) {
+      if (!dd.contains(e.target) && !btn.contains(e.target)) {
+        dd.style.display = 'none';
+        btn.dataset.open = 'false';
+        document.removeEventListener('click', h);
+      }
+    }), 0);
+  }
+}
+
 function buildAnAccountBar() {
   const allActive = !anCurrentAccount || anCurrentAccount === '__all__';
   const options = [
@@ -2946,31 +2978,12 @@ function buildAnAccountBar() {
   const displayLabel = allActive ? 'All Accounts' : (anCurrentAccount || 'Select account');
 
   return `
-    <div class="acct-selector an-acct-trigger" data-open="false"
-      onclick="(function(btn){
-        const dd = btn.nextElementSibling;
-        const chev = btn.querySelector('.an-acct-chevron');
-        const open = btn.dataset.open === 'true';
-        if(open){ dd.style.display='none'; btn.dataset.open='false'; chev.style.transform=''; }
-        else {
-          dd.style.display='block'; btn.dataset.open='true'; chev.style.transform='rotate(180deg)';
-          setTimeout(()=>document.addEventListener('click',function h(e){
-            if(!dd.contains(e.target)&&!btn.contains(e.target)){
-              dd.style.display='none'; btn.dataset.open='false'; chev.style.transform='';
-              document.removeEventListener('click',h);
-            }
-          }),0);
-        }
-      })(this)"
-      style="display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:3px 10px;cursor:pointer;transition:border-color .15s;user-select:none;min-width:200px;min-height:34px;justify-content:space-between"
-      onmouseenter="this.style.borderColor='var(--border3)'"
-      onmouseleave="if(this.dataset.open!=='true')this.style.borderColor='var(--border2)'">
-      <span style="font-size:12.5px;font-weight:500;color:var(--text)">${displayLabel}</span>
-      <span style="color:var(--text3);font-size:10px;margin-left:4px;display:flex;align-items:center">
-        <svg class="an-acct-chevron" width="10" height="10" viewBox="0 0 12 12" fill="none" style="transition:transform .2s"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button class="topbar-action-btn acct-selector an-acct-trigger" data-open="false" type="button" title="${displayLabel}" onclick="toggleAnAcctDropdown(this)" style="padding:0;min-width:0;width:42px;height:42px;display:flex;align-items:center;justify-content:center;">
+      <span id="an-acct-selected-label" style="display:flex;align-items:center;justify-content:center;width:100%;height:100%;color:var(--text)">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1v-9z"/><path d="M4 11h16" stroke-linecap="round"/><path d="M8 20v-6" stroke-linecap="round"/><path d="M12 20v-6" stroke-linecap="round"/><path d="M16 20v-6" stroke-linecap="round"/></svg>
       </span>
-    </div>
-    <div class="an-acct-dd" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:var(--bg2);border:1px solid var(--ac-20);border-radius:12px;min-width:260px;overflow:hidden;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px var(--ac-08)">
+    </button>
+    <div class="an-acct-dd" style="display:none;position:absolute;top:calc(100% + 6px);right:0;left:auto;background:var(--bg2);border:1px solid var(--ac-20);border-radius:12px;min-width:260px;overflow:hidden;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px var(--ac-08)">
       ${options}
     </div>`;
 }
@@ -3161,8 +3174,8 @@ function updateAnalyticsCards() {
   const losses = trades.filter(t => t.pnl < 0);
   const avgWin  = wins.length   ? wins.reduce((s,t)=>s+t.pnl,0)/wins.length    : 0;
   const avgLoss = losses.length ? losses.reduce((s,t)=>s+t.pnl,0)/losses.length : 0;
-  const best    = trades.length ? trades.reduce((b,t)=>t.pnl>b.pnl?t:b, trades[0]) : null;
-  const worst   = trades.length ? trades.reduce((w,t)=>t.pnl<w.pnl?t:w, trades[0]) : null;
+  const best    = wins.length ? wins.reduce((b,t)=>t.pnl>b.pnl?t:b, wins[0]) : null;
+  const worst   = losses.length ? losses.reduce((w,t)=>t.pnl<w.pnl?t:w, losses[0]) : null;
   const rr      = (avgWin && avgLoss) ? (avgWin / Math.abs(avgLoss)) : null;
 
   const aw = $('an-avg-win');
@@ -3200,7 +3213,7 @@ function updateAnalyticsCards() {
   const alsub = $('an-avg-loss-sub');
   const rsub  = $('an-rr-sub');
 
-  if (bsub)  bsub.textContent  = best  ? best.symbol  : '—';
+  if (bsub)  bsub.textContent  = best  ? best.symbol  : 'No best trade yet';
   if (wsub)  wsub.textContent  = worst ? worst.symbol : '—';
   // Store IDs on cards for click navigation
   const bestCard  = $('an-best-card');
@@ -5641,7 +5654,9 @@ function selectAcct(i) {
   if (window._tradeLogDrilldownActive) clearTradeLogTransientFilters(true);
   if (i === -1) {
     const acctLabel = $('acct-selected-label');
-    if (acctLabel) acctLabel.textContent = 'All Accounts';
+    if (acctLabel) acctLabel.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1v-9z"/><path d="M4 11h16" stroke-linecap="round"/><path d="M8 20v-6" stroke-linecap="round"/><path d="M12 20v-6" stroke-linecap="round"/><path d="M16 20v-6" stroke-linecap="round"/></svg>';
+    const acctButton = $('acct-selector-btn');
+    if (acctButton) acctButton.title = 'All Accounts';
     const bannerTitle = $('banner-title-text');
     if (bannerTitle) {
       // Keep the arrow, just update the firm name and phase
@@ -5660,8 +5675,8 @@ function selectAcct(i) {
     if (bannerPhaseTag) bannerPhaseTag.textContent = 'ALL';
   } else {
     const a = ACCOUNTS[i];
-    const acctLabel = $('acct-selected-label');
-    if (acctLabel) acctLabel.textContent = a.firm;
+    const acctButton = $('acct-selector-btn');
+    if (acctButton) acctButton.title = a.firm;
     const bannerTitle = $('banner-title-text');
     if (bannerTitle) {
       // Keep the arrow, just update the firm name and phase
@@ -5677,6 +5692,10 @@ function selectAcct(i) {
     if (tag) { tag.textContent = a.phase; tag.style.cssText = 'background:var(--ac-15);color:#a97de8;border:1px solid var(--ac-30);padding:2px 8px;border-radius:5px;font-size:10px;font-family:JetBrains Mono,monospace;font-weight:500'; }
     const bannerPhaseTag = $('banner-phase-tag');
     if (bannerPhaseTag) bannerPhaseTag.textContent = a.phase;
+  }
+  const anAcctBtn = $('an-acct-selector-btn');
+  if (anAcctBtn) {
+    anAcctBtn.title = i === -1 ? 'All Accounts' : ACCOUNTS[i].firm;
   }
   renderAcctList();
   closeAcctDropdown();

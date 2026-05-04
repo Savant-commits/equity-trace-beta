@@ -2544,7 +2544,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .page-btn{width:26px;height:26px;border-radius:6px;background:var(--bg4);border:1px solid var(--border);cursor:pointer;font-size:11px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:all .18s cubic-bezier(.4,0,.2,1)}
 .page-btn.active,.page-btn:hover{background:var(--purple2);border-color:var(--ac-45);color:#b891f5;box-shadow:0 0 8px var(--ac-25)}
 
-.sym-cell{display:flex;justify-content:center}
+.sym-cell{display:flex;justify-content:center;align-items:center}
 .sym-name{position:relative;display:inline-flex;align-items:center;justify-content:center;font-weight:500;font-family:var(--font-display);font-size:13px}
 .sym-code{font-weight:500}
 .sym-badge{font-family:var(--font-mono);font-size:9px;background:var(--ac-35);color:var(--ac-80);padding:2px 6px;border-radius:3px;white-space:nowrap;margin-left:6px;flex-shrink:0}
