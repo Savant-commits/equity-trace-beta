@@ -975,6 +975,9 @@ function confirmImportTrades() {
   const skipCount = result.skipCount;
 
   saveTradesToStorage();
+  if (importCount > 0 && typeof checkAndCreateNextPhase === 'function') {
+    checkAndCreateNextPhase(targetAccount);
+  }
   // Clear state after successful import
   _importedTrades = [];
   _importFile = null;
@@ -1261,6 +1264,7 @@ async function runBrokerSync(connectionId, manual) {
 
     if (result.importCount > 0) {
       saveTradesToStorage();
+      if (typeof checkAndCreateNextPhase === 'function') checkAndCreateNextPhase(c.account);
       if (typeof renderTrades === 'function') renderTrades(TRADES);
       if (typeof populateDashboard === 'function') populateDashboard();
       if (typeof refreshAdvAnalytics === 'function') refreshAdvAnalytics();

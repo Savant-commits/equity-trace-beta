@@ -423,8 +423,9 @@ document.addEventListener('click', function(e) {
     });
 
     document.addEventListener('click',function(e){
-      if(clkOpen&&!pop.contains(e.target)&&e.target!==inp)clkCancel();
-    });
+      const clickedTimeInput = e.target === inp || (e.target instanceof Element && !!e.target.closest('#f-time'));
+      if(clkOpen && !pop.contains(e.target) && !clickedTimeInput) clkCancel();
+    }, true);
 
     // Date auto-format + clear btn
     const dateInp=$('f-date');
@@ -1575,7 +1576,8 @@ function renderTimePerformanceHeatmap() {
       const clickable = cell.count > 0 && cell.ids.length > 0;
       const cellIds = clickable ? cell.ids.join(',') : '';
       const glow = cell.count ? bg : 'transparent';
-      return `<div class="trade-cell" title="${title}"${clickable ? ` data-ids="${cellIds}" onclick="navigateToLog({type:'ids',value:this.dataset.ids?this.dataset.ids.split(','):[]})"` : ''} style="--trade-glow:${glow};color:${color};background:${bg};">${cell.count ? text : '-'}</div>`;
+      const cellBg = cell.count ? bg : 'var(--bg3)';
+      return `<div class="trade-cell" title="${title}"${clickable ? ` data-ids="${cellIds}" onclick="navigateToLog({type:'ids',value:this.dataset.ids?this.dataset.ids.split(','):[]})"` : ''} style="--trade-glow:${glow};color:${color};background:${cellBg};">${cell.count ? text : '-'}</div>`;
     }).join('');
     return `<div style="display:contents"><div class="day-label">${day}</div>${cells}</div>`;
   }).join('');

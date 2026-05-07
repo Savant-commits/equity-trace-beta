@@ -7767,12 +7767,99 @@ function removeAccountPhoto() {
   updateAccountPhotoPreview('');
 }
 
+const _ACM_CHALLENGE_TYPES = ['Instant', '1 Phase', '2 Phase', '3 Phase', 'Funded'];
+
+function _setAcmPhaseVisual(value) {
+  const label = $('acm-phase-label');
+  const trigger = $('acm-phase-trigger');
+  if (label) {
+    label.textContent = value || 'Select Phase...';
+    label.style.color = value ? 'var(--text)' : 'var(--text3)';
+  }
+  if (trigger && trigger.dataset.open !== 'true') trigger.style.borderColor = 'var(--border)';
+}
+
+function renderAcmPhaseOptions() {
+  const list = $('acm-phase-list');
+  if (!list) return;
+  const current = $('acm-phase') ? $('acm-phase').value : '';
+  list.innerHTML = _ACM_CHALLENGE_TYPES.map(type => {
+    const active = type === current;
+    return `<div onclick="selectAcmPhase('${type}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--font-body);color:${active?'var(--purple)':'var(--text2)'};background:${active?'var(--ac-12)':'transparent'};transition:background .12s" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${active?'var(--ac-12)':'transparent'}'">
+      <span>${type}</span>
+      ${active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1.5 6l3 3 6-6" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+    </div>`;
+  }).join('');
+}
+
+function toggleAcmPhaseDropdown(event) {
+  if (event) event.stopPropagation();
+  const dd = $('acm-phase-dd');
+  const trigger = $('acm-phase-trigger');
+  const chev = $('acm-phase-chevron');
+  if (!dd || !trigger) return;
+  const open = dd.style.display === 'block';
+  if (open) {
+    dd.style.display = 'none';
+    trigger.dataset.open = 'false';
+    trigger.style.borderColor = 'var(--border)';
+    if (chev) chev.style.transform = '';
+    return;
+  }
+  renderAcmPhaseOptions();
+  dd.style.display = 'block';
+  trigger.dataset.open = 'true';
+  trigger.style.borderColor = 'var(--ac-50)';
+  if (chev) chev.style.transform = 'rotate(180deg)';
+  setTimeout(() => {
+    document.addEventListener('click', function h(e) {
+      const wrap = $('acm-phase-trigger')?.parentElement;
+      if (wrap && !wrap.contains(e.target)) {
+        dd.style.display = 'none';
+        trigger.dataset.open = 'false';
+        trigger.style.borderColor = 'var(--border)';
+        if (chev) chev.style.transform = '';
+        document.removeEventListener('click', h);
+      }
+    });
+  }, 0);
+}
+
+function selectAcmPhase(value) {
+  const input = $('acm-phase');
+  if (!input) return;
+  input.value = value;
+  _setAcmPhaseVisual(value);
+  const dd = $('acm-phase-dd');
+  const trigger = $('acm-phase-trigger');
+  const chev = $('acm-phase-chevron');
+  if (dd) dd.style.display = 'none';
+  if (trigger) { trigger.dataset.open = 'false'; trigger.style.borderColor = 'var(--border)'; }
+  if (chev) chev.style.transform = '';
+  updatePhaseFields();
+}
+
+function setAcmCurrentPhase(phaseNum) {
+  const input = $('acm-current-phase');
+  if (!input) return;
+  input.value = String(phaseNum);
+  [1,2,3].forEach(n => {
+    const pill = $('acm-phase-pill-' + n);
+    if (!pill) return;
+    const active = n === phaseNum;
+    pill.style.background = active ? 'var(--ac-12)' : 'var(--bg4)';
+    pill.style.borderColor = active ? 'var(--ac-50)' : 'var(--border)';
+    pill.style.color = active ? 'var(--purple)' : 'var(--text2)';
+  });
+}
+
 function updatePhaseFields() {
   try {
     const phaseType = $('acm-phase') ? $('acm-phase').value : '';
     const profitCol = $('acm-profit-target-col');
     const multiPhaseSection = $('acm-multi-phase-targets');
     const currentPhaseInput = $('acm-current-phase');
+    const currentPhaseCol = $('acm-current-phase-col');
     
     // Show single profit target only for 1 Phase. Multi-phase uses the dedicated phase targets section.
     if (profitCol) {
@@ -7785,29 +7872,23 @@ function updatePhaseFields() {
     // ──────────────────────────────────────────────────────────
     if (currentPhaseInput) {
       const isMultiPhase = phaseType === '2 Phase' || phaseType === '3 Phase';
-      
-      // Show/hide the field
-      currentPhaseInput.parentElement.style.display = isMultiPhase ? '' : 'none';
-      
-      // Enable/disable editing
+
+      if (currentPhaseCol) currentPhaseCol.style.display = isMultiPhase ? '' : 'none';
+
       if (isMultiPhase) {
-        // Show and make editable
-        currentPhaseInput.disabled = false;
-        currentPhaseInput.style.opacity = '1';
-        currentPhaseInput.style.cursor = 'text';
-        currentPhaseInput.style.pointerEvents = 'auto';
-        if (currentPhaseInput.value === '' || currentPhaseInput.value === '0') {
-          currentPhaseInput.value = '1';
-        }
-        // Set max value based on phase type
-        currentPhaseInput.max = phaseType === '3 Phase' ? '3' : '2';
+        const maxPhase = phaseType === '3 Phase' ? 3 : 2;
+        let current = parseInt(currentPhaseInput.value, 10) || 1;
+        if (current < 1) current = 1;
+        if (current > maxPhase) current = maxPhase;
+        currentPhaseInput.value = String(current);
+        const p2 = $('acm-phase-pill-2');
+        const p3 = $('acm-phase-pill-3');
+        if (p2) p2.style.display = '';
+        if (p3) p3.style.display = phaseType === '3 Phase' ? '' : 'none';
+        setAcmCurrentPhase(current);
       } else {
-        // Hide and disable
-        currentPhaseInput.disabled = true;
         currentPhaseInput.value = '1';
-        currentPhaseInput.style.opacity = '0.5';
-        currentPhaseInput.style.cursor = 'not-allowed';
-        currentPhaseInput.style.pointerEvents = 'none';
+        setAcmCurrentPhase(1);
       }
     }
     
@@ -7854,20 +7935,22 @@ function checkAndCreateNextPhase(accountName) {
       if (match) totalPhases = parseInt(match[1]) || 1;
     }
     
-    // Check if profit target reached and next phase doesn't exist
-    if (totalPnL >= profitTargetAmount && currentPhaseNum < totalPhases) {
-      // Check if next phase account already exists
+    // Require target hit before any phase progression.
+    if (totalPnL < profitTargetAmount) return;
+
+    const nextId = ACCOUNTS.length > 0 ? Math.max(...ACCOUNTS.map(a => a.id || 0)) + 1 : 1;
+
+    // If not at final challenge phase yet: create next challenge phase account.
+    if (currentPhaseNum < totalPhases) {
       const nextPhaseNum = currentPhaseNum + 1;
-      const nextPhaseKey = `${account.firm} - Phase ${nextPhaseNum}`;
-      const nextPhaseExists = ACCOUNTS.some(a => a.key === nextPhaseKey.replace(/\s+/g, ' ').trim());
-      
-      if (!nextPhaseExists) {
-        // Auto-create next phase
+      const nextPhaseKey = `${account.firm} - Phase ${nextPhaseNum}`.replace(/\s+/g, ' ').trim();
+      const existingNext = ACCOUNTS.find(a => (a.key || '').trim() === nextPhaseKey);
+      if (!existingNext) {
         const nextPhaseAccount = {
-          id: Date.now(),
+          id: nextId,
           firm: account.firm,
           phase: nextPhaseKey,
-          key: nextPhaseKey.replace(/\s+/g, ' ').trim(),
+          key: nextPhaseKey,
           balance: '$' + account.startBal.toFixed(2),
           active: true,
           startBal: account.startBal,
@@ -7887,16 +7970,64 @@ function checkAndCreateNextPhase(accountName) {
         ACCOUNTS.push(nextPhaseAccount);
         account.nextPhaseId = nextPhaseAccount.id;
         saveAccounts();
-        showToast(`🎉 Phase ${nextPhaseNum} account auto-created!`, 'success', '✓', 3000);
-        // Only refresh Accounts page if it's currently active
-        if (typeof renderAccountsPage === 'function') {
-          renderAccountsPage();
-        }
-        // ── Sync the Add Trade modal account list ──
-        if (typeof syncTradeModalAccountList === 'function') {
-          syncTradeModalAccountList();
-        }
+        showToast(
+          `🎉 Congrats! You passed ${account.firm} Phase ${currentPhaseNum}. Phase ${nextPhaseNum} has been unlocked automatically.`,
+          'success',
+          '🏆',
+          4200
+        );
+        if (typeof renderAccountsPage === 'function') renderAccountsPage();
+        if (typeof syncTradeModalAccountList === 'function') syncTradeModalAccountList();
+      } else if (!account.nextPhaseId) {
+        account.nextPhaseId = existingNext.id;
+        saveAccounts();
       }
+      return;
+    }
+
+    // Final challenge phase passed -> auto-create funded account.
+    const fundedKey = String(account.firm || '').replace(/\s+/g, ' ').trim();
+    if (!fundedKey) return;
+    const existingFunded = ACCOUNTS.find(a =>
+      String(a.challengeType || '').trim() === 'Funded' &&
+      String(a.firm || '').replace(/\s+/g, ' ').trim() === fundedKey
+    );
+    if (!existingFunded) {
+      const fundedAccount = {
+        id: nextId,
+        firm: account.firm,
+        phase: fundedKey,
+        key: fundedKey,
+        balance: '$' + account.startBal.toFixed(2),
+        active: true,
+        startBal: account.startBal,
+        challengeType: 'Funded',
+        currentPhase: null,
+        phaseTargets: {},
+        maxDrawdown: account.maxDrawdown,
+        dailyLoss: account.dailyLoss,
+        profitTarget: null,
+        ddType: account.ddType,
+        notes: account.notes ? account.notes + ` [Auto-created funded from Phase ${currentPhaseNum}]` : `[Auto-created funded from Phase ${currentPhaseNum}]`,
+        leverage: account.leverage,
+        nextPhaseId: null,
+        prevPhaseId: account.id,
+        createdDate: new Date().toISOString()
+      };
+      ACCOUNTS.push(fundedAccount);
+      account.nextPhaseId = fundedAccount.id;
+      saveAccounts();
+      showToast(
+        `🎉 Huge win! You passed ${account.firm} Phase ${currentPhaseNum}. Your Funded account has been created automatically.`,
+        'success',
+        '🏆',
+        4600
+      );
+      if (typeof renderAccountsPage === 'function') renderAccountsPage();
+      if (typeof syncTradeModalAccountList === 'function') syncTradeModalAccountList();
+    } else if (!account.nextPhaseId) {
+      account.nextPhaseId = existingFunded.id;
+      saveAccounts();
     }
   } catch (e) {
     console.warn('checkAndCreateNextPhase error:', e);
@@ -8720,6 +8851,13 @@ function deleteAccountCard(id) {
 }
 
 function openAddAccountModal() {
+  // Defensive reset: ensure no stale/legacy overlays or menus block first click.
+  const legacyOverlay = $('add-account-overlay');
+  if (legacyOverlay) legacyOverlay.style.display = 'none';
+  const optionsDropdown = $('acct-options-dropdown');
+  if (optionsDropdown) optionsDropdown.style.display = 'none';
+  document.removeEventListener('click', closeAcctOptionsOutside);
+
   _acmEditId = null;
   _acmActive = true;
   $('acct-modal-title').textContent = 'Add Account';
@@ -8744,9 +8882,17 @@ function openAddAccountModal() {
   _acmPhotoData = '';
   updateAccountAvatarFallback();
   updateAccountPhotoPreview('');
+  _setAcmPhaseVisual('');
+  setAcmCurrentPhase(1);
   updatePhaseFields();
   _syncAcctModalActiveUI();
-  $('acct-modal-overlay').style.display = 'flex';
+  const overlay = $('acct-modal-overlay');
+  if (overlay) {
+    overlay.style.display = 'none';
+    // Force a paint so reopening always takes effect on first click.
+    void overlay.offsetWidth;
+    overlay.style.display = 'flex';
+  }
   setTimeout(() => $('acm-firm').focus(), 50);
 }
 
@@ -8786,6 +8932,8 @@ function openEditAccountModal(id) {
   updateAccountAvatarFallback();
   _acmPhotoData = a.avatar || '';
   updateAccountPhotoPreview(_acmPhotoData);
+  _setAcmPhaseVisual(a.challengeType || '');
+  setAcmCurrentPhase(parseInt($('acm-current-phase').value, 10) || 1);
   updatePhaseFields();
   _syncAcctModalActiveUI();
   $('acct-modal-overlay').style.display = 'flex';
@@ -8793,6 +8941,8 @@ function openEditAccountModal(id) {
 
 function closeAccountModal() {
   $('acct-modal-overlay').style.display = 'none';
+  const legacyOverlay = $('add-account-overlay');
+  if (legacyOverlay) legacyOverlay.style.display = 'none';
 }
 
 function toggleAcctModalActive() {
