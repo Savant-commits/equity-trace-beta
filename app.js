@@ -323,6 +323,19 @@ window.addEventListener('focus', () => {
 // ── Scroll position store ──
 const _viewScrollPos = {};
 
+function syncTopbarOffset() {
+  const root = document.documentElement;
+  if (!root) return;
+  const topbar = document.querySelector('.topbar');
+  const fallback = getComputedStyle(root).getPropertyValue('--topbar-height').trim() || '66px';
+  if (!topbar) {
+    root.style.setProperty('--topbar-offset', fallback);
+    return;
+  }
+  const h = Math.round(topbar.getBoundingClientRect().height);
+  root.style.setProperty('--topbar-offset', h > 0 ? `${h}px` : fallback);
+}
+
 function goToView(view) {
   var el = document.querySelector('[data-view="' + view + '"]');
   if (el) switchView(el);
@@ -384,6 +397,7 @@ function switchView(el) {
     if (liveDateWrap) liveDateWrap.style.display = v === 'dashboard' ? '' : 'none';
     if (tzSwitcher) tzSwitcher.style.display = showTzSwitcher ? '' : 'none';
     if (topbar) topbar.style.height = useTradeLogTopbarStyle ? '10px' : '';
+    requestAnimationFrame(syncTopbarOffset);
     if (topbarRight) topbarRight.style.display = showProfileInTopbar ? '' : 'none';
     if (authUserBadge) {
       if (showAuthBadge) {
@@ -482,7 +496,6 @@ function updateTlCards(trades) {
   const todayTrades = trades.filter(t => t.date === todayStr).length;
   const weekTrades  = trades.filter(t => new Date(t.date) >= weekStart).length;
   const monthTrades = trades.filter(t => new Date(t.date) >= monthStart).length;
-  const bwMode = window._bwCardMode || 'dollar';
 
   // ── Card 1: Total Trades ticker ──
   const ttVal0 = $('tl-tt-val-0');
@@ -555,81 +568,44 @@ function updateTlCards(trades) {
       pfEl.style.setProperty('color', 'var(--purple)', 'important');
     }
   }
-  // ── Best & Worst trade (hover overlay) ──
-  syncBwToggleButtons(bwMode);
+  // ── Consistency card (trade log) ──
+  const tlDailyPnlMap = {};
+  trades.forEach(t => {
+    if (!t.date) return;
+    tlDailyPnlMap[t.date] = (tlDailyPnlMap[t.date] || 0) + (t.pnl || 0);
+  });
+  const tlDayPnls = Object.values(tlDailyPnlMap);
+  const tlBestWinningDayProfit = tlDayPnls.length
+    ? Math.max(0, ...tlDayPnls.filter(v => v > 0))
+    : 0;
+  const tlAbsTotalProfit = Math.abs(netPnl);
+  const tlHasConsistencyData = netPnl > 0 && tlBestWinningDayProfit > 0;
+  const tlConsistencyPct = tlHasConsistencyData
+    ? (Math.abs(tlBestWinningDayProfit) / tlAbsTotalProfit) * 100
+    : 0;
+  const tlRoundedConsistencyPct = Number(tlConsistencyPct.toFixed(2));
 
-  if (trades.length > 0) {
-    // Helper: get startBal for a trade's account
-    function _tradeAcctBal(t) {
-      const acct = ACCOUNTS.find(a =>
-        (a.key || a.phase) === (t.account || '') ||
-        (a.firm + ' - ' + (a.key || a.phase)) === (t.account || '')
-      );
-      return (acct && acct.startBal > 0) ? acct.startBal : 25000;
-    }
+  const tlConsistencyValueEl = $('tl-consistency-pct');
+  const tlConsistencyStatusEl = $('tl-consistency-status');
+  const tlConsistencySubEl = $('tl-consistency-sub');
 
-    let best, worst;
-    if (bwMode === 'pct') {
-      // Rank by pnl as % of that trade's own account size
-      best  = trades.reduce((b, t) => (t.pnl / _tradeAcctBal(t)) > (b.pnl / _tradeAcctBal(b)) ? t : b, trades[0]);
-      worst = trades.reduce((w, t) => (t.pnl / _tradeAcctBal(t)) < (w.pnl / _tradeAcctBal(w)) ? t : w, trades[0]);
-    } else {
-      best  = trades.reduce((b, t) => t.pnl > b.pnl ? t : b, trades[0]);
-      worst = trades.reduce((w, t) => t.pnl < w.pnl ? t : w, trades[0]);
-    }
+  if (tlConsistencyValueEl) {
+    tlConsistencyValueEl.textContent = tlHasConsistencyData ? `${tlRoundedConsistencyPct.toFixed(2)}%` : '0.00%';
+    tlConsistencyValueEl.style.color = tlHasConsistencyData ? 'var(--purple)' : 'var(--text3)';
+  }
 
-    const barTotal = Math.abs(best.pnl) + Math.abs(worst.pnl) || 1;
-    const bestBarPct = ((Math.abs(best.pnl) / barTotal) * 100).toFixed(1);
+  if (tlConsistencyStatusEl) {
+    tlConsistencyStatusEl.textContent = tlHasConsistencyData ? '' : 'NOT ENOUGH DATA';
+    tlConsistencyStatusEl.style.color = 'var(--text3)';
+  }
 
-    const bestValEl  = $('tl-best-val');
-    const worstValEl = $('tl-worst-val');
-    const bestSymEl  = $('tl-best-sym');
-    const worstSymEl = $('tl-worst-sym');
-    const bestLblEl  = $('tl-best-label');
-    const worstLblEl = $('tl-worst-label');
-    const bestBar    = $('tl-best-bar');
-
-    // Build both dollar and pct strings - use combined values if available
-    const bestAcctBal   = _tradeAcctBal(best);
-    const worstAcctBal  = _tradeAcctBal(worst);
-    const bestPnlValue  = best._isGrouped ? best._combinedPnL : best.pnl;
-    const worstPnlValue = worst._isGrouped ? worst._combinedPnL : worst.pnl;
-    const bestPctVal    = (bestPnlValue  / bestAcctBal)  * 100;
-    const worstPctVal   = (worstPnlValue / worstAcctBal) * 100;
-    const bestDolStr    = (bestPnlValue  >= 0 ? '+$' : '-$') + Math.abs(bestPnlValue).toFixed(2);
-    const worstDolStr   = (worstPnlValue >= 0 ? '+$' : '-$') + Math.abs(worstPnlValue).toFixed(2);
-    const bestPctStr    = (bestPctVal  >= 0 ? '+' : '') + bestPctVal.toFixed(2)  + '%';
-    const worstPctStr   = (worstPctVal >= 0 ? '+' : '') + worstPctVal.toFixed(2) + '%';
-    const bestColor     = bestPnlValue  >= 0 ? 'var(--green)' : 'var(--red)';
-    const worstColor    = worstPnlValue >= 0 ? 'var(--green)' : 'var(--red)';
-
-    // Store BOTH values as data-attributes — setBwCardMode reads them directly (no re-render)
-    if (bestValEl)  { bestValEl.dataset.dollar  = bestDolStr;   bestValEl.dataset.pct  = bestPctStr;  bestValEl.dataset.color  = bestColor;
-                      bestValEl.dataset.tradeId  = best.id;  bestValEl.style.cursor = 'pointer'; bestValEl.title = 'Click to view trade'; }
-    if (worstValEl) { worstValEl.dataset.dollar = worstDolStr;  worstValEl.dataset.pct = worstPctStr; worstValEl.dataset.color = worstColor;
-                      worstValEl.dataset.tradeId = worst.id; worstValEl.style.cursor = 'pointer'; worstValEl.title = 'Click to view trade'; }
-    if (bestLblEl)  { bestLblEl.dataset.dollar  = bestDolStr;   bestLblEl.dataset.pct  = bestPctStr;  bestLblEl.dataset.color  = bestColor; }
-    if (worstLblEl) { worstLblEl.dataset.dollar = worstDolStr;  worstLblEl.dataset.pct = worstPctStr; worstLblEl.dataset.color = worstColor; }
-    if (bestSymEl)  bestSymEl.dataset.tradeId  = best.id;
-    if (worstSymEl) worstSymEl.dataset.tradeId = worst.id;
-
-    // Render based on current mode (large val = mode format, small label = other format)
-    const _bwM = window._bwCardMode || 'dollar';
-    if (bestValEl)  { bestValEl.textContent  = _bwM === 'pct' ? bestPctStr  : bestDolStr;  bestValEl.style.setProperty('color', bestColor, 'important'); }
-    if (worstValEl) { worstValEl.textContent = _bwM === 'pct' ? worstPctStr : worstDolStr; worstValEl.style.setProperty('color', worstColor, 'important'); }
-    if (bestLblEl)  { bestLblEl.textContent  = _bwM === 'pct' ? bestDolStr  : bestPctStr;  bestLblEl.style.setProperty('color', bestColor, 'important'); }
-    if (worstLblEl) { worstLblEl.textContent = _bwM === 'pct' ? worstDolStr : worstPctStr; worstLblEl.style.setProperty('color', worstColor, 'important'); }
-    if (bestBar)    bestBar.style.width    = bestBarPct + '%';
-    const worstBar = $('tl-worst-bar');
-    if (worstBar) {
-      worstBar.style.background = worst.pnl < 0
-        ? 'linear-gradient(90deg,#b53030,#e8504a)'
-        : 'linear-gradient(90deg,#2a6644,#4a9e6b)';
-      worstBar.style.boxShadow = worst.pnl < 0
-        ? '0 0 6px rgba(232,80,74,.25)'
-        : '0 0 6px rgba(74,158,107,.2)';
-    }
-
+  if (tlConsistencySubEl) {
+    const tlBestDayAmount = Math.abs(tlBestWinningDayProfit).toFixed(2);
+    const tlTotalAmount = Math.abs(netPnl).toFixed(2);
+    const tlTotalPrefix = netPnl < 0 ? '-' : '';
+    const tlBestDayClass = tlBestWinningDayProfit > 0 ? 'profit' : '';
+    const tlTotalClass = netPnl > 0 ? 'profit' : netPnl < 0 ? 'loss' : '';
+    tlConsistencySubEl.innerHTML = `Best day: <span class="consistency-sub-value ${tlBestDayClass}">$${tlBestDayAmount}</span>\nTotal profit: <span class="consistency-sub-value ${tlTotalClass}">${tlTotalPrefix}$${tlTotalAmount}</span>`;
   }
 }
 
@@ -755,6 +731,39 @@ function renderTrades(trades) {
   
   // Group combined trades for display
   const displayTrades = groupCombinedTrades(trades);
+  const parseTradeTimestamp = (trade) => {
+    if (!trade || !trade.date) return 0;
+    const baseDate = String(trade.date).trim();
+    const rawTime = String(trade.time || '00:00').trim();
+    let hour = 0;
+    let minute = 0;
+    const match = rawTime.match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/i);
+    if (match) {
+      hour = parseInt(match[1], 10);
+      minute = parseInt(match[2] || '0', 10);
+      const ampm = (match[3] || '').toLowerCase();
+      if (ampm) {
+        if (hour === 12) hour = ampm === 'am' ? 0 : 12;
+        else if (ampm === 'pm') hour += 12;
+      }
+    }
+    const parts = baseDate.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (parts) {
+      const dt = new Date(
+        Number(parts[1]),
+        Number(parts[2]) - 1,
+        Number(parts[3]),
+        Number.isFinite(hour) ? hour : 0,
+        Number.isFinite(minute) ? minute : 0,
+        0,
+        0
+      );
+      return Number.isFinite(dt.getTime()) ? dt.getTime() : 0;
+    }
+    const dt = new Date(`${baseDate} ${rawTime}`);
+    return Number.isFinite(dt.getTime()) ? dt.getTime() : 0;
+  };
+  displayTrades.sort((a, b) => parseTradeTimestamp(b) - parseTradeTimestamp(a));
   
   const totalPages = Math.max(1, Math.ceil(displayTrades.length / TRADES_PER_PAGE));
   if (currentPage > totalPages) currentPage = totalPages;
@@ -2810,9 +2819,47 @@ function getAnTrades() {
 // Per-card "This week" period filter
 if (!window._anCardPeriod) window._anCardPeriod = {};
 
+function normalizeHeatmapSessionLabel(label) {
+  const key = String(label || '').trim().toLowerCase();
+  if (!key) return '';
+  if (key === 'asia') return 'asia';
+  if (key === 'true day open' || key === 'tdo') return 'tdo';
+  if (key === 'london') return 'london';
+  if (key === 'ny am' || key === 'new york am' || key === 'newyork am') return 'nyam';
+  if (key === 'london close') return 'londonclose';
+  if (key === 'ny pm' || key === 'new york pm' || key === 'newyork pm') return 'nypm';
+  if (key === 'random') return 'random';
+  return key.replace(/\s+/g, '');
+}
+
+function getHeatmapSessionKeyForTrade(trade) {
+  const explicitSession = normalizeHeatmapSessionLabel(trade && trade.session);
+  if (explicitSession) return explicitSession;
+  const tradeTime = trade && (trade.time || trade.entryTime || trade.openTime || trade.tradeTime || trade.entry_time || trade.open_time || trade.trade_time);
+  if (!tradeTime) return 'random';
+  try {
+    if (typeof inferSessionFromTradingTime === 'function') {
+      const inferred = inferSessionFromTradingTime(tradeTime);
+      return normalizeHeatmapSessionLabel(inferred) || 'random';
+    }
+    if (typeof inferSessionFromESTTime === 'function') {
+      const inferred = inferSessionFromESTTime(tradeTime);
+      return normalizeHeatmapSessionLabel(inferred) || 'random';
+    }
+  } catch (_) {}
+  return 'random';
+}
+
 function getAnTradesForCard(cardId) {
   const base = getAnTrades();
-  if (window._anCardPeriod[cardId] !== 'week') return base;
+  const period = window._anCardPeriod[cardId];
+  if (!period || period === 'all') return base;
+  if (cardId === 'heatmap' && period.startsWith('session:')) {
+    const wantedSession = normalizeHeatmapSessionLabel(period.slice('session:'.length));
+    if (!wantedSession) return base;
+    return base.filter(t => getHeatmapSessionKeyForTrade(t) === wantedSession);
+  }
+  if (period !== 'week') return base;
   const now = new Date();
   const day = now.getDay(); // 0=Sun
   const monday = new Date(now);
@@ -6130,6 +6177,23 @@ function calculateTradingDays(period) {
   return uniqueDates.size;
 }
 
+function resolveConsistencyLimit(acctRules) {
+  if (!acctRules || typeof acctRules !== 'object') return null;
+  const candidates = [
+    acctRules.consistencyLimit,
+    acctRules.consistencyPctLimit,
+    acctRules.consistencyPercentageLimit,
+    acctRules.consistencyRule,
+    acctRules.consistency,
+    acctRules.maxConsistency
+  ];
+  for (const raw of candidates) {
+    const parsed = Number(raw);
+    if (Number.isFinite(parsed) && parsed >= 0) return parsed;
+  }
+  return null;
+}
+
 function tdRender(idx, dir) {
   const ticker = $('td-ticker');
   const period = TD_LABELS[idx];
@@ -6351,6 +6415,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── Sync Add Trade modal account list from ACCOUNTS on load ──
     syncTradeModalAccountList();
+    syncTopbarOffset();
+    window.addEventListener('resize', syncTopbarOffset);
   } catch (error) {
     console.error('Initialization error:', error);
   }
@@ -6430,6 +6496,7 @@ function populateDashboard() {
   const analyticsGrid = $('dashboard-analytics-grid');
   const rightPanels = $('dashboard-right-panels');
   const isAll = selectedAcct === -1;
+  const acctRules = (selectedAcct >= 0 && ACCOUNTS[selectedAcct]) ? ACCOUNTS[selectedAcct] : null;
   const now = new Date();
   const T = getDashboardTrades(); // filtered by selected account
   const hasTrades = T.length > 0;
@@ -6636,6 +6703,58 @@ function populateDashboard() {
   set('td-val-2', tradingDays);
   tdRender(tdIndex, 0);
 
+  // ── Consistency percentage ──
+  // Rule: (highest single winning day profit / current total profit) * 100
+  // Use absolute values and guard when total profit <= 0.
+  const dailyPnlMap = {};
+  groupedT.forEach(t => {
+    if (!t.date) return;
+    dailyPnlMap[t.date] = (dailyPnlMap[t.date] || 0) + (t.pnl || 0);
+  });
+  const dayPnls = Object.values(dailyPnlMap);
+  const bestWinningDayProfit = dayPnls.length
+    ? Math.max(0, ...dayPnls.filter(v => v > 0))
+    : 0;
+  const absTotalProfit = Math.abs(netPnl);
+  const hasConsistencyData = netPnl > 0 && bestWinningDayProfit > 0;
+  const consistencyPct = hasConsistencyData
+    ? (Math.abs(bestWinningDayProfit) / absTotalProfit) * 100
+    : 0;
+  const roundedConsistencyPct = Number(consistencyPct.toFixed(2));
+  const consistencyLimit = resolveConsistencyLimit(acctRules);
+
+  const consistencyValueEl = $('consistency-pct');
+  const consistencyStatusEl = $('consistency-status');
+  const consistencySubEl = $('consistency-sub');
+
+  if (consistencyValueEl) {
+    consistencyValueEl.textContent = hasConsistencyData ? `${roundedConsistencyPct.toFixed(2)}%` : '0.00%';
+    consistencyValueEl.style.color = hasConsistencyData ? 'var(--purple)' : 'var(--text3)';
+  }
+
+  if (consistencyStatusEl) {
+    if (!hasConsistencyData) {
+      consistencyStatusEl.textContent = 'NOT ENOUGH DATA';
+      consistencyStatusEl.style.color = 'var(--text3)';
+    } else if (consistencyLimit !== null) {
+      const passedConsistency = roundedConsistencyPct <= consistencyLimit;
+      consistencyStatusEl.textContent = passedConsistency ? 'PASS' : 'FAIL';
+      consistencyStatusEl.style.color = passedConsistency ? 'var(--green)' : 'var(--red)';
+    } else {
+      consistencyStatusEl.textContent = '';
+      consistencyStatusEl.style.color = 'var(--text2)';
+    }
+  }
+
+  if (consistencySubEl) {
+    const bestDayAmount = Math.abs(bestWinningDayProfit).toFixed(2);
+    const totalAmount = Math.abs(netPnl).toFixed(2);
+    const totalPrefix = netPnl < 0 ? '-' : '';
+    const bestDayClass = bestWinningDayProfit > 0 ? 'profit' : '';
+    const totalClass = netPnl > 0 ? 'profit' : netPnl < 0 ? 'loss' : '';
+    consistencySubEl.innerHTML = `Best day: <span class="consistency-sub-value ${bestDayClass}">$${bestDayAmount}</span>\nTotal profit: <span class="consistency-sub-value ${totalClass}">${totalPrefix}$${totalAmount}</span>`;
+  }
+
   // ── Trade log sub-stats ──
   set('tl-total', total);
   set('tl-gross', (grossPnl >= 0 ? '+$' : '-$') + Math.abs(grossPnl).toFixed(2), grossPnl >= 0 ? 'var(--green)' : 'var(--red)');
@@ -6663,7 +6782,6 @@ function populateDashboard() {
   const fmtDollar  = v => '$' + v.toFixed(2);
 
   // Get account-specific rule percentages (fall back to 8/8/4 if not set)
-  const acctRules = (selectedAcct >= 0 && ACCOUNTS[selectedAcct]) ? ACCOUNTS[selectedAcct] : null;
   const profitTargetPct  = acctRules ? acctRules.profitTarget  : 8;
   const maxDrawdownPct   = acctRules ? acctRules.maxDrawdown   : 8;
   const dailyLossPct     = acctRules ? acctRules.dailyLoss     : 4;
@@ -6688,7 +6806,7 @@ function populateDashboard() {
   if (prBarWrap) prBarWrap.style.display = hideProfitBar ? 'none' : 'block';
 
   const prTooltipAmt = $('profit-tooltip-amt');
-  if (prTooltipAmt) prTooltipAmt.textContent = '+' + fmtDollar(amountGained) + ' gained';
+  if (prTooltipAmt) prTooltipAmt.textContent = 'GAINED: +' + fmtDollar(amountGained);
 
   const prTooltipPct = $('profit-tooltip-pct');
   if (prTooltipPct) prTooltipPct.textContent = '+' + gainedPct + '%';
@@ -6725,7 +6843,7 @@ function populateDashboard() {
   if (mlRemaining) mlRemaining.innerHTML = `${fmtDollar(remaining)} <span style="font-size:11px;color:#c53030!important;font-weight:400!important">(${remPct}%)</span>`;
 
   const mlTooltipAmt = $('maxloss-tooltip-amt');
-  if (mlTooltipAmt) mlTooltipAmt.textContent = (amountLost > 0 ? '-' : '') + fmtDollar(amountLost) + ' lost';
+  if (mlTooltipAmt) mlTooltipAmt.textContent = 'LOSS USED: ' + fmtDollar(amountLost);
 
   const mlTooltipPct = $('maxloss-tooltip-pct');
   if (mlTooltipPct) mlTooltipPct.textContent = (amountLost > 0 ? '-' : '') + lostPct + '%';
@@ -6755,7 +6873,7 @@ function populateDashboard() {
   if (dlRemEl) dlRemEl.innerHTML = `${fmtDollar(dlRemaining)} <span style="font-size:11px;color:#c53030!important;font-weight:400!important">(${dlRemPct}%)</span>`;
 
   const dlTooltipAmt = $('dailyloss-tooltip-amt');
-  if (dlTooltipAmt) dlTooltipAmt.textContent = (todayLost > 0 ? '-' : '') + fmtDollar(todayLost) + ' lost today';
+  if (dlTooltipAmt) dlTooltipAmt.textContent = 'TODAY LOSS: ' + fmtDollar(todayLost);
 
   const dlTooltipPct = $('dailyloss-tooltip-pct');
   if (dlTooltipPct) dlTooltipPct.textContent = (todayLost > 0 ? '-' : '') + dlLostPct + '%';
@@ -7938,6 +8056,16 @@ function checkAndCreateNextPhase(accountName) {
     // Require target hit before any phase progression.
     if (totalPnL < profitTargetAmount) return;
 
+    // If enabled, Consistency Rule is also mandatory for clearing by target.
+    if (account.consistencyRuleEnabled) {
+      const capPct = parseFloat(account.consistencyRulePct);
+      const consistency = calculateConsistencyRules(accountName);
+      if (!consistency) return;
+      if (!(capPct >= 10 && capPct <= 90)) return;
+      if (consistency.totalPnL <= 0) return;
+      if ((consistency.bestDayProfitPct || 0) > capPct) return;
+    }
+
     const nextId = ACCOUNTS.length > 0 ? Math.max(...ACCOUNTS.map(a => a.id || 0)) + 1 : 1;
 
     // If not at final challenge phase yet: create next challenge phase account.
@@ -8087,6 +8215,7 @@ function calculateConsistencyRules(accountName) {
     let winDays = 0, lossDays = 0, breakEvenDays = 0;
     let totalWins = 0, totalLosses = 0, totalWinTrades = 0, totalLossTrades = 0;
     let largestWin = 0, largestLoss = 0;
+    let bestDayProfit = 0;
     let peakEquity = account.startBal;
     let maxDrawdown = 0;
     let currentEquity = account.startBal;
@@ -8095,6 +8224,7 @@ function calculateConsistencyRules(accountName) {
     daysArray.forEach(date => {
       const dayTrades = tradesByDate[date];
       const dayPnL = dayTrades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+      if (dayPnL > bestDayProfit) bestDayProfit = dayPnL;
 
       dayTrades.forEach(t => {
         if (t.pnl && t.pnl > 0) {
@@ -8135,6 +8265,9 @@ function calculateConsistencyRules(accountName) {
     const riskRewardRatio = avgLoss > 0 ? avgWin / avgLoss : 0;
     const currentDrawdown = ((peakEquity - currentEquity) / peakEquity) * 100;
 
+    const totalPnL = trades.reduce((sum, t) => sum + (t.pnl || 0), 0);
+    const bestDayProfitPct = totalPnL > 0 ? (bestDayProfit / totalPnL) * 100 : 0;
+
     return {
       totalTrades,
       totalWins,
@@ -8156,7 +8289,9 @@ function calculateConsistencyRules(accountName) {
       maxDrawdown,
       currentDrawdown,
       currentEquity,
-      totalPnL: trades.reduce((sum, t) => sum + (t.pnl || 0), 0)
+      totalPnL,
+      bestDayProfit,
+      bestDayProfitPct
     };
   } catch (e) {
     console.warn('calculateConsistencyRules error:', e);
@@ -8198,6 +8333,26 @@ function checkPayoutEligibility(accountName) {
     } else {
       reasons.push(`✗ Profit target NOT met: $${consistency.totalPnL.toFixed(2)} / $${profitTargetAmount.toFixed(2)}`);
       eligible = false;
+    }
+
+    // Check optional Consistency Rule
+    if (account.consistencyRuleEnabled) {
+      const capPct = parseFloat(account.consistencyRulePct);
+      if (!(capPct >= 10 && capPct <= 90)) {
+        reasons.push(`✗ Consistency rule enabled but percentage not configured`);
+        eligible = false;
+      } else if (consistency.totalPnL <= 0) {
+        reasons.push(`✗ Consistency rule requires positive total profit`);
+        eligible = false;
+      } else {
+        const actual = consistency.bestDayProfitPct || 0;
+        if (actual <= capPct) {
+          reasons.push(`✓ Consistency rule met: Best day ${actual.toFixed(1)}% ≤ ${capPct}%`);
+        } else {
+          reasons.push(`✗ Consistency rule failed: Best day ${actual.toFixed(1)}% > ${capPct}%`);
+          eligible = false;
+        }
+      }
     }
 
     // Check max drawdown
@@ -8879,12 +9034,17 @@ function openAddAccountModal() {
   $('acm-lev-futures').value= '';
   $('acm-lev-crypto').value = '';
   $('acm-lev-indices').value= '';
+  if ($('acm-consistency-enabled')) $('acm-consistency-enabled').value = '0';
+  if ($('acm-consistency-fixed')) $('acm-consistency-fixed').value = '0';
+  if ($('acm-consistency-pct')) $('acm-consistency-pct').value = '50';
+  if ($('acm-consistency-score')) $('acm-consistency-score').value = '50';
   _acmPhotoData = '';
   updateAccountAvatarFallback();
   updateAccountPhotoPreview('');
   _setAcmPhaseVisual('');
   setAcmCurrentPhase(1);
   updatePhaseFields();
+  _syncAcmConsistencyRuleUI();
   _syncAcctModalActiveUI();
   const overlay = $('acct-modal-overlay');
   if (overlay) {
@@ -8929,12 +9089,18 @@ function openEditAccountModal(id) {
   $('acm-lev-futures').value= lev.futures || '';
   $('acm-lev-crypto').value = lev.crypto  || '';
   $('acm-lev-indices').value= lev.indices || '';
+  if ($('acm-consistency-enabled')) $('acm-consistency-enabled').value = a.consistencyRuleEnabled ? '1' : '0';
+  const pct = (a.consistencyRulePct !== undefined && a.consistencyRulePct !== null) ? a.consistencyRulePct : '50';
+  if ($('acm-consistency-pct')) $('acm-consistency-pct').value = String(pct);
+  if ($('acm-consistency-fixed')) $('acm-consistency-fixed').value = a.consistencyRuleEnabled ? '1' : '0';
+  if ($('acm-consistency-score')) $('acm-consistency-score').value = String(pct);
   updateAccountAvatarFallback();
   _acmPhotoData = a.avatar || '';
   updateAccountPhotoPreview(_acmPhotoData);
   _setAcmPhaseVisual(a.challengeType || '');
   setAcmCurrentPhase(parseInt($('acm-current-phase').value, 10) || 1);
   updatePhaseFields();
+  _syncAcmConsistencyRuleUI();
   _syncAcctModalActiveUI();
   $('acct-modal-overlay').style.display = 'flex';
 }
@@ -8959,6 +9125,90 @@ function _syncAcctModalActiveUI() {
   knob.style.left        = _acmActive ? '17px' : '2px';
 }
 
+function toggleAcmConsistencyRule() {
+  const inp = $('acm-consistency-enabled');
+  if (!inp) return;
+  inp.value = inp.value === '1' ? '0' : '1';
+  // Toggling OFF unlocks and requires re-done next time.
+  if (inp.value !== '1') {
+    if ($('acm-consistency-fixed')) $('acm-consistency-fixed').value = '0';
+  }
+  _syncAcmConsistencyRuleUI();
+}
+
+function _syncAcmConsistencyRuleUI() {
+  const enabled = $('acm-consistency-enabled')?.value === '1';
+  const sw = $('acm-consistency-switch');
+  const knob = $('acm-consistency-knob');
+  const bar = $('acm-consistency-bar');
+  const slider = $('acm-consistency-score');
+  const readout = $('acm-consistency-val');
+  const fixedInp = $('acm-consistency-fixed');
+  const pctInp = $('acm-consistency-pct');
+  const doneBtn = $('acm-consistency-done');
+  const tick = $('acm-consistency-tick');
+
+  if (sw) {
+    sw.classList.toggle('on', enabled);
+    sw.setAttribute('aria-checked', enabled ? 'true' : 'false');
+  }
+  if (knob) {
+    // knob visuals are handled by CSS, but keep for future safety
+    void knob.offsetWidth;
+  }
+  if (bar) {
+    bar.style.display = enabled ? 'flex' : 'none';
+  }
+  if (slider) {
+    // Ensure we always have a valid ruler value when enabling.
+    const v = parseFloat(slider.value);
+    if (!Number.isFinite(v) || v < 10 || v > 90) slider.value = '50';
+    // Snap to 5s
+    const snapped = Math.round((parseInt(slider.value, 10) || 50) / 5) * 5;
+    slider.value = String(Math.min(90, Math.max(10, snapped)));
+
+    const fixed = fixedInp?.value === '1';
+    const committed = pctInp ? parseInt(pctInp.value, 10) : NaN;
+    const displayVal = (fixed && Number.isFinite(committed)) ? committed : (parseInt(slider.value, 10) || 50);
+    if (readout) readout.textContent = String(displayVal);
+
+    if (doneBtn) {
+      doneBtn.textContent = 'Done';
+      doneBtn.disabled = false;
+      doneBtn.style.opacity = '1';
+      doneBtn.style.cursor = 'pointer';
+    }
+    if (tick) tick.style.display = fixed ? 'inline-block' : 'none';
+  }
+}
+
+function acmConsistencyInput(val) {
+  const v = parseInt(val, 10);
+  const out = $('acm-consistency-val');
+  const snapped = Number.isFinite(v) ? (Math.round(v / 5) * 5) : NaN;
+  const clamped = Number.isFinite(snapped) ? Math.min(90, Math.max(10, snapped)) : NaN;
+  if ($('acm-consistency-score') && Number.isFinite(clamped)) $('acm-consistency-score').value = String(clamped);
+  if (out) out.textContent = String(Number.isFinite(clamped) ? clamped : '');
+  // Any adjustment after "Done" un-fixes until Done is clicked again.
+  if ($('acm-consistency-fixed')) $('acm-consistency-fixed').value = '0';
+  const tick = $('acm-consistency-tick');
+  if (tick) tick.style.display = 'none';
+}
+
+function acmConsistencyDone() {
+  const slider = $('acm-consistency-score');
+  const pctInp = $('acm-consistency-pct');
+  const fixedInp = $('acm-consistency-fixed');
+  if (!slider || !pctInp || !fixedInp) return;
+  const v = parseInt(slider.value, 10);
+  const snapped = Number.isFinite(v) ? Math.round(v / 5) * 5 : NaN;
+  const clamped = Number.isFinite(snapped) ? Math.min(90, Math.max(10, snapped)) : NaN;
+  if (!Number.isFinite(clamped)) return;
+  pctInp.value = String(clamped);
+  fixedInp.value = '1';
+  _syncAcmConsistencyRuleUI();
+}
+
 function saveAccountFromModal() {
   let firm  = $('acm-firm').value.trim();
   const challengeType = $('acm-phase').value.trim();
@@ -8972,6 +9222,22 @@ function saveAccountFromModal() {
   if (!firm || !challengeType) {
     showToast('Firm name and challenge type are required', 'error', '⚠️', 2800);
     return;
+  }
+
+  // Consistency Rule config (optional toggle; when enabled, % is mandatory)
+  const consistencyEnabled = $('acm-consistency-enabled')?.value === '1';
+  const consistencyFixed = $('acm-consistency-fixed')?.value === '1';
+  const consistencyPctRaw = $('acm-consistency-pct') ? $('acm-consistency-pct').value : '';
+  const consistencyPct = consistencyPctRaw === '' ? NaN : parseFloat(consistencyPctRaw);
+  if (consistencyEnabled) {
+    if (!consistencyFixed) {
+      showToast('Click Done to fix the consistency %', 'error', '⚠️', 2600);
+      return;
+    }
+    if (!(consistencyPct >= 10 && consistencyPct <= 90) || (consistencyPct % 5 !== 0)) {
+      showToast('Consistency rule must be 10–90 in steps of 5', 'error', '⚠️', 3000);
+      return;
+    }
   }
   
   const lev = {};
@@ -9036,6 +9302,8 @@ function saveAccountFromModal() {
       notes:       $('acm-notes').value.trim(),
       avatar:      _acmPhotoData || '',
       leverage:    lev,
+      consistencyRuleEnabled: consistencyEnabled,
+      consistencyRulePct: consistencyEnabled ? consistencyPct : null,
       nextPhaseId: null  // Will be populated when next phase is auto-created
     });
     showToast('Account added', 'success', '✓', 2000);
@@ -9060,7 +9328,9 @@ function saveAccountFromModal() {
         ddType:      $('acm-ddtype').value || 'trailing',
         notes:       $('acm-notes').value.trim(),
         avatar:      _acmPhotoData || '',
-        leverage:    lev
+        leverage:    lev,
+        consistencyRuleEnabled: consistencyEnabled,
+        consistencyRulePct: consistencyEnabled ? consistencyPct : null
       };
       // Update all trades that reference the old account name to use the new one
       if (oldPhase !== phase) {

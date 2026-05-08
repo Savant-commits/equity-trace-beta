@@ -892,40 +892,44 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="font-family:var(--font-body);font-weight:600;font-size:26px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px">Goals</div>
       <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px" id="goals-grid">
 
-          <!-- Max Loss -->
-          <div class="maxloss-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column;gap:0">
-            <div style="font-family:var(--font-display);font-weight:600;font-size:15px;margin-bottom:12px">Max Loss</div>
-            <div style="display:flex;justify-content:space-between;margin-bottom:14px">
-              <div>
-                <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:3px">Limit</div>
-                <div id="maxloss-limit-amt" style="font-family:var(--font-display);font-weight:600;font-size:18px;color:#7b3bcc!important">$2,000.00 <span style="font-size:12px;color:#7b3bcc!important;font-weight:400">(8%)</span></div>
+          <!-- Trading Days + Consistency (separate cards) -->
+          <div class="td-consistency-row">
+            <div class="td-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column;justify-content:flex-start;user-select:none;position:relative">
+              <div class="stat-card-label" style="font-size:10px;margin-bottom:12px">TRADING DAYS</div>
+              <div class="td-controls" style="display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .2s;position:absolute;top:14px;right:10px;z-index:10;pointer-events:auto">
+                <div style="display:flex;flex-direction:column;gap:2px">
+                  <button onclick="tdShift(-1)" style="background:var(--bg5);border:1px solid var(--border);border-radius:3px;width:16px;height:14px;cursor:pointer;color:var(--text3);font-size:8px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'">▲</button>
+                  <button onclick="tdShift(1)"  style="background:var(--bg5);border:1px solid var(--border);border-radius:3px;width:16px;height:14px;cursor:pointer;color:var(--text3);font-size:8px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'">▼</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
+                  <div class="td-dot" data-i="0" onclick="tdGoto(0)" style="width:3px;height:14px;border-radius:2px;cursor:pointer;background:var(--purple);transition:background .2s"></div>
+                  <div class="td-dot" data-i="1" onclick="tdGoto(1)" style="width:3px;height:14px;border-radius:2px;cursor:pointer;background:var(--bg5);transition:background .2s"></div>
+                  <div class="td-dot" data-i="2" onclick="tdGoto(2)" style="width:3px;height:14px;border-radius:2px;cursor:pointer;background:var(--bg5);transition:background .2s"></div>
+                </div>
               </div>
-              <div style="text-align:right">
-                <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:3px">Remaining</div>
-                <div id="maxloss-remaining" style="font-family:var(--font-display);font-weight:600;font-size:18px;color:#c53030!important">$2,000.00 <span style="font-size:12px;color:#c53030!important;font-weight:400">(8%)</span></div>
+              <div style="display:flex;align-items:center;justify-content:center;gap:14px;flex:1;width:100%">
+                <div id="td-period-label" style="font-size:13px;color:var(--text2);font-family:var(--font-body);white-space:nowrap">This Week</div>
+                <div style="overflow:hidden;height:48px;position:relative;">
+                  <div id="td-ticker" style="transition:transform .28s cubic-bezier(.4,0,.2,1)">
+                    <div style="height:48px;display:flex;align-items:center;justify-content:center"><div style="font-family:var(--font-display);font-weight:600;font-size:42px;color:var(--purple)" id="td-val-0">0</div></div>
+                    <div style="height:48px;display:flex;align-items:center;justify-content:center"><div style="font-family:var(--font-display);font-weight:600;font-size:42px;color:var(--purple)" id="td-val-1">0</div></div>
+                    <div style="height:48px;display:flex;align-items:center;justify-content:center"><div style="font-family:var(--font-display);font-weight:600;font-size:42px;color:var(--purple)" id="td-val-2">0</div></div>
+                  </div>
+                </div>
+                <div id="td-unit-label" style="font-size:13px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap">days</div>
               </div>
             </div>
-            <div style="margin-top:auto">
-              <div style="position:relative;margin-bottom:6px" id="maxloss-bar-wrap"
-                onmouseenter="$('maxloss-tooltip').style.opacity='1';$('maxloss-bar-labels').style.color='var(--text)'"
-                onmouseleave="$('maxloss-tooltip').style.opacity='0';$('maxloss-bar-labels').style.color='var(--text3)'">
-                <div id="maxloss-tooltip" style="opacity:0;transition:opacity .15s;position:absolute;bottom:14px;left:60%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(232,80,74,.35);border-radius:6px;padding:4px 10px;font-family:var(--font-mono);white-space:nowrap;pointer-events:none;z-index:10;text-align:center">
-                  <div id="maxloss-tooltip-amt" style="font-size:10px;color:var(--red)">$0.00 lost</div>
-                  <div id="maxloss-tooltip-pct" style="font-size:9px;color:var(--text3);margin-top:1px">0.00%</div>
-                </div>
-                <div style="height:6px;background:rgba(128,128,128,0.16);border-radius:3px;overflow:hidden;transform:scaleX(-1)">
-                  <div id="maxloss-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#e8504a,#ff6b63);border-radius:3px;box-shadow:0 0 6px rgba(232,80,74,.5)"></div>
-                </div>
-              </div>
-              <div id="maxloss-bar-labels" style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--font-mono);color:var(--text3);transition:color .2s">
-                <span id="maxloss-label-low">$23,000.00</span><span id="maxloss-label-high">$25,000.00</span>
-              </div>
+            <div class="consistency-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column;justify-content:flex-start;user-select:none;position:relative">
+              <div class="stat-card-label consistency-card-heading" style="font-size:10px;margin-bottom:12px">CONSISTENCY</div>
+              <div id="consistency-pct" class="consistency-value">0.00%</div>
+              <div id="consistency-status" class="consistency-status">NOT ENOUGH DATA</div>
+              <div id="consistency-sub" class="consistency-sub">Best day: <span class="consistency-sub-value">$0.00</span>&#10;Total profit: <span class="consistency-sub-value">$0.00</span></div>
             </div>
           </div>
 
           <!-- Profit -->
           <div class="goals-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column">
-            <div style="font-family:var(--font-display);font-weight:600;font-size:15px;margin-bottom:12px">Profit</div>
+            <div class="stat-card-label" style="font-size:10px;margin-bottom:12px">PROFIT</div>
             <div style="display:flex;justify-content:space-between;margin-bottom:14px">
               <div>
                 <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:3px">Target</div>
@@ -938,11 +942,11 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
             <div style="margin-top:auto">
               <div style="position:relative;margin-bottom:6px" id="profit-bar-wrap"
-                onmouseenter="$('profit-tooltip').style.opacity='1';$('profit-bar-labels').style.color='var(--text)'"
-                onmouseleave="$('profit-tooltip').style.opacity='0';$('profit-bar-labels').style.color='var(--text3)'">
-                <div id="profit-tooltip" style="opacity:0;transition:opacity .15s;position:absolute;bottom:14px;left:11%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(46,204,138,.35);border-radius:6px;padding:4px 10px;font-family:var(--font-mono);white-space:nowrap;pointer-events:none;z-index:10;text-align:center">
-                  <div id="profit-tooltip-amt" style="font-size:10px;color:var(--green)">+$0.00 gained</div>
-                  <div id="profit-tooltip-pct" style="font-size:9px;color:var(--text3);margin-top:1px">+0.00%</div>
+                onmouseenter="$('profit-tooltip').style.opacity='1'"
+                onmouseleave="$('profit-tooltip').style.opacity='0'">
+                <div id="profit-tooltip" style="opacity:0;transition:opacity .15s;position:absolute;bottom:14px;left:11%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(46,204,138,.35);border-radius:6px;padding:6px 12px;font-family:var(--font-mono);white-space:nowrap;pointer-events:none;z-index:10;text-align:center">
+                  <div id="profit-tooltip-amt" style="font-size:11px;font-weight:600;color:var(--green)">GAINED: +$0.00</div>
+                  <div id="profit-tooltip-pct" style="font-size:9px;color:var(--text3);margin-top:2px">+0.00%</div>
                 </div>
                 <div style="height:6px;background:rgba(128,128,128,0.16);border-radius:3px;overflow:hidden">
                   <div id="profit-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#1e9e68,#2ecc8a);border-radius:3px;box-shadow:0 0 6px rgba(46,204,138,.5)"></div>
@@ -956,7 +960,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
           <!-- Daily Loss -->
           <div class="goals-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column">
-            <div style="font-family:var(--font-display);font-weight:700;font-size:13.5px;margin-bottom:12px">Daily Loss</div>
+            <div class="stat-card-label" style="font-size:10px;margin-bottom:12px">DAILY LOSS</div>
             <div style="display:flex;justify-content:space-between;margin-bottom:14px">
               <div>
                 <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:3px">Limit</div>
@@ -970,11 +974,11 @@ window.addEventListener('DOMContentLoaded', function() {
             <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:14px">Timer Reset In: <span id="daily-timer" style="font-family:var(--font-mono);color:var(--text)">05:42:51</span></div>
             <div style="margin-top:auto">
               <div style="position:relative;margin-bottom:6px" id="dailyloss-bar-wrap"
-                onmouseenter="$('dailyloss-tooltip').style.opacity='1';$('dailyloss-bar-labels').style.color='var(--text)'"
-                onmouseleave="$('dailyloss-tooltip').style.opacity='0';$('dailyloss-bar-labels').style.color='var(--text3)'">
-                <div id="dailyloss-tooltip" style="opacity:0;transition:opacity .15s;position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(232,80,74,.35);border-radius:6px;padding:4px 10px;font-family:var(--font-mono);white-space:nowrap;pointer-events:none;z-index:10;text-align:center">
-                  <div id="dailyloss-tooltip-amt" style="font-size:10px;color:var(--red)">$0.00 lost</div>
-                  <div id="dailyloss-tooltip-pct" style="font-size:9px;color:var(--text3);margin-top:1px">0.00%</div>
+                onmouseenter="$('dailyloss-tooltip').style.opacity='1'"
+                onmouseleave="$('dailyloss-tooltip').style.opacity='0'">
+                <div id="dailyloss-tooltip" style="opacity:0;transition:opacity .15s;position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(232,80,74,.35);border-radius:6px;padding:6px 12px;font-family:var(--font-mono);white-space:nowrap;pointer-events:none;z-index:10;text-align:center">
+                  <div id="dailyloss-tooltip-amt" style="font-size:11px;font-weight:600;color:var(--red)">TODAY LOSS: $0.00</div>
+                  <div id="dailyloss-tooltip-pct" style="font-size:9px;color:var(--text3);margin-top:2px">0.00%</div>
                 </div>
                 <div style="height:6px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;transform:scaleX(-1)">
                   <div id="dailyloss-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#e8504a,#ff6b63);border-radius:3px;box-shadow:0 0 6px rgba(232,80,74,.5)"></div>
@@ -986,34 +990,34 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
 
-          <!-- Trading Days -->
-          <div class="td-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:16px;display:flex;flex-direction:column;justify-content:center;user-select:none;position:relative">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;position:absolute;top:0;left:0;right:0;padding:14px 16px 0;pointer-events:none">
-              <div class="stat-card-label" style="font-size:10px">TRADING DAYS</div>
-              <div class="td-controls" style="display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .2s;pointer-events:auto;visibility:hidden"><!-- placeholder to keep layout --></div>
-            </div>
-            <!-- controls: vertically centered on card right edge -->
-            <div class="td-controls" style="display:flex;align-items:center;gap:4px;opacity:0;transition:opacity .2s;position:absolute;top:50%;right:10px;transform:translateY(-50%);z-index:10;pointer-events:auto">
-              <div style="display:flex;flex-direction:column;gap:2px">
-                <button onclick="tdShift(-1)" style="background:var(--bg5);border:1px solid var(--border);border-radius:3px;width:16px;height:14px;cursor:pointer;color:var(--text3);font-size:8px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'">▲</button>
-                <button onclick="tdShift(1)"  style="background:var(--bg5);border:1px solid var(--border);border-radius:3px;width:16px;height:14px;cursor:pointer;color:var(--text3);font-size:8px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'">▼</button>
+          <!-- Max Loss -->
+          <div class="maxloss-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column;gap:0">
+            <div class="stat-card-label" style="font-size:10px;margin-bottom:12px">MAX LOSS</div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+              <div>
+                <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:3px">Limit</div>
+                <div id="maxloss-limit-amt" style="font-family:var(--font-display);font-weight:600;font-size:18px;color:#7b3bcc!important">$2,000.00 <span style="font-size:12px;color:#7b3bcc!important;font-weight:400">(8%)</span></div>
               </div>
-              <div style="display:flex;flex-direction:column;gap:4px;align-items:center">
-                <div class="td-dot" data-i="0" onclick="tdGoto(0)" style="width:3px;height:14px;border-radius:2px;cursor:pointer;background:var(--purple);transition:background .2s"></div>
-                <div class="td-dot" data-i="1" onclick="tdGoto(1)" style="width:3px;height:14px;border-radius:2px;cursor:pointer;background:var(--bg5);transition:background .2s"></div>
-                <div class="td-dot" data-i="2" onclick="tdGoto(2)" style="width:3px;height:14px;border-radius:2px;cursor:pointer;background:var(--bg5);transition:background .2s"></div>
+              <div style="text-align:right">
+                <div style="font-size:10px;color:var(--text2);font-family:var(--font-body);margin-bottom:3px">Remaining</div>
+                <div id="maxloss-remaining" style="font-family:var(--font-display);font-weight:600;font-size:18px;color:#c53030!important">$2,000.00 <span style="font-size:12px;color:#c53030!important;font-weight:400">(8%)</span></div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-top:8px">
-              <div id="td-period-label" style="font-size:11px;color:var(--text2);font-family:var(--font-body);white-space:nowrap">This Week</div>
-              <div style="overflow:hidden;height:48px;position:relative;">
-                <div id="td-ticker" style="transition:transform .28s cubic-bezier(.4,0,.2,1)">
-                  <div style="height:48px;display:flex;align-items:center;justify-content:center"><div style="font-family:var(--font-display);font-weight:700;font-size:42px;color:var(--purple)" id="td-val-0">0</div></div>
-                  <div style="height:48px;display:flex;align-items:center;justify-content:center"><div style="font-family:var(--font-display);font-weight:700;font-size:42px;color:var(--purple)" id="td-val-1">0</div></div>
-                  <div style="height:48px;display:flex;align-items:center;justify-content:center"><div style="font-family:var(--font-display);font-weight:700;font-size:42px;color:var(--purple)" id="td-val-2">0</div></div>
+            <div style="margin-top:auto">
+              <div style="position:relative;margin-bottom:6px" id="maxloss-bar-wrap"
+                onmouseenter="$('maxloss-tooltip').style.opacity='1'"
+                onmouseleave="$('maxloss-tooltip').style.opacity='0'">
+                <div id="maxloss-tooltip" style="opacity:0;transition:opacity .15s;position:absolute;bottom:14px;left:60%;transform:translateX(-50%);background:var(--bg2);border:1px solid rgba(232,80,74,.35);border-radius:6px;padding:6px 12px;font-family:var(--font-mono);white-space:nowrap;pointer-events:none;z-index:10;text-align:center">
+                  <div id="maxloss-tooltip-amt" style="font-size:11px;font-weight:600;color:var(--red)">LOSS USED: $0.00</div>
+                  <div id="maxloss-tooltip-pct" style="font-size:9px;color:var(--text3);margin-top:2px">0.00%</div>
+                </div>
+                <div style="height:6px;background:rgba(128,128,128,0.16);border-radius:3px;overflow:hidden;transform:scaleX(-1)">
+                  <div id="maxloss-bar-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#e8504a,#ff6b63);border-radius:3px;box-shadow:0 0 6px rgba(232,80,74,.5)"></div>
                 </div>
               </div>
-              <div id="td-unit-label" style="font-size:11px;color:var(--text3);font-family:var(--font-mono);white-space:nowrap">days</div>
+              <div id="maxloss-bar-labels" style="display:flex;justify-content:space-between;font-size:10px;font-family:var(--font-mono);color:var(--text3);transition:color .2s">
+                <span id="maxloss-label-low">$23,000.00</span><span id="maxloss-label-high">$25,000.00</span>
+              </div>
             </div>
           </div>
 
@@ -1282,40 +1286,12 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
 
-        <!-- Best & Worst Card -->
-        <div class="stat-card" id="tl-bw-card" style="padding:18px 18px 16px;display:flex;flex-direction:column;justify-content:space-between;cursor:default">
-          <!-- Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-            <div class="stat-card-label" style="transition:color .2s;font-size:10px;color:var(--text)">Best &amp; Worst</div>
-            <div onclick="event.stopPropagation()" style="display:flex;align-items:center;background:var(--bg5);border:1px solid var(--border2);border-radius:7px;padding:2px;gap:2px">
-              <button id="tl-bw-toggle-dollar" onclick="setBwCardMode('dollar')" title="Rank by dollar P&amp;L" style="font-size:10px;font-weight:700;font-family:var(--font-mono);padding:3px 9px;border-radius:5px;border:none;background:var(--purple);color:#fff;cursor:pointer;transition:all .18s;letter-spacing:.04em;box-shadow:0 1px 4px rgba(0,0,0,.35)">$</button>
-              <button id="tl-bw-toggle-pct"    onclick="setBwCardMode('pct')"    title="Rank by % return"     style="font-size:10px;font-weight:700;font-family:var(--font-mono);padding:3px 9px;border-radius:5px;border:none;background:transparent;color:var(--text3);cursor:pointer;transition:all .18s;letter-spacing:.04em">%</button>
-            </div>
-          </div>
-          <!-- Values -->
-          <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px">
-            <div style="display:flex;justify-content:space-between;align-items:flex-end">
-              <div style="text-align:left">
-                <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Worst  -  <span id="tl-worst-sym" style="color:var(--text)">-</span></div>
-                <div id="tl-worst-val" onclick="navigateToBwTrade(this)" style="font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--red);line-height:1;cursor:pointer;transition:opacity .15s" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">-</div>
-              </div>
-              <div style="text-align:right">
-                <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Best  -  <span id="tl-best-sym" style="color:var(--text)">-</span></div>
-                <div id="tl-best-val" onclick="navigateToBwTrade(this)" style="font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--green);line-height:1;cursor:pointer;transition:opacity .15s" onmouseenter="this.style.opacity='.7'" onmouseleave="this.style.opacity='1'">-</div>
-              </div>
-            </div>
-            <!-- Split bar -->
-            <div>
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-                <span style="font-size:9px;font-family:var(--font-mono);color:var(--red)" id="tl-worst-label">-</span>
-                <span style="font-size:9px;font-family:var(--font-mono);color:var(--green)" id="tl-best-label">-</span>
-              </div>
-              <div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;display:flex;gap:1px">
-                <div id="tl-worst-bar" style="height:100%;flex:1;background:linear-gradient(90deg,#b53030,#e8504a);border-radius:2px 0 0 2px;box-shadow:0 0 6px rgba(232,80,74,.25);transition:flex .6s cubic-bezier(.4,0,.2,1)"></div>
-                <div id="tl-best-bar"  style="height:100%;width:50%;background:linear-gradient(90deg,#1e9e68,#2ecc8a);border-radius:0 2px 2px 0;box-shadow:0 0 6px rgba(46,204,138,.35);transition:width .6s cubic-bezier(.4,0,.2,1)"></div>
-              </div>
-            </div>
-          </div>
+        <!-- Consistency Card -->
+        <div class="stat-card consistency-card" id="tl-consistency-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column;justify-content:flex-start;user-select:none;position:relative;cursor:default">
+          <div class="stat-card-label" style="margin-bottom:12px">Consistency</div>
+          <div id="tl-consistency-pct" class="consistency-value">0.00%</div>
+          <div id="tl-consistency-status" class="consistency-status">NOT ENOUGH DATA</div>
+          <div id="tl-consistency-sub" class="consistency-sub">Best day: <span class="consistency-sub-value">$0.00</span>&#10;Total profit: <span class="consistency-sub-value">$0.00</span></div>
         </div>
         </div>
 
@@ -1885,9 +1861,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <div style="display:flex;align-items:center;gap:8px">
               <!-- Period filter -->
               <div class="panel-actions">
-                <button class="pan-btn active" onclick="ecSetPeriod(this,'all')">All</button>
-                <button class="pan-btn" onclick="ecSetPeriod(this,'month')">Month</button>
-                <button class="pan-btn" onclick="ecSetPeriod(this,'week')">Week</button>
               </div>
             </div>
           </div>
@@ -2124,9 +2097,16 @@ window.addEventListener('DOMContentLoaded', function() {
               Performance by Time
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <select id="time-heatmap-period" onchange="cardPeriodSet('heatmap', this.value);" style="font-size:10px;font-family:var(--font-mono);color:var(--text);padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg4);min-width:120px">
+              <select id="time-heatmap-period" class="time-heatmap-period-select" onchange="cardPeriodSet('heatmap', this.value);">
                 <option value="all">Overall</option>
                 <option value="week">This week</option>
+                <option value="session:asia">Session: Asia</option>
+                <option value="session:tdo">Session: True Day Open</option>
+                <option value="session:london">Session: London</option>
+                <option value="session:nyam">Session: NY AM</option>
+                <option value="session:londonclose">Session: London Close</option>
+                <option value="session:nypm">Session: NY PM</option>
+                <option value="session:random">Session: Random</option>
               </select>
               <span style="font-size:10px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;background:var(--bg4);color:var(--text2);border:1px solid var(--border)" id="time-heatmap-pill-tz">TZ</span>
             </div>
@@ -3935,7 +3915,7 @@ window.addEventListener('DOMContentLoaded', function() {
     <!-- Header -->
     <div style="padding:18px 22px 14px;border-bottom:1px solid var(--ac-12);display:flex;align-items:center;justify-content:space-between">
       <div>
-        <div style="font-family:var(--font-display);font-weight:700;font-size:15px">Add Account</div>
+        <div style="font-family:var(--font-display);font-weight:750;font-size:18px;line-height:1.05">Add Account</div>
         <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:2px">Configure your prop firm account</div>
       </div>
       <button onclick="closeAddAccountModal()" style="width:26px;height:26px;border-radius:7px;background:var(--bg4);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text3)'"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
@@ -4063,7 +4043,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     <!-- Modal Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border)">
-      <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--text)" id="acct-modal-title">Add Account</div>
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:750;color:var(--text);line-height:1.05" id="acct-modal-title">Add Account</div>
       <button onclick="closeAccountModal()" style="background:none;border:none;cursor:pointer;color:var(--text3);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .15s;border:1px solid var(--border)" onmouseenter="this.style.color='var(--text)';this.style.borderColor='var(--border2)'" onmouseleave="this.style.color='var(--text3)';this.style.borderColor='var(--border)'"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
     </div>
 
@@ -4168,6 +4148,34 @@ window.addEventListener('DOMContentLoaded', function() {
               <option value="trailing">Trailing</option>
               <option value="static">Static</option>
             </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Consistency Rule -->
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
+          <div style="font-size:11px;letter-spacing:.08em;color:var(--purple);font-family:var(--font-mono);text-transform:uppercase;font-weight:600">Consistency Rule</div>
+          <div id="acm-consistency-switch" class="acm-switch" role="switch" aria-checked="false" tabindex="0" onclick="toggleAcmConsistencyRule()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleAcmConsistencyRule();}">
+            <div class="acm-switch-knob" id="acm-consistency-knob"></div>
+          </div>
+          <input id="acm-consistency-enabled" type="hidden" value="0">
+          <input id="acm-consistency-fixed" type="hidden" value="0">
+          <input id="acm-consistency-pct" type="hidden" value="50">
+        </div>
+        <div id="acm-consistency-bar" class="acm-consistency-bar" style="display:none">
+          <div class="acm-consistency-top">
+            <div class="acm-consistency-readout">
+              <span id="acm-consistency-val">50</span>%<span id="acm-consistency-tick" class="acm-consistency-tick" style="display:none">✓</span>
+            </div>
+          </div>
+          <div class="acm-ruler-wrap">
+            <div class="acm-ruler-edge">10%</div>
+            <input id="acm-consistency-score" class="acm-ruler" type="range" min="10" max="90" step="5" value="50" oninput="acmConsistencyInput(this.value)" />
+            <div class="acm-ruler-edge">90%</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;padding-top:2px">
+            <button id="acm-consistency-done" type="button" onclick="acmConsistencyDone()" style="padding:7px 14px;border-radius:9px;border:none;background:var(--purple);color:#fff;font-family:var(--font-body);font-size:12px;font-weight:700;cursor:pointer;transition:opacity .15s;box-shadow:0 4px 12px var(--ac-30)" onmouseenter="this.style.opacity='.88'" onmouseleave="this.style.opacity='1'">Done</button>
           </div>
         </div>
       </div>

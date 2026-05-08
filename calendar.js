@@ -1467,13 +1467,90 @@ function renderPnlDistributionChart() {
   });
 }
 
+const _timeHeatmapLabelFilters = {
+  days: new Set(),
+  hours: new Set()
+};
+
+function getTimeHeatmapSessionHours(period) {
+  const p = String(period || '').toLowerCase();
+  const allHours = Array.from({ length: 24 }, (_, i) => i);
+  if (!p.startsWith('session:')) return allHours;
+  const key = p.slice('session:'.length);
+  if (key === 'asia') return [19, 20, 21, 22, 23];
+  if (key === 'tdo') return [0, 1];
+  if (key === 'london') return [2, 3, 4];
+  if (key === 'nyam') return [7, 8, 9];
+  if (key === 'londonclose') return [10, 11];
+  if (key === 'nypm') return [12, 13, 14, 15, 16];
+  if (key === 'random') return [5, 6, 17, 18];
+  return allHours;
+}
+
+function getTimeHeatmapSessionDividerHours(zone) {
+  const targetZone = zone || 'UTC';
+  const referenceDate = '2026-01-15'; // January date keeps NY in EST as requested
+  const nyZone = 'America/New_York';
+  const nySessionStarts = [
+    { name: 'TDO', hour: 0, minute: 0 },
+    { name: 'London', hour: 2, minute: 0 },
+    { name: 'NY AM', hour: 7, minute: 0 },
+    { name: 'London Close', hour: 10, minute: 0 },
+    { name: 'NY PM', hour: 12, minute: 0 },
+    { name: 'Asia', hour: 20, minute: 0 }
+  ];
+  const dividerHours = new Set();
+
+  nySessionStarts.forEach(session => {
+    let convertedHour = session.hour;
+    if (targetZone !== nyZone && typeof convertTradeDateTimeBetweenZones === 'function') {
+      try {
+        const hh = String(session.hour).padStart(2, '0');
+        const mm = String(session.minute).padStart(2, '0');
+        const converted = convertTradeDateTimeBetweenZones(referenceDate, `${hh}:${mm}`, nyZone, targetZone);
+        const match = String(converted && converted.time ? converted.time : '').trim().match(/^(\d{1,2}):(\d{2})/);
+        if (match) {
+          const h = parseInt(match[1], 10);
+          const m = parseInt(match[2], 10);
+          // Heatmap is hourly; use closest hour when converted boundary lands on half-hour zones (e.g. IST).
+          convertedHour = (h + (m >= 30 ? 1 : 0)) % 24;
+        }
+      } catch (_) {}
+    }
+    dividerHours.add(convertedHour);
+  });
+  return dividerHours;
+}
+
+function toggleTimeHeatmapDayFilter(day) {
+  if (!day) return;
+  if (_timeHeatmapLabelFilters.days.has(day)) _timeHeatmapLabelFilters.days.delete(day);
+  else _timeHeatmapLabelFilters.days.add(day);
+  renderTimePerformanceHeatmap();
+}
+
+function toggleTimeHeatmapHourFilter(hour) {
+  const h = Number(hour);
+  if (!Number.isInteger(h) || h < 0 || h > 23) return;
+  if (_timeHeatmapLabelFilters.hours.has(h)) _timeHeatmapLabelFilters.hours.delete(h);
+  else _timeHeatmapLabelFilters.hours.add(h);
+  renderTimePerformanceHeatmap();
+}
+
+function clearTimeHeatmapFilters() {
+  _timeHeatmapLabelFilters.days.clear();
+  _timeHeatmapLabelFilters.hours.clear();
+  renderTimePerformanceHeatmap();
+}
+
 function renderTimePerformanceHeatmap() {
   const tzLabel = $('time-heatmap-pill-tz');
   const periodEl = $('time-heatmap-period');
   const timeHeatmap = $('time-heatmap');
   const trades = (typeof getAnTradesForCard === 'function' ? getAnTradesForCard('heatmap') : (typeof getAnTrades === 'function' ? getAnTrades() : TRADES)) || [];
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const zone = (typeof getJournalTimezone === 'function' ? getJournalTimezone() : 'UTC');
+  const isLightMode = document.documentElement.classList.contains('light');
   if (periodEl) periodEl.value = (window._anCardPeriod && window._anCardPeriod.heatmap) || 'all';
   if (tzLabel) tzLabel.textContent = zone;
 
@@ -1493,8 +1570,14 @@ function renderTimePerformanceHeatmap() {
 
     let dateStr = rawDate;
     let timeStr = rawTime;
-    if (typeof convertTradeDateTimeBetweenZones === 'function') {
-      const sourceTz = (typeof getImportSourceTimezone === 'function' ? getImportSourceTimezone() : '') || zone || 'UTC';
+    const sourceTz =
+      t.sourceTimezone ||
+      t.source_tz ||
+      t.importTimezone ||
+      t.import_timezone ||
+      '';
+    // Most trades are already stored in journal timezone; only convert when source timezone is explicitly present.
+    if (sourceTz && sourceTz !== zone && typeof convertTradeDateTimeBetweenZones === 'function') {
       try {
         const converted = convertTradeDateTimeBetweenZones(rawDate, rawTime, sourceTz, zone);
         dateStr = converted.date || rawDate;
@@ -1519,12 +1602,12 @@ function renderTimePerformanceHeatmap() {
     let d = String(dateStr).match(/^(\d{4})-(\d{2})-(\d{2})/);
     let dayName;
     if (d) {
-      const dayIndex = new Date(Date.UTC(parseInt(d[1], 10), parseInt(d[2], 10) - 1, parseInt(d[3], 10))).getUTCDay();
+      const dayIndex = new Date(parseInt(d[1], 10), parseInt(d[2], 10) - 1, parseInt(d[3], 10)).getDay();
       dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
     } else {
       const parsedDate = new Date(dateStr);
       if (Number.isNaN(parsedDate.getTime())) return;
-      const dayIndex = parsedDate.getUTCDay();
+      const dayIndex = parsedDate.getDay();
       dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dayIndex];
     }
     if (!grid[dayName]) return;
@@ -1544,30 +1627,70 @@ function renderTimePerformanceHeatmap() {
   maxAbs = Math.max(maxAbs, 1);
 
   if (!timeHeatmap) return;
-  const hourLabels = [''].concat(Array.from({ length: 24 }, (_, i) => `${i}`));
+  const activePeriod = (window._anCardPeriod && window._anCardPeriod.heatmap) || 'all';
+  const sessionHours = getTimeHeatmapSessionHours(activePeriod);
+  const filterHasAny = _timeHeatmapLabelFilters.days.size > 0 || _timeHeatmapLabelFilters.hours.size > 0;
+  const visibleDays = days.filter(day => !_timeHeatmapLabelFilters.days.has(day));
+  const hiddenHours = sessionHours.filter(hour => _timeHeatmapLabelFilters.hours.has(hour));
+  const visibleHours = sessionHours.filter(hour => !_timeHeatmapLabelFilters.hours.has(hour));
+  const sessionDividerHours = getTimeHeatmapSessionDividerHours(zone);
+  const totalCols = 1 + visibleHours.length;
+
+  timeHeatmap.style.gridTemplateColumns = `72px repeat(${visibleHours.length},minmax(0,1fr))`;
+
+  const hiddenColsRow = (hiddenHours.length || filterHasAny)
+    ? `<div style="grid-column:span ${Math.max(totalCols, 2)};display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:0 0 6px 0;">
+        <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Hidden columns:</span>
+        ${hiddenHours.map(hour => `
+          <button type="button" onclick="toggleTimeHeatmapHourFilter(${hour})" style="height:20px;min-width:26px;padding:0 8px;border-radius:6px;border:1px solid var(--ac-30);background:var(--bg3);color:var(--text2);font-size:10px;font-family:var(--font-mono);cursor:pointer;transition:all .15s" title="Unhide ${hour}">
+            ${hour}
+          </button>
+        `).join('')}
+        <button type="button" onclick="clearTimeHeatmapFilters()" style="height:20px;padding:0 9px;border-radius:6px;border:1px solid var(--ac-30);background:var(--bg3);color:var(--text2);font-size:10px;font-family:var(--font-mono);cursor:pointer;transition:all .15s" title="Clear all heatmap filters">
+          Clear
+        </button>
+      </div>`
+    : '';
+
+  const hourLabels = [''].concat(visibleHours.map(h => String(h)));
   const header = hourLabels.map(label => {
-    return `<div class="hour-label">${label}</div>`;
+    if (label === '') {
+      return `<div class="hour-label"><button class="heatmap-clear-filter" type="button" title="Clear filters" onclick="clearTimeHeatmapFilters()" ${filterHasAny ? '' : 'hidden'}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 4h12l-4 5v7l-4 4v-11z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 4h6l-2 2-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>`;
+    }
+    const hour = Number(label);
+    const isFiltered = _timeHeatmapLabelFilters.hours.has(hour);
+    const hoverLabel = isFiltered ? 'Restore this hour' : 'Filter out this hour';
+    const icon = isFiltered
+      ? '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.6 6.2A10.6 10.6 0 0 1 12 6c5 0 9 4.4 10 6-0.5 0.7-1.8 2.5-3.9 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.1 14.2a3 3 0 0 1-4.2-4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M6.1 9.5C4.8 10.6 3.8 11.7 3 12c1 1.6 5 6 9 6 1.4 0 2.8-.4 4.1-1.1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12c1.5-2.2 5-7 10-7s8.5 4.8 10 7c-1.5 2.2-5 7-10 7s-8.5-4.8-10-7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>';
+    return `<div class="hour-label label-cell ${isFiltered ? 'filtered' : ''}${sessionDividerHours.has(hour) ? ' session-divider' : ''}"><span class="label-text">${label}</span><button class="label-eye-btn" type="button" title="${hoverLabel}" onclick="toggleTimeHeatmapHourFilter(${hour})">${icon}</button></div>`;
   }).join('');
 
-  const rows = days.map(day => {
-    const cells = grid[day].map((cell, hour) => {
+  const rows = visibleDays.map(day => {
+    const cells = visibleHours.map(hour => {
+      const cell = grid[day][hour];
       const avg = cell.count ? cell.avg : null;
       const absAvg = Math.abs(avg);
       const intensity = avg === 0 ? 0 : Math.min(0.92, Math.max(0.12, absAvg / maxAbs * 0.85));
       let bg;
       let color;
       if (avg > 0) {
-        bg = `rgba(46,204,138,${intensity})`;
-        color = '#fff';
+        const alpha = isLightMode ? Math.min(0.62, Math.max(0.18, intensity * 0.72)) : intensity;
+        bg = isLightMode ? `rgba(26,158,98,${alpha})` : `rgba(46,204,138,${intensity})`;
+        color = isLightMode ? '#07140d' : '#fff';
       } else if (avg < 0) {
-        bg = `rgba(232,80,74,${intensity})`;
-        color = '#fff';
+        const alpha = isLightMode ? Math.min(0.62, Math.max(0.18, intensity * 0.72)) : intensity;
+        bg = isLightMode ? `rgba(214,60,55,${alpha})` : `rgba(232,80,74,${intensity})`;
+        color = isLightMode ? '#180706' : '#fff';
       } else if (cell.count > 0) {
-        bg = `rgba(139,92,246,${Math.min(0.8, Math.max(0.18, intensity || 0.25))})`;
-        color = '#fff';
+        const flatIntensity = Math.min(0.8, Math.max(0.18, intensity || 0.25));
+        bg = isLightMode
+          ? `rgba(124,84,220,${Math.min(0.56, Math.max(0.22, flatIntensity * 0.68))})`
+          : `rgba(139,92,246,${flatIntensity})`;
+        color = isLightMode ? '#100a1f' : '#fff';
       } else {
-        bg = 'rgba(255,255,255,0.08)';
-        color = 'var(--text3)';
+        bg = isLightMode ? 'rgba(20,24,36,0.08)' : 'rgba(255,255,255,0.08)';
+        color = isLightMode ? 'var(--text2)' : 'var(--text3)';
       }
       const text = avg !== null ? (avg === 0 ? '$0' : `${avg > 0 ? '+' : ''}$${avg.toFixed(0)}`) : '-';
       const title = avg !== null
@@ -1577,18 +1700,25 @@ function renderTimePerformanceHeatmap() {
       const cellIds = clickable ? cell.ids.join(',') : '';
       const glow = cell.count ? bg : 'transparent';
       const cellBg = cell.count ? bg : 'var(--bg3)';
-      return `<div class="trade-cell" title="${title}"${clickable ? ` data-ids="${cellIds}" onclick="navigateToLog({type:'ids',value:this.dataset.ids?this.dataset.ids.split(','):[]})"` : ''} style="--trade-glow:${glow};color:${color};background:${cellBg};">${cell.count ? text : '-'}</div>`;
+      return `<div class="trade-cell${sessionDividerHours.has(hour) ? ' session-divider' : ''}" title="${title}"${clickable ? ` data-ids="${cellIds}" onclick="navigateToLog({type:'ids',value:this.dataset.ids?this.dataset.ids.split(','):[]})"` : ''} style="--trade-glow:${glow};color:${color};background:${cellBg};">${cell.count ? text : '-'}</div>`;
     }).join('');
-    return `<div style="display:contents"><div class="day-label">${day}</div>${cells}</div>`;
+    const dayHoverLabel = 'Filter out this day';
+    const dayIcon = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2 12c1.5-2.2 5-7 10-7s8.5 4.8 10 7c-1.5 2.2-5 7-10 7s-8.5-4.8-10-7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/></svg>';
+    return `<div style="display:contents"><div class="day-label label-cell"><span class="label-text">${day}</span><button class="label-eye-btn" type="button" title="${dayHoverLabel}" onclick="toggleTimeHeatmapDayFilter('${day}')">${dayIcon}</button></div>${cells}</div>`;
   }).join('');
 
-  const hasTradeData = days.some(day => grid[day].some(cell => cell.count > 0));
-  if (!hasTradeData) {
-    timeHeatmap.innerHTML = `<div style="padding:40px 0 20px;grid-column:span 25;text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:11px">No trades with valid date/time found for the selected data set.</div>`;
+  if (visibleDays.length === 0 || visibleHours.length === 0) {
+    timeHeatmap.innerHTML = hiddenColsRow + `<div style="padding:40px 0 20px;grid-column:span ${Math.max(totalCols, 2)};text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:11px">All visible ${visibleDays.length === 0 ? 'days' : 'hours'} are filtered out. Use the clear filter button to restore them.</div>`;
     return;
   }
 
-  timeHeatmap.innerHTML = header + rows;
+  const hasTradeData = visibleDays.some(day => visibleHours.some(hour => grid[day][hour].count > 0));
+  if (!hasTradeData) {
+    timeHeatmap.innerHTML = hiddenColsRow + `<div style="padding:40px 0 20px;grid-column:span ${Math.max(totalCols, 2)};text-align:center;color:var(--text3);font-family:var(--font-mono);font-size:11px">No trades with valid date/time found for the selected data set.</div>`;
+    return;
+  }
+
+  timeHeatmap.innerHTML = hiddenColsRow + header + rows;
 }
 
 // ── R-Multiple symbol filter ──
