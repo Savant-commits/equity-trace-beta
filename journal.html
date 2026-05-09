@@ -2266,76 +2266,6 @@ window.addEventListener('DOMContentLoaded', function() {
         <input type="hidden" id="exp-date-from">
         <input type="hidden" id="exp-date-to">
       </div>
-      <!-- PERFORMANCE SNAPSHOT -->
-      <div style="background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);padding:22px 24px;box-shadow:inset 0 0 60px var(--ac-07)">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:32px;height:32px;border-radius:9px;background:rgba(46,204,138,.12);border:1px solid rgba(46,204,138,.25);display:flex;align-items:center;justify-content:center;font-size:15px; color:var(--green);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><polyline points="1,13 4,8 7,10 10,4 13,6 15,2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-            <div><div style="font-family:var(--font-display);font-weight:700;font-size:14px">Performance Snapshot</div><div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Live summary of your trading activity</div></div>
-          </div>
-          <button onclick="openExportModal('snapshot')" style="display:flex;align-items:center;gap:6px;background:var(--purple);border:none;color:#fff;padding:7px 16px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font-body);transition:opacity .15s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'"><svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>Export</button>
-        </div>
-        <!-- Account filter row -->
-        <div style="margin-bottom:16px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;margin-right:2px">Filter</div>
-          <button id="snap-acct-btn-all" onclick="setSnapAccount('__all__', this)" style="padding:5px 13px;border-radius:20px;font-size:11px;font-family:var(--font-body);cursor:pointer;transition:all .15s;border:1px solid var(--ac-50);background:var(--ac-18);color:var(--purple);font-weight:600;white-space:nowrap">All Accounts</button>
-          <div id="snap-acct-btns" style="display:flex;gap:6px;flex-wrap:wrap"></div>
-        </div>
-        <div id="rpt-snapshot" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px"></div>
-      </div>
-      <!-- MONTHLY BREAKDOWN -->
-      <div style="background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);padding:20px 22px;box-shadow:inset 0 0 60px var(--ac-07);overflow-x:auto">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;height:28px;border-radius:8px;background:rgba(77,142,240,.12);border:1px solid rgba(77,142,240,.2);display:flex;align-items:center;justify-content:center;color:var(--blue)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></div>
-            <div class="sec-title">Monthly Breakdown</div>
-            <div id="rpt-monthly-badge" style="display:none;font-size:9px;font-family:var(--font-mono);background:var(--purple2);color:var(--purple);border:1px solid var(--ac-25);border-radius:4px;padding:1px 7px"></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono)">P&amp;L per account per month</div>
-            <button id="rpt-monthly-expand-btn" onclick="toggleMonthlyExpand()" style="display:none;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:10px;font-family:var(--font-mono);color:var(--text2);transition:all .15s" onmouseenter="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Show 12 months ▾</button>
-            <button onclick="openExportModal('monthly')" style="display:flex;align-items:center;gap:5px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:10px;font-family:var(--font-mono);color:var(--text2);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-40)';this.style.color='var(--purple)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Export</button>
-          </div>
-        </div>
-        <div id="rpt-monthly-table" style="display:flex;flex-direction:column;gap:0;min-width:500px"></div>
-        <!-- Paginated overflow (13+ months) -->
-        <div id="rpt-monthly-pages" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase">All months</div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button id="rpt-monthly-prev" onclick="monthlyPageNav(-1)" class="page-nav-btn">‹</button>
-              <span id="rpt-monthly-page-label" style="font-size:11px;color:var(--text2);font-family:var(--font-mono);min-width:80px;text-align:center"></span>
-              <button id="rpt-monthly-next" onclick="monthlyPageNav(1)" class="page-nav-btn">›</button>
-            </div>
-          </div>
-          <div id="rpt-monthly-page-table" style="display:flex;flex-direction:column;gap:0;min-width:500px"></div>
-        </div>
-      </div>
-      <!-- BY ACCOUNT -->
-      <div class="rpt-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <div style="width:28px;height:28px;border-radius:8px;background:rgba(232,80,74,.12);border:1px solid rgba(232,80,74,.2);display:flex;align-items:center;justify-content:center;font-size:13px; color:var(--blue);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 6h12M8 2l6 4H2l6-4z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" fill="none"/><line x1="3" y1="6" x2="3" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="6" y1="6" x2="6" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="10" y1="6" x2="10" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="13" y1="6" x2="13" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="2" y1="12" x2="14" y2="12" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-            <div class="sec-title">By Account</div>
-            <div id="rpt-acct-badge" style="display:none;font-size:9px;font-family:var(--font-mono);background:var(--purple2);color:var(--purple);border:1px solid var(--ac-25);border-radius:4px;padding:1px 7px"></div>
-          </div>
-          <button id="rpt-acct-expand-btn" onclick="toggleAcctExpand()" style="display:none;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:10px;font-family:var(--font-mono);color:var(--text2);transition:all .15s" onmouseenter="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Show more ▾</button>
-          <button onclick="openExportModal('account')" style="display:flex;align-items:center;gap:5px;background:var(--bg4);border:1px solid var(--border);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:10px;font-family:var(--font-mono);color:var(--text2);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-40)';this.style.color='var(--purple)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'"><svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>Export</button>
-        </div>
-        <div id="rpt-account-table" style="display:flex;flex-direction:column;gap:4px"></div>
-        <!-- Paginated overflow -->
-        <div id="rpt-acct-pages" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-            <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase">All accounts</div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <button id="rpt-acct-prev" onclick="acctPageNav(-1)" class="page-nav-btn">‹</button>
-              <span id="rpt-acct-page-label" style="font-size:11px;color:var(--text2);font-family:var(--font-mono);min-width:80px;text-align:center"></span>
-              <button id="rpt-acct-next" onclick="acctPageNav(1)" class="page-nav-btn">›</button>
-            </div>
-          </div>
-          <div id="rpt-acct-page-table" style="display:flex;flex-direction:column;gap:4px"></div>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -4238,6 +4168,16 @@ window.addEventListener('DOMContentLoaded', function() {
       </div>
 
     </div>
+  </div>
+</div>
+
+<div id="acct-detail-overlay" onclick="if(event.target===this)closeAccountDetail()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:68px 16px 24px">
+  <div onclick="event.stopPropagation()" style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:540px;max-width:96vw;box-shadow:0 32px 80px rgba(0,0,0,.6)">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--border)">
+      <div style="font-family:var(--font-display);font-size:18px;font-weight:750;color:var(--text);line-height:1.05">Account Details</div>
+      <button onclick="closeAccountDetail()" style="background:none;border:none;cursor:pointer;color:var(--text3);width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;transition:all .15s;border:1px solid var(--border)" onmouseenter="this.style.color='var(--text)';this.style.borderColor='var(--border2)'" onmouseleave="this.style.color='var(--text3)';this.style.borderColor='var(--border)'"><svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+    </div>
+    <div id="acct-detail-body" style="padding:20px 22px 24px;display:flex;flex-direction:column;gap:16px"></div>
   </div>
 </div>
 

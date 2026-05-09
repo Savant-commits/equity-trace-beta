@@ -4833,22 +4833,10 @@ function saveTrade() {
     const _isForex = _symUpper.includes('/') || ['EURUSD','GBPUSD','USDJPY','AUDUSD','USDCAD','USDCHF','NZDUSD','XAUUSD','XAGUSD'].some(s => _symUpper === s || _symUpper === s.replace('/',''));
     const _isFutures = ['NQ','ES','YM','MNQ','MES','MYM','RTY','CL','GC','SI','ZB','ZN','6E','6J'].some(s => _symUpper === s || _symUpper.startsWith(s));
     if (_isForex && entry > 500) {
-      try {
-        if (typeof showToast === 'function') {
-          showToast('Heads up: entry price looks high for a forex pair — double-check your decimal', 'info', '⚠️', 4000);
-        }
-      } catch(e) {
-        console.warn('Error showing forex sanity check:', e);
-      }
+      // Removed heads-up toast for forex entry price warnings
     }
     if (_isFutures && entry < 10 && entry > 0) {
-      try {
-        if (typeof showToast === 'function') {
-          showToast('Heads up: entry price looks low for a futures contract — double-check your value', 'info', '⚠️', 4000);
-        }
-      } catch(e) {
-        console.warn('Error showing futures sanity check:', e);
-      }
+      // Removed heads-up toast for futures entry price warnings
     }
 
     // Validation checks — STRICT: must have essential fields
@@ -8700,11 +8688,8 @@ function renderAccountsPage() {
     if (netPnl <= -ml || Math.abs(worstDay) >= dl) status = 'breached';
     else if (a.profitTarget > 0 && netPnl >= pt)   status = 'passed';
 
-    // Calculate margin metrics
-    const currentBalance = (a.startBal || 0) + netPnl;
-    const marginUsedPct = ml > 0 ? Math.max(0, Math.min(100, (Math.abs(netPnl) / ml) * 100)).toFixed(1) : 0;
-    const marginUsedColor = marginUsedPct >= 80 ? 'var(--red)' : marginUsedPct >= 50 ? 'var(--amber)' : 'var(--green)';
-    const freMarginColor = currentBalance < 0 ? 'var(--red)' : currentBalance < (a.startBal || 0) * 0.5 ? 'var(--amber)' : 'var(--green)';
+    const acctTradesCount = acctTrades.length;
+    const accountTarget = a.profitTarget !== undefined && a.profitTarget !== null ? `${a.profitTarget}%` : '—';
 
     // Status badge + glow colours
     const statusBadge = status === 'breached'
@@ -8742,7 +8727,7 @@ function renderAccountsPage() {
       <div class="acct-card-glow" style="pointer-events:none;position:absolute;inset:0;border-radius:16px;opacity:0;transition:opacity .22s;background:radial-gradient(ellipse at 50% 0%,${glowRgba} 0%,transparent 68%)"></div>
 
       <!-- Card header -->
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openEditAccountModal(${a.id})`}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openAccountDetail(${a.id})`}">
         <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
           <div style="flex-shrink:0">${firmLogoHTML(a.firm, 34, 9, a.avatar)}</div>
           <div style="flex:1;min-width:0">
@@ -8768,7 +8753,7 @@ function renderAccountsPage() {
       </div>
 
       <!-- Balance / DD type -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openEditAccountModal(${a.id})`}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openAccountDetail(${a.id})`}">
         <div style="background:var(--bg3);border-radius:9px;padding:10px 14px">
           <div style="font-size:10px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">Balance</div>
           <div style="font-size:14px;font-weight:700;color:var(--text);font-family:var(--font-mono)">$${Number(a.startBal||0).toLocaleString()}</div>
@@ -8779,37 +8764,27 @@ function renderAccountsPage() {
         </div>
       </div>
 
-      <!-- Margin / Free Margin -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openEditAccountModal(${a.id})`}">
+      <!-- Trades / Target -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openAccountDetail(${a.id})`}">
         <div style="background:var(--bg3);border-radius:9px;padding:10px 14px">
-          <div style="font-size:10px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">Margin Used</div>
-          <div style="font-size:14px;font-weight:700;color:${marginUsedColor};font-family:var(--font-mono)">${marginUsedPct}% of ${a.maxDrawdown||8}%</div>
+          <div style="font-size:10px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">No. of Trades</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);font-family:var(--font-mono)">${acctTradesCount}</div>
         </div>
         <div style="background:var(--bg3);border-radius:9px;padding:10px 14px">
-          <div style="font-size:10px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">Free Margin</div>
-          <div style="font-size:14px;font-weight:700;color:${freMarginColor};font-family:var(--font-mono)">$${Number(currentBalance).toLocaleString()}</div>
+          <div style="font-size:10px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px">Account Target</div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);font-family:var(--font-mono)">${accountTarget}</div>
         </div>
       </div>
 
       <!-- Rules chips -->
-      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openEditAccountModal(${a.id})`}">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openAccountDetail(${a.id})`}">
         <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:6px;border:1px solid var(--border);font-weight:600">Max DD: ${a.maxDrawdown||8}%</span>
         <span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:6px;border:1px solid var(--border);font-weight:600">Daily: ${a.dailyLoss||4}%</span>
         ${a.profitTarget ? `<span style="font-size:11px;font-family:var(--font-mono);color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:6px;border:1px solid var(--border);font-weight:600">Target: ${a.profitTarget}%</span>` : ''}
       </div>
 
-      <!-- Leverage chips -->
-      ${(lev.forex||lev.metals||lev.futures||lev.crypto||lev.stocks||lev.indices) ? `
-      <div style="display:flex;gap:6px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:14px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openEditAccountModal(${a.id})`}">
-        ${lev.forex   ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--blue);background:var(--blue2);padding:2px 7px;border-radius:4px">Forex 1:${lev.forex}</span>` : ''}
-        ${lev.metals  ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--amber);background:var(--amber2);padding:2px 7px;border-radius:4px">Metals 1:${lev.metals}</span>` : ''}
-        ${lev.futures ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--green);background:var(--green2);padding:2px 7px;border-radius:4px">Futures 1:${lev.futures}</span>` : ''}
-        ${lev.crypto  ? `<span style="font-size:9px;font-family:var(--font-mono);color:#b891f5;background:var(--ac-12);padding:2px 7px;border-radius:4px">Crypto 1:${lev.crypto}</span>` : ''}
-        ${lev.stocks  ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:2px 7px;border-radius:4px">Stocks 1:${lev.stocks}</span>` : ''}
-        ${lev.indices ? `<span style="font-size:9px;font-family:var(--font-mono);color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:2px 7px;border-radius:4px">Indices 1:${lev.indices}</span>` : ''}
-      </div>` : ''}
 
-      ${a.notes ? `<div style="font-size:11px;color:var(--text3);font-family:var(--font-body);padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:14px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openEditAccountModal(${a.id})`}">${a.notes}</div>` : ''}
+      ${a.notes ? `<div style="font-size:11px;color:var(--text3);font-family:var(--font-body);padding-bottom:14px;border-bottom:1px solid var(--border);margin-bottom:14px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openAccountDetail(${a.id})`}">${a.notes}</div>` : ''}
 
       ${status === 'breached' ? (() => {
         const reasons = computeBreachReason(a);
@@ -9109,6 +9084,100 @@ function closeAccountModal() {
   $('acct-modal-overlay').style.display = 'none';
   const legacyOverlay = $('add-account-overlay');
   if (legacyOverlay) legacyOverlay.style.display = 'none';
+}
+
+function openAccountDetail(id) {
+  const a = ACCOUNTS.find(x => x.id === id);
+  if (!a) return;
+  const acctName = a.key || a.phase;
+  const acctTrades = TRADES.filter(t => (t.account || '') === acctName);
+  const acctTradesCount = acctTrades.length;
+  const accountTarget = a.profitTarget !== undefined && a.profitTarget !== null ? `${a.profitTarget}%` : '—';
+  const lev = a.leverage || {};
+  const leverageLines = [];
+  if (lev.forex) leverageLines.push(`Forex 1:${lev.forex}`);
+  if (lev.metals) leverageLines.push(`Metals 1:${lev.metals}`);
+  if (lev.futures) leverageLines.push(`Futures 1:${lev.futures}`);
+  if (lev.crypto) leverageLines.push(`Crypto 1:${lev.crypto}`);
+  if (lev.stocks) leverageLines.push(`Stocks 1:${lev.stocks}`);
+  if (lev.indices) leverageLines.push(`Indices 1:${lev.indices}`);
+  const leverageHtml = leverageLines.length
+    ? leverageLines.map(item => `<div style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px;white-space:nowrap">${item}</div>`).join('')
+    : '<div style="font-size:13px;color:var(--text3)">No leverage details</div>';
+
+  const status = typeof computeStatus === 'function' ? computeStatus(a) : 'active';
+  const statusLabel = status === 'breached' ? 'Breached' : status === 'passed' ? 'Passed' : 'Active';
+
+  const content = `
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;align-items:flex-start;gap:14px">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--bg3);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative">
+          <img id="acct-detail-avatar-img" src="${a.avatar||''}" alt="Account Photo" style="display:${a.avatar ? 'block' : 'none'};width:100%;height:100%;object-fit:cover"> 
+          <span id="acct-detail-avatar-fallback" style="display:${a.avatar ? 'none' : 'flex'};font-size:16px;font-family:var(--font-display);font-weight:700;color:#fff">${(a.firm||'').slice(0,2).toUpperCase()}</span>
+        </div>
+        <div style="min-width:0;flex:1">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div style="font-size:17px;font-weight:700;color:var(--text);font-family:var(--font-display);margin-bottom:4px">${a.firm}</div>
+            <div style="font-size:13px;font-family:var(--font-mono);font-weight:600;color:${status === 'active' ? 'var(--green)' : status==='breached' ? 'var(--red)' : 'var(--blue)'};background:${status === 'active' ? 'rgba(46,204,138,.12)' : status==='breached' ? 'rgba(232,80,74,.12)' : 'rgba(77,142,240,.12)'};border:1px solid ${status === 'active' ? 'rgba(46,204,138,.25)' : status==='breached' ? 'rgba(232,80,74,.25)' : 'rgba(77,142,240,.25)'};border-radius:999px;padding:6px 10px;white-space:nowrap;letter-spacing:.08em;text-transform:uppercase">${statusLabel}</div>
+            <div style="font-size:13px;font-family:var(--font-mono);font-weight:600;color:${a.startBal >= 0 ? 'var(--green)' : 'var(--red)'};background:${a.startBal >= 0 ? 'rgba(46,204,138,.12)' : 'rgba(232,80,74,.12)'};border:1px solid ${a.startBal >= 0 ? 'rgba(46,204,138,.25)' : 'rgba(232,80,74,.25)'};border-radius:999px;padding:6px 10px;white-space:nowrap;letter-spacing:.08em;text-transform:uppercase">Balance $${Number(a.startBal||0).toLocaleString()}</div>
+          </div>
+          <div style="font-size:12px;color:var(--text3);font-family:var(--font-mono)">${a.phase}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:10px;letter-spacing:.08em;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px">Balance</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono)">$${Number(a.startBal||0).toLocaleString()}</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:10px;letter-spacing:.08em;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px">No. of Trades</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono)">${acctTradesCount}</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:10px;letter-spacing:.08em;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px">Account Target</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono)">${accountTarget}</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:10px;letter-spacing:.08em;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px">DD Type</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text2);font-family:var(--font-mono)">${(a.ddType||'trailing').charAt(0).toUpperCase()+(a.ddType||'trailing').slice(1)}</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:10px;letter-spacing:.08em;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px">Max DD</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono)">${a.maxDrawdown||8}%</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px">
+          <div style="font-size:10px;letter-spacing:.08em;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:6px">Daily Loss</div>
+          <div style="font-size:15px;font-weight:700;color:var(--text);font-family:var(--font-mono)">${a.dailyLoss||4}%</div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:10px;letter-spacing:.08em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:8px">Leverage</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">${leverageHtml}</div>
+      </div>
+
+      ${a.notes ? `<div style="background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:14px;font-size:13px;color:var(--text2);font-family:var(--font-body);line-height:1.6">${a.notes}</div>` : ''}
+
+      <div style="display:flex;justify-content:flex-end;gap:10px">
+        <button onclick="closeAccountDetail()" style="padding:10px 16px;border-radius:10px;border:1px solid var(--border);background:var(--bg4);color:var(--text2);font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .15s">Close</button>
+        <button onclick="event.stopPropagation();closeAccountDetail();openEditAccountModal(${a.id})" style="padding:10px 16px;border-radius:10px;border:none;background:var(--purple);color:#fff;font-family:var(--font-body);font-size:13px;cursor:pointer;transition:all .15s">Edit</button>
+      </div>
+    </div>
+  `;
+
+  const overlay = $('acct-detail-overlay');
+  if (!overlay) return;
+  $('acct-detail-body').innerHTML = content;
+  overlay.style.display = 'flex';
+}
+
+function closeAccountDetail() {
+  const overlay = $('acct-detail-overlay');
+  if (overlay) overlay.style.display = 'none';
 }
 
 function toggleAcctModalActive() {
