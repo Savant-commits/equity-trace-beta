@@ -392,11 +392,14 @@ function switchView(el) {
     const showTopbarButtons = (v === 'dashboard' || v === 'tradelog' || v === 'accounts');
     const showTzSwitcher = (v === 'dashboard');
     const useTradeLogTopbarStyle = (v === 'tradelog' || v === 'analytics' || v === 'advanalytics' || v === 'calendar' || v === 'playbook' || v === 'accounts' || v === 'reports' || v === 'settings');
+    const hideTopbarTitle = (v !== 'dashboard');
     const showProfileInTopbar = !useTradeLogTopbarStyle;
     const showAuthBadge = (v === 'dashboard');
     if (liveDateWrap) liveDateWrap.style.display = v === 'dashboard' ? '' : 'none';
     if (tzSwitcher) tzSwitcher.style.display = showTzSwitcher ? '' : 'none';
     if (topbar) topbar.style.height = useTradeLogTopbarStyle ? '10px' : '';
+    const topbarTitle = document.querySelector('.topbar-title');
+    if (topbarTitle) topbarTitle.style.display = hideTopbarTitle ? 'none' : '';
     requestAnimationFrame(syncTopbarOffset);
     if (topbarRight) topbarRight.style.display = showProfileInTopbar ? '' : 'none';
     if (authUserBadge) {
@@ -5378,6 +5381,11 @@ function firmLogoHTML(firmName, size, radius, customPhoto) {
     + '</div>';
 }
 
+// Account number badge (replaces logo with sequential numbers: 1, 2, 3, etc.)
+function accountNumberHTML(accountNumber, size, radius) {
+  const fontSize = size ? Math.round(size * 0.35) : 12;
+  return '<div style="font-size:' + fontSize + 'px;font-weight:500;font-family:var(--font-display);color:var(--text);flex-shrink:0;border:1px solid var(--border);border-radius:4px;padding:4px 6px;display:flex;align-items:center;justify-content:center;background:var(--bg3)">' + accountNumber + '</div>';
+}
 
 function renderAllAccountsSection() {
   const wrap = $('all-accounts-cards');
@@ -5395,7 +5403,7 @@ function renderAllAccountsSection() {
     breached: { label:'Breached', icon:'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red)"></span>', color:'var(--red)',    bg:'rgba(232,80,74,.08)',    border:'rgba(232,80,74,.25)'   },
   };
 
-  wrap.innerHTML = ACCOUNTS.map(a => {
+  wrap.innerHTML = ACCOUNTS.map((a, i) => {
     const acctName = a.key || a.phase;
     const acctTrades = TRADES.filter(t => (t.account || '') === acctName);
     const netPnl = acctTrades.reduce((s,t) => s+t.pnl, 0);
@@ -5441,7 +5449,7 @@ function renderAllAccountsSection() {
     const statusTitle = breachReason || sm.label;
 
     return `
-    <div class="acct-status-card status-${computedStatus}" style="position:relative">
+    <div class="stat-card status-${computedStatus}" style="position:relative;min-height:240px">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
         <!-- Three-dot menu -->
         <div style="position:absolute;top:12px;right:4px;z-index:10">
@@ -5462,15 +5470,15 @@ function renderAllAccountsSection() {
         </div>
         <!-- Left: identity -->
         <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
-          <div style="flex-shrink:0">${firmLogoHTML(a.firm, 42, 10, a.avatar)}</div>
+          <div style="flex-shrink:0">${accountNumberHTML(i + 1, 42, 10)}</div>
           <div style="display:flex;align-items:center;gap:8px;min-width:0">
-            <div style="font-family:var(--font-display);font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
-            <span style="background:var(--ac-12);color:#a97de8;border:1px solid var(--ac-30);padding:2px 8px;border-radius:5px;font-size:10px;font-family:var(--font-mono);font-weight:500">${formatAccountPhase(a)}</span>
+            <div style="font-family:var(--font-display);font-size:19px;font-weight:500;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
+            <span style="background:var(--ac-12);color:#a97de8;border:1px solid var(--ac-30);padding:4px 12px;border-radius:5px;font-size:12px;font-family:var(--font-mono);font-weight:500">${formatAccountPhase(a)}</span>
           </div>
         </div>
         <!-- Right: P&L -->
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-family:var(--font-display);font-weight:500;font-size:30px;color:${pnlColor}!important;line-height:1">${pnlSign}${fmt(Math.abs(netPnl))}</div>
+        <div style="text-align:right;flex-shrink:0;margin-right:8px;transform:translateX(-15px)">
+          <div style="font-family:var(--font-display);font-weight:550;font-size:30px;color:${pnlColor}!important;line-height:1">${pnlSign}${fmt(Math.abs(netPnl))}</div>
           <div style="font-family:var(--font-mono);font-size:10px;color:${pnlColor}!important;margin-top:2px;opacity:.8">${pnlSign}${Math.abs(pnlPct)}%</div>
         </div>
       </div>
@@ -5479,24 +5487,24 @@ function renderAllAccountsSection() {
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <div>
           <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Equity</div>
-          <div class="sec-title">${fmtK(equity)}</div>
+          <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1">${fmtK(equity)}</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Trades</div>
-          <div class="sec-title">${acctTrades.length}</div>
+          <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1">${acctTrades.length}</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Win Rate</div>
-          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:${wr>=55?'var(--green)':wr>=50?'var(--amber)':'var(--red)'}!important">${wr}%</div>
+          <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1;color:${wr>=55?'var(--green)':wr>=50?'var(--amber)':'var(--red)'}!important">${wr}%</div>
         </div>
         <div>
           <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Size</div>
-          <div class="sec-title">${fmtK(a.startBal)}</div>
+          <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1">${fmtK(a.startBal)}</div>
         </div>
       </div>
 
       <!-- Rule bars -->
-      <div style="display:grid;grid-template-columns:${hideProfitTarget ? '1fr' : '1fr 1fr'};gap:10px;margin-top:14px">
+      <div style="display:grid;grid-template-columns:${hideProfitTarget ? '1fr' : '1fr 1fr'};gap:10px;margin-top:22px">
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
             <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.05em;text-transform:uppercase">Max Drawdown</span>
@@ -5505,7 +5513,6 @@ function renderAllAccountsSection() {
           <div class="acct-rule-bar">
             <div class="acct-rule-fill" style="width:${maxLossPct}%;background:${maxLossPct>80?'var(--red)':maxLossPct>50?'var(--amber)':'rgba(232,80,74,.5)'}"></div>
           </div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:3px">Limit: ${fmtK(maxLossLimit)} (${a.maxDrawdown}%)</div>
         </div>
         ${hideProfitTarget ? '' : `
         <div>
@@ -5514,9 +5521,8 @@ function renderAllAccountsSection() {
             <span style="font-size:9px;color:var(--green)!important;font-family:var(--font-mono)">${profitPct}% reached</span>
           </div>
           <div class="acct-rule-bar">
-            <div class="acct-rule-fill" style="width:${profitPct}%;background:${profitPct>=100?'var(--blue)':'var(--green)'}"></div>
+            <div class="acct-rule-fill" style="width:${profitPct}%;background:var(--green)"></div>
           </div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);margin-top:3px">Target: ${fmtK(profitLimit)} (${a.profitTarget}%)</div>
         </div>
         `}
       </div>
@@ -5637,15 +5643,12 @@ function renderAcctList() {
 
   function buildRow({ a, i, status, pnl }) {
     const isSelected = i === selectedAcct;
-    const dotColor = status === 'breached' ? 'var(--red)' : status === 'passed' ? 'var(--blue)' : 'var(--green)';
-    const dotTitle = status === 'breached' ? 'Breached' : status === 'passed' ? 'Passed' : 'Active';
     const phaseLabel = formatAccountPhase(a);
     return `
-    <div style="display:flex;align-items:center;position:relative;background:${isSelected?'var(--ac-10)':'transparent'};border-left:2px solid ${isSelected?'var(--purple)':'transparent'};${status!=='active'?'opacity:.7':''}transition:background .12s;" onmouseenter="this.style.background='var(--ac-07)'" onmouseleave="this.style.background='${isSelected?'var(--ac-10)':'transparent'}'">
+    <div style="display:flex;align-items:center;background:${isSelected?'var(--ac-10)':'transparent'};border-left:2px solid ${isSelected?'var(--purple)':'transparent'};${status!=='active'?'opacity:.7':''}transition:background .12s;" onmouseenter="this.style.background='var(--ac-07)'" onmouseleave="this.style.background='${isSelected?'var(--ac-10)':'transparent'}'">
       <div onclick="selectAcct(${i})" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;flex:1;min-width:0">
-        <div style="position:relative;flex-shrink:0">
-          ${firmLogoHTML(a.firm, 28, 7, a.avatar)}
-          <span title="${dotTitle}" style="position:absolute;bottom:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:${dotColor};border:1.5px solid var(--bg2)"></span>
+        <div style="flex-shrink:0">
+          ${accountNumberHTML(i + 1, 28, 7)}
         </div>
         <div style="flex:1;min-width:0;display:flex;align-items:center;gap:8px">
           <div style="font-size:14.5px;font-weight:600;color:${isSelected?'var(--text)':'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
@@ -5886,14 +5889,12 @@ function renderTopbarAcctList() {
 
   const rowsHtml = acctStatuses.map(({ a, i, status, pnl }) => {
     const isSelected = i === selectedAcct;
-    const dotColor = status === 'breached' ? 'var(--red)' : status === 'passed' ? 'var(--blue)' : 'var(--green)';
     const menuId = 'acct-card-menu-tb-' + a.id;
     return `
     <div style="display:flex;align-items:center;border-radius:8px;background:${isSelected?'var(--ac-12)':'transparent'};transition:background .12s;position:relative" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${isSelected?'var(--ac-12)':'transparent'}'">
       <div onclick="selectAcctFromTopbar(${i})" style="display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;flex:1;min-width:0">
-        <div style="position:relative;flex-shrink:0">
-          ${firmLogoHTML(a.firm, 30, 8, a.avatar)}
-          <span style="position:absolute;bottom:-2px;right:-2px;width:7px;height:7px;border-radius:50%;background:${dotColor};border:1.5px solid var(--bg2)"></span>
+        <div style="flex-shrink:0">
+          ${accountNumberHTML(i + 1, 30, 8)}
         </div>
         <div style="flex:1;min-width:0">
           <div style="font-size:14px;font-weight:600;color:${isSelected?'var(--text)':'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
@@ -7891,7 +7892,7 @@ function renderAcmPhaseOptions() {
   const current = $('acm-phase') ? $('acm-phase').value : '';
   list.innerHTML = _ACM_CHALLENGE_TYPES.map(type => {
     const active = type === current;
-    return `<div onclick="selectAcmPhase('${type}')" style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:12px;font-family:var(--font-body);color:${active?'var(--purple)':'var(--text2)'};background:${active?'var(--ac-12)':'transparent'};transition:background .12s" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${active?'var(--ac-12)':'transparent'}'">
+    return `<div onclick="selectAcmPhase('${type}')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-family:var(--font-body);color:${active?'var(--purple)':'var(--text2)'};background:${active?'var(--ac-12)':'transparent'};transition:background .12s" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${active?'var(--ac-12)':'transparent'}'">
       <span>${type}</span>
       ${active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1.5 6l3 3 6-6" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
     </div>`;
@@ -7940,7 +7941,11 @@ function selectAcmPhase(value) {
   const trigger = $('acm-phase-trigger');
   const chev = $('acm-phase-chevron');
   if (dd) dd.style.display = 'none';
-  if (trigger) { trigger.dataset.open = 'false'; trigger.style.borderColor = 'var(--border)'; }
+  if (trigger) {
+    trigger.dataset.open = 'false';
+    trigger.style.borderColor = 'var(--border)';
+    trigger.classList.remove('input-error');
+  }
   if (chev) chev.style.transform = '';
   updatePhaseFields();
 }
@@ -8670,7 +8675,7 @@ function renderAccountsPage() {
   const passedAccounts   = visibleAccounts.filter(a => computeStatus(a) === 'passed');
   const breachedAccounts = visibleAccounts.filter(a => computeStatus(a) === 'breached');
 
-  function renderCardHtml(a) {
+  function renderCardHtml(a, accountNumber) {
     const acctName   = a.key || a.phase;
     const acctTrades = TRADES.filter(t => (t.account || '') === acctName);
     const netPnl     = acctTrades.reduce((s, t) => s + (t.pnl || 0), 0);
@@ -8729,7 +8734,7 @@ function renderAccountsPage() {
       <!-- Card header -->
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;position:relative" onclick="${acctSelectMode ? `toggleAccountSelection(${a.id})` : `openAccountDetail(${a.id})`}">
         <div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0">
-          <div style="flex-shrink:0">${firmLogoHTML(a.firm, 34, 9, a.avatar)}</div>
+          <div style="flex-shrink:0">${accountNumberHTML(accountNumber, 34, 9)}</div>
           <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:5px">
             <!-- FCFS number badge — click to rename -->
@@ -8823,7 +8828,7 @@ function renderAccountsPage() {
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(52,211,153,.35),transparent)"></div>
       </div>
     `;
-    sectionsHtml += activeAccounts.map(a => renderCardHtml(a)).join('');
+    sectionsHtml += activeAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('');
   }
 
   // ── Render Passed challenges section ──
@@ -8835,7 +8840,7 @@ function renderAccountsPage() {
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(184,145,245,.35),transparent)"></div>
       </div>
     `;
-    sectionsHtml += passedAccounts.map(a => renderCardHtml(a)).join('');
+    sectionsHtml += passedAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('');
   }
 
   if (breachedAccounts.length > 0) {
@@ -8846,7 +8851,7 @@ function renderAccountsPage() {
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(239,68,68,.35),transparent)"></div>
       </div>
     `;
-    sectionsHtml += breachedAccounts.map(a => renderCardHtml(a)).join('');
+    sectionsHtml += breachedAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('');
   }
 
   grid.innerHTML = sectionsHtml;
@@ -9072,6 +9077,7 @@ function openEditAccountModal(id) {
   updateAccountAvatarFallback();
   _acmPhotoData = a.avatar || '';
   updateAccountPhotoPreview(_acmPhotoData);
+  resetAcmFieldErrors();
   _setAcmPhaseVisual(a.challengeType || '');
   setAcmCurrentPhase(parseInt($('acm-current-phase').value, 10) || 1);
   updatePhaseFields();
@@ -9278,6 +9284,19 @@ function acmConsistencyDone() {
   _syncAcmConsistencyRuleUI();
 }
 
+function resetAcmFieldErrors() {
+  ['acm-firm','acm-balance','acm-phase-trigger'].forEach(id => {
+    const el = $(id);
+    if (el) el.classList.remove('input-error');
+  });
+}
+
+function markAcmFieldError(id) {
+  const el = $(id);
+  if (!el) return;
+  el.classList.add('input-error');
+}
+
 function saveAccountFromModal() {
   let firm  = $('acm-firm').value.trim();
   const challengeType = $('acm-phase').value.trim();
@@ -9288,8 +9307,21 @@ function saveAccountFromModal() {
   }
   
   const bal   = parseFloat($('acm-balance').value) || 0;
-  if (!firm || !challengeType) {
-    showToast('Firm name and challenge type are required', 'error', '⚠️', 2800);
+  resetAcmFieldErrors();
+  let hasError = false;
+  if (!firm) {
+    markAcmFieldError('acm-firm');
+    hasError = true;
+  }
+  if (!challengeType) {
+    markAcmFieldError('acm-phase-trigger');
+    hasError = true;
+  }
+  if (!bal || bal <= 0) {
+    markAcmFieldError('acm-balance');
+    hasError = true;
+  }
+  if (hasError) {
     return;
   }
 

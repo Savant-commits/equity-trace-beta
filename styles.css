@@ -2139,7 +2139,7 @@ h1,h2,h3{letter-spacing:-.02em}
 /* ─── MAIN ─── */
 .main{margin-left:var(--sidebar-collapsed);flex:1;display:flex;flex-direction:column;min-height:100vh;min-width:0;transition:margin-left .25s cubic-bezier(.4,0,.2,1)}
 .topbar{background:linear-gradient(135deg,rgba(80,30,180,0.96) 0%,rgba(120,55,220,0.92) 50%,rgba(90,35,190,0.96) 100%);border-bottom:1px solid rgba(153,93,255,0.28);height:var(--topbar-height);display:flex;align-items:center;padding:0 24px;gap:12px;position:sticky;top:0;z-index:99999;backdrop-filter:blur(18px);box-shadow:0 2px 18px rgba(0,0,0,.22);margin-left:calc(0px - var(--sidebar-collapsed));padding-left:calc(24px + var(--sidebar-collapsed))}
-.topbar-title{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:600;font-size:17px;letter-spacing:0;color:#fff;flex:1;text-align:center}
+.topbar-title{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:600;font-size:19px;letter-spacing:0;color:#fff;flex:1;text-align:center}
 .topbar-right{display:flex;align-items:center;gap:8px;margin-left:auto}
 .acct-selector{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;transition:border-color .15s}
 .acct-selector:hover{border-color:var(--border3)}
@@ -2446,13 +2446,13 @@ h1,h2,h3{letter-spacing:-.02em}
 .stat-card{background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:var(--radius);padding:16px 18px;cursor:default;transition:background .2s,border-color .2s,transform .2s,box-shadow .2s;position:relative;overflow:hidden;transform:scale(0.96);box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09)}
 .stat-card:hover{background:linear-gradient(135deg,var(--bg4) 0%,var(--ac-09) 60%,var(--ac-22) 100%);transform:scale(1);}
 /* Account status card */
-.acct-status-card{background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:var(--radius);padding:22px 24px;transition:background .2s,transform .2s,box-shadow .2s;transform:scale(0.96);box-shadow:inset 0 0 60px var(--ac-10)}
-.acct-status-card:hover{background:linear-gradient(135deg,var(--bg4) 0%,var(--ac-09) 60%,var(--ac-22) 100%);transform:scale(1);}
-.light .acct-status-card:hover{background:linear-gradient(135deg,#f4f5fb 0%,var(--ac-07) 60%,var(--ac-15) 100%);transform:scale(1);}
-.acct-status-card.status-active{border-color:rgba(46,204,138,.3)}
-.acct-status-card.status-passed{border-color:rgba(77,142,240,.3)}
-.acct-status-card.status-breached{border-color:rgba(232,80,74,.3)}
-.light .acct-status-card{background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-05) 60%,var(--ac-12) 100%);box-shadow:none}
+.acct-status-card{background:linear-gradient(135deg,var(--bg3) 0%,var(--bg4) 60%,var(--bg4) 100%);border:1px solid var(--ac-20);border-radius:var(--radius);padding:22px 24px;transition:background .2s,transform .2s,box-shadow .2s;transform:scale(0.96);box-shadow:inset 0 0 60px var(--ac-10)}
+.acct-status-card:hover{background:linear-gradient(135deg,var(--bg3) 0%,var(--bg4) 60%,var(--bg4) 100%);transform:scale(0.96);}
+.light .acct-status-card:hover{background:linear-gradient(135deg,var(--bg3) 0%,var(--bg4) 60%,var(--bg4) 100%);transform:scale(0.96);}
+.acct-status-card.status-active,
+.acct-status-card.status-passed,
+.acct-status-card.status-breached{border-color:var(--ac-20)}
+.light .acct-status-card{background:linear-gradient(135deg,var(--bg3) 0%,var(--bg4) 60%,var(--bg4) 100%);box-shadow:none}
 .light .acct-status-card .acct-stat-val{color:var(--text)!important}
 .light .acct-status-card .acct-stat-lbl{color:var(--text3)!important}
 .acct-rule-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:5px}
@@ -2623,6 +2623,11 @@ h1,h2,h3{letter-spacing:-.02em}
 .filter-btn:hover{border-color:var(--ac-50);color:#a97de8;background:var(--purple2);box-shadow:0 0 12px var(--ac-30),inset 0 0 10px var(--ac-10)}
 .filter-btn.has-filter{position:relative}
 .filter-btn.has-filter:hover{color:var(--red);}
+
+.input-error {
+  border-color: var(--red) !important;
+  box-shadow: 0 0 0 2px rgba(232,80,74,.18) !important;
+}
 .filter-btn.has-filter:hover svg{opacity:0;transition:opacity .15s ease}
 .filter-btn.has-filter:hover::after{content:'×';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:700;color:var(--red);pointer-events:none;}
 .filter-btn.active{background:var(--purple2);border-color:var(--ac-65);color:#b891f5;box-shadow:0 0 16px var(--ac-50),inset 0 0 14px var(--ac-18)}
@@ -2702,7 +2707,8 @@ h1,h2,h3{letter-spacing:-.02em}
 .form-group{display:flex;flex-direction:column;gap:4px;flex:1;position:relative}
 .form-label{font-size:9.5px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;font-family:var(--font-mono)}
 .form-input,.form-select,.form-textarea{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:7px 11px;color:var(--text);font-size:13px;font-family:var(--font-body);outline:none;transition:border-color .15s;width:100%}
-.form-select{appearance:none;cursor:pointer;color-scheme:dark}
+.form-select{appearance:none;-webkit-appearance:none;-moz-appearance:none;cursor:pointer;color-scheme:dark;background-image:linear-gradient(45deg, transparent 45%, currentColor 45%, currentColor 55%, transparent 55%), linear-gradient(135deg, transparent 45%, currentColor 45%, currentColor 55%, transparent 55%);background-position:calc(100% - 12px) center, calc(100% - 7px) center;background-size:6px 6px;background-repeat:no-repeat;padding-right:calc(11px + 18px)}
+.form-select::-ms-expand{display:none}
 .form-select option,
 .form-select optgroup{
   background-color:var(--bg2);
@@ -3191,6 +3197,11 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 /* ─── PROFIT FACTOR CARD ─── */
 #pf-card:hover .stat-sub{opacity:1!important}
 #pf-card:hover #pf-rr-label{opacity:1!important}
+#pf-card:hover #pf-val{font-size:26px!important}
+#pf-card:hover .stat-card-label{font-size:11px!important}
+#pf-card:hover .stat-sub span{font-size:12px!important;line-height:1.2!important}
+#pf-card:hover #pf-worst,
+#pf-card:hover #pf-best{font-size:13px!important}
 
 /* ─── EMOTION TAGS IMPROVED ─── */
 .emo-tag{transition:all .2s cubic-bezier(.4,0,.2,1)!important}

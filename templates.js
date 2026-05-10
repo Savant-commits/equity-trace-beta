@@ -1442,10 +1442,10 @@ function initProfileUI() {
 
 // ── SETTINGS STORE ────────────────────────────────────────
 const DEFAULT_SETTINGS = {
-  timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-  displayTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-  tradingTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
-  calendarTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC',
+  timezone: 'Asia/Kolkata',
+  displayTimezone: 'Asia/Kolkata',
+  tradingTimezone: 'America/New_York',
+  calendarTimezone: 'Asia/Kolkata',
   importTimezone: 'UTC+00:00',
   dateFormat: 'YYYY-MM-DD',
   timeFormat: '24h',
