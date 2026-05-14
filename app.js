@@ -587,6 +587,7 @@ function updateTlCards(trades) {
     ? (Math.abs(tlBestWinningDayProfit) / tlAbsTotalProfit) * 100
     : 0;
   const tlRoundedConsistencyPct = Number(tlConsistencyPct.toFixed(2));
+  const tlBestTrade = trades.length ? trades.reduce((best, t) => t.pnl > best.pnl ? t : best, trades[0]) : null;
 
   const tlConsistencyValueEl = $('tl-consistency-pct');
   const tlConsistencyStatusEl = $('tl-consistency-status');
@@ -603,12 +604,13 @@ function updateTlCards(trades) {
   }
 
   if (tlConsistencySubEl) {
-    const tlBestDayAmount = Math.abs(tlBestWinningDayProfit).toFixed(2);
+    const tlBestTradeAmount = tlBestTrade ? Math.abs(tlBestTrade.pnl).toFixed(2) : '0.00';
+    const tlBestTradePrefix = tlBestTrade && tlBestTrade.pnl >= 0 ? '+' : (tlBestTrade ? '-' : '');
     const tlTotalAmount = Math.abs(netPnl).toFixed(2);
     const tlTotalPrefix = netPnl < 0 ? '-' : '';
-    const tlBestDayClass = tlBestWinningDayProfit > 0 ? 'profit' : '';
+    const tlBestTradeClass = tlBestTrade && tlBestTrade.pnl > 0 ? 'profit' : '';
     const tlTotalClass = netPnl > 0 ? 'profit' : netPnl < 0 ? 'loss' : '';
-    tlConsistencySubEl.innerHTML = `Best day: <span class="consistency-sub-value ${tlBestDayClass}">$${tlBestDayAmount}</span>\nTotal profit: <span class="consistency-sub-value ${tlTotalClass}">${tlTotalPrefix}$${tlTotalAmount}</span>`;
+    tlConsistencySubEl.innerHTML = `Best trade: <span class="consistency-sub-value ${tlBestTradeClass}">${tlBestTradePrefix}$${tlBestTradeAmount}</span>\nTotal profit: <span class="consistency-sub-value ${tlTotalClass}">${tlTotalPrefix}$${tlTotalAmount}</span>`;
   }
 }
 
@@ -7509,7 +7511,16 @@ function optionsOutsideClick(e) {
   if (wrap && !wrap.contains(e.target)) closeOptionsMenu();
 }
 function exportTrades() {
-  selExportSelected();
+  const body = 'Download a backup of your selected trades?';
+  const perform = () => selExportSelected();
+
+  if (typeof _acctConfirm === 'function') {
+    _acctConfirm('Confirm export', body, 'Export', 'primary', perform);
+  } else if (typeof showConfirmModal === 'function') {
+    showConfirmModal('Confirm export', body, 'Export', 'Cancel', 'primary', perform);
+  } else {
+    if (window.confirm('Download a backup of your selected trades?')) perform();
+  }
 }
 const TL_TT_PERIODS = [
   { label: 'OVERALL',    sub: 'all time' },
@@ -8542,10 +8553,16 @@ function togglePasswordVisibility(fieldId) {
 }
 
 // Unified confirm helper — uses confirm-modal if present, else _showInlineConfirm
-function _acctConfirm(title, bodyHtml, okLabel, callback) {
+function _acctConfirm(title, bodyHtml, okLabel, type, callback) {
+  if (typeof type === 'function') {
+    callback = type;
+    type = 'danger';
+  }
+  type = type || 'danger';
+
   const modal = document.getElementById('confirm-modal');
   if (modal && typeof showConfirmModal === 'function') {
-    showConfirmModal(title, bodyHtml, okLabel, 'Cancel', 'danger', callback);
+    showConfirmModal(title, bodyHtml, okLabel, 'Cancel', type, callback);
   } else {
     _showInlineConfirm(bodyHtml, okLabel, callback);
   }

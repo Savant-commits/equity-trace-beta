@@ -642,18 +642,16 @@ function _tzShortLabel(tz) {
 })();
 
 /* ─── TOAST SYSTEM ─── */
-/* ─── TOAST SYSTEM (queue-aware, max 4 stacked, with undo support) ─── */
+/* ─── TOAST SYSTEM (single message only; new toast replaces previous instantly) ─── */
 window.showToast = (function(){
-  const MAX = 4;
   return function(msg, type='info', icon='', duration=3000, undoCallback=null){
     const container = $('toast-container');
     if(!container) return;
     const icons = {success:'✓', error:'✕', info:'◆'};
-    // Prune oldest if at max
-    while(container.children.length >= MAX){
-      const oldest = container.children[0];
-      oldest.classList.add('hide');
-      setTimeout(()=>oldest.remove(), 300);
+    // Remove any existing toast immediately so new toast does not stack
+    const existing = container.querySelector('.toast');
+    if (existing) {
+      existing.remove();
     }
     const t = document.createElement('div');
     t.className = `toast t-${type}`;

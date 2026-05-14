@@ -1169,21 +1169,35 @@ h1,h2,h3{letter-spacing:-.02em}
   margin-bottom:auto;
 }
 
-#view-tradelog #tl-consistency-card:hover .consistency-value{
-  margin-top:0;
-  margin-bottom:0;
-  transform:translateY(15px);
+#view-tradelog #tl-consistency-card:hover {
+  background:var(--bg3) !important;
+  border-color:var(--ac-20) !important;
+  box-shadow:none !important;
+  transform:none !important;
 }
 
-#view-tradelog #tl-consistency-card:hover .consistency-status,
-#view-tradelog #tl-consistency-card:hover .consistency-sub{
-  opacity:1;
-  max-height:96px;
-  transform:translateY(15px);
+#view-tradelog #tl-consistency-card .consistency-value{
+  margin-top:0 !important;
+  margin-bottom:0 !important;
+  transform:none !important;
+}
+
+#view-tradelog #tl-consistency-card .consistency-status,
+#view-tradelog #tl-consistency-card .consistency-sub{
+  opacity:1 !important;
+  max-height:none !important;
+  transform:none !important;
+}
+
+#view-tradelog #tl-consistency-card .consistency-card-body{
+  margin-top:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
 #tl-pnl-card {
-  min-height:240px !important;
+  min-height:200px !important;
   height:240px !important;
 }
 
@@ -1387,6 +1401,25 @@ h1,h2,h3{letter-spacing:-.02em}
     inset 0 0 80px var(--ac-08),
     inset 0 1px 0 rgba(255,255,255,.05),
     0 6px 32px rgba(0,0,0,.42) !important;
+}
+
+#view-dashboard #goals-grid {
+  gap:16px !important;
+}
+
+#view-dashboard #goals-grid .td-card,
+#view-dashboard #goals-grid .consistency-card,
+#view-dashboard #goals-grid .goals-card,
+#view-dashboard #goals-grid .maxloss-card {
+  padding:18px 14px !important;
+  min-height:170px !important;
+}
+
+#view-dashboard #goals-grid .td-card .stat-card-label,
+#view-dashboard #goals-grid .consistency-card .stat-card-label,
+#view-dashboard #goals-grid .goals-card .stat-card-label,
+#view-dashboard #goals-grid .maxloss-card .stat-card-label {
+  margin-bottom:10px !important;
 }
 
 #view-dashboard button[style*='background:var(--bg4)'],
@@ -2497,6 +2530,10 @@ h1,h2,h3{letter-spacing:-.02em}
 .light .stat-card *,.light .panel *,.light .metric-card *,.light .maxloss-card *,.light .goals-card *,.light .td-card *,.light .consistency-card *,.light .trade-record-card *,.light .banner *,.light .prog-section *,.light .acct-status-card *{color:var(--text)!important;}
 .light .banner [style*="color:var(--green)"],.light .panel [style*="color:var(--green)"],.light .metric-card [style*="color:var(--green)"],.light .maxloss-card [style*="color:var(--green)"],.light .goals-card [style*="color:var(--green)"],.light .td-card [style*="color:var(--green)"],.light .consistency-card [style*="color:var(--green)"]{color:var(--green)!important;}
 .light .banner [style*="color:var(--red)"],.light .panel [style*="color:var(--red)"],.light .metric-card [style*="color:var(--red)"],.light .maxloss-card [style*="color:var(--red)"],.light .goals-card [style*="color:var(--red)"],.light .td-card [style*="color:var(--red)"],.light .consistency-card [style*="color:var(--red)"]{color:var(--red)!important;}
+.light #tl-wl-loss, #tl-wl-loss{color:var(--red)!important;}
+.light #tl-wl-win, #tl-wl-win{color:var(--green)!important;}
+.light .consistency-card .consistency-sub-value.profit{color:var(--green)!important;}
+.light .consistency-card .consistency-sub-value.loss{color:var(--red)!important;}
 .light .banner [style*="color:var(--purple)"],.light .stat-card [style*="color:var(--purple)"],.light .panel [style*="color:var(--purple)"],.light .metric-card [style*="color:var(--purple)"],.light .td-card [style*="color:var(--purple)"],.light .consistency-card [style*="color:var(--purple)"]{color:var(--purple)!important;}
 .light .stat-card [style*="color:var(--amber)"],.light .panel [style*="color:var(--amber)"],.light .metric-card [style*="color:var(--amber)"]{color:var(--amber)!important;}
 
@@ -2939,9 +2976,9 @@ h1,h2,h3{letter-spacing:-.02em}
 /* Keep Trading Days card size/hover consistent with other goal cards */
 #goals-grid .td-card{
   transform:none !important;
-  padding-top:24px !important;
-  padding-bottom:24px !important;
-  min-height:195px;
+  padding-top:18px !important;
+  padding-bottom:18px !important;
+  min-height:165px;
   background:var(--bg3) !important;
   border:1px solid var(--ac-20) !important;
   box-shadow:none !important;
@@ -2950,20 +2987,21 @@ h1,h2,h3{letter-spacing:-.02em}
 #goals-grid .td-consistency-row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:6px;
+  gap:16px;
   width:100%;
   height:100%;
 }
 
 #goals-grid .consistency-card{
   transform:none !important;
-  padding-top:24px !important;
-  padding-bottom:24px !important;
-  min-height:195px;
+  padding-top:18px !important;
+  padding-bottom:18px !important;
+  min-height:165px;
   background:var(--bg3) !important;
   border:1px solid var(--ac-20) !important;
   box-shadow:none !important;
   transition:background .25s ease,opacity .25s ease;
+  cursor:default;
 }
 
 #goals-grid .td-card{
@@ -2976,7 +3014,7 @@ h1,h2,h3{letter-spacing:-.02em}
 
 .consistency-value{
   font-family:var(--font-display);
-  font-weight:600;
+  font-weight:500;
   font-size:36px;
   line-height:1;
   color:var(--purple);
@@ -2993,10 +3031,10 @@ h1,h2,h3{letter-spacing:-.02em}
   letter-spacing:.08em;
   font-family:var(--font-mono);
   color:var(--text2);
-  opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transform:translateY(10px);
+  opacity:1;
+  max-height:none;
+  overflow:visible;
+  transform:none;
   transition:none;
   transition-delay:0s;
   text-align:center;
@@ -3011,10 +3049,10 @@ h1,h2,h3{letter-spacing:-.02em}
   font-family:var(--font-mono);
   line-height:1.55;
   white-space:pre-line;
-  opacity:0;
-  max-height:0;
-  overflow:hidden;
-  transform:translateY(12px);
+  opacity:1;
+  max-height:none;
+  overflow:visible;
+  transform:none;
   transition:none;
   transition-delay:0s;
   text-align:center;
@@ -3041,24 +3079,24 @@ h1,h2,h3{letter-spacing:-.02em}
 
 #goals-grid .consistency-card:hover .consistency-value{
   align-self:center;
-  margin-top:0;
-  margin-bottom:0;
-  transform:translateY(4px);
+  margin-top:auto;
+  margin-bottom:auto;
+  transform:translateY(0);
 }
 
 #goals-grid .consistency-card:hover .consistency-status,
 #goals-grid .consistency-card:hover .consistency-sub{
   opacity:1;
-  max-height:96px;
-  transform:translateY(4px);
+  max-height:none;
+  transform:none;
 }
 
 #goals-grid .consistency-card:hover .consistency-status{
-  transition-delay:.14s;
+  transition-delay:0s;
 }
 
 #goals-grid .consistency-card:hover .consistency-sub{
-  transition-delay:.22s;
+  transition-delay:0s;
 }
 
 #goals-grid .td-card:hover,

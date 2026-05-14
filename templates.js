@@ -656,6 +656,8 @@ function showConfirmModal(title, body, okLabel, cancelLabel, type, callback) {
   const cancelBtn = document.getElementById('confirm-modal-cancel');
   if (!modal) return;
   titleEl.textContent = title;
+  titleEl.style.fontSize = '20px';
+  titleEl.style.fontWeight = '500';
   bodyEl.innerHTML = body;
   okBtn.textContent = okLabel || 'Confirm';
   cancelBtn.textContent = cancelLabel || 'Cancel';
@@ -2192,22 +2194,22 @@ function renderExpCal() {
     cells += `<div onclick="selectExpCalDate('${dateStr}')"
       style="text-align:center;padding:6px 4px;border-radius:${radius};cursor:pointer;font-size:12px;
              background:${bg};color:${color};transition:background .1s;border:${border}"
-      onmouseenter="if(this.style.background==='transparent'||this.style.background==='')this.style.background='var(--bg4)'"
-      onmouseleave="if('${isSelected||inRange}'==='false')this.style.background='${bg}'">${d}</div>`;
+      onmouseenter="this.dataset.origBg=this.style.background||'transparent';this.style.background='var(--bg4)'"
+      onmouseleave="this.style.background=this.dataset.origBg||'transparent'">${d}</div>`;
   }
 
   popup.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
       <button onclick="expCalNav(-1)" style="background:var(--bg4);border:1px solid var(--border);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--text2);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text2)'">‹</button>
-      <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--text)">${months[m]} ${y}</div>
+      <div style="font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--text2)">${months[m]} ${y}</div>
       <button onclick="expCalNav(1)"  style="background:var(--bg4);border:1px solid var(--border);border-radius:6px;width:26px;height:26px;cursor:pointer;color:var(--text2);font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text2)'">›</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px">
-      ${days.map(d=>`<div style="text-align:center;font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.05em;padding:3px 0">${d}</div>`).join('')}
+      ${days.map(d=>`<div style="text-align:center;font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.05em;padding:3px 0">${d}</div>`).join('')}
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px">${cells}</div>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
-      <button onclick="clearExpCal()" style="font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;font-family:var(--font-mono)" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'">Clear</button>
+      <button onclick="clearExpCal()" style="font-size:11px;color:var(--text2);background:none;border:none;cursor:pointer;font-family:var(--font-mono)" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text2)'">Clear</button>
       <button onclick="$('exp-calendar-popup').style.display='none';_expCalTarget=null" style="background:var(--purple);border:none;color:#fff;padding:5px 14px;border-radius:6px;cursor:pointer;font-size:11px;font-family:var(--font-body);font-weight:600">Done</button>
     </div>`;
 }
@@ -2316,6 +2318,20 @@ function getExportTrades() {
 }
 
 function exportReport(fmt) {
+  const label = fmt === 'md' ? 'Markdown' : fmt.toUpperCase();
+  const body = `Download your trades as <strong>${label}</strong>?`;
+  const doExport = () => exportReportConfirmed(fmt);
+
+  if (typeof _acctConfirm === 'function') {
+    _acctConfirm('Confirm export', body, 'Export', 'primary', doExport);
+  } else if (typeof showConfirmModal === 'function') {
+    showConfirmModal('Confirm export', body, 'Export', 'Cancel', 'primary', doExport);
+  } else {
+    if (window.confirm(`Export trades as ${label}?`)) doExport();
+  }
+}
+
+function exportReportConfirmed(fmt) {
   const trades = getExportTrades();
   const now = new Date().toISOString().split('T')[0];
   if (fmt === 'json') {

@@ -678,9 +678,12 @@ function runExport() {
     return;
   }
 
-  let content, filename, mime, emailBody;
+  const formatLabel = _exportFormat ? _exportFormat.toUpperCase() : 'EXPORT';
+  const body = `Download the ${title} report as <strong>${formatLabel}</strong>?`;
+  const executeExport = () => {
+    let content, filename, mime, emailBody;
 
-  switch (_exportFormat) {
+    switch (_exportFormat) {
     case 'csv':
       content   = _rowsToCSV(rows);
       filename  = `EquityTrace-${label}-${date}.csv`;
@@ -706,27 +709,36 @@ function runExport() {
       emailBody = `Equity Trace — ${title}\nExported: ${date}\n\nYour PDF was opened in a new window. Use your browser's print dialog to save as PDF.`;
       filename  = null;
       break;
-  }
-
-  if (filename) _download(content, filename, mime);
-
-  if (_exportEmail) {
-    const emailInput = document.getElementById('exp-email-input');
-    const email = emailInput ? emailInput.value.trim() : '';
-    if (email && email.includes('@')) {
-      _sendExportEmail(email, `Equity Trace — ${title} Export (${date})`, emailBody);
-    } else {
-      if (typeof showToast === 'function') showToast('Please enter a valid email address', 'error', '', 2000);
-      return;
     }
-  }
 
-  if (btn) { btn.textContent = '✓ Done!'; btn.style.background = 'var(--green)'; }
-  setTimeout(() => {
-    closeExportModal();
-    if (btn) { btn.textContent = 'Download'; btn.style.background = 'var(--purple)'; }
-    if (typeof showToast === 'function') showToast(`${title} exported as ${_exportFormat.toUpperCase()}`, 'success', '📊', 2500);
-  }, 900);
+    if (filename) _download(content, filename, mime);
+
+    if (_exportEmail) {
+      const emailInput = document.getElementById('exp-email-input');
+      const email = emailInput ? emailInput.value.trim() : '';
+      if (email && email.includes('@')) {
+        _sendExportEmail(email, `Equity Trace — ${title} Export (${date})`, emailBody);
+      } else {
+        if (typeof showToast === 'function') showToast('Please enter a valid email address', 'error', '', 2000);
+        return;
+      }
+    }
+
+    if (btn) { btn.textContent = '✓ Done!'; btn.style.background = 'var(--green)'; }
+    setTimeout(() => {
+      closeExportModal();
+      if (btn) { btn.textContent = 'Download'; btn.style.background = 'var(--purple)'; }
+      if (typeof showToast === 'function') showToast(`${title} exported as ${_exportFormat.toUpperCase()}`, 'success', '📊', 2500);
+    }, 900);
+  };
+
+  if (typeof _acctConfirm === 'function') {
+    _acctConfirm('Confirm export', body, 'Export', 'primary', executeExport);
+  } else if (typeof showConfirmModal === 'function') {
+    showConfirmModal('Confirm export', body, 'Export', 'Cancel', 'primary', executeExport);
+  } else if (window.confirm(`Download the ${title} report as ${formatLabel}?`)) {
+    executeExport();
+  }
 }
 
 document.addEventListener('keydown', function(e) {

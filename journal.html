@@ -869,7 +869,7 @@ window.addEventListener('DOMContentLoaded', function() {
       <!-- GOALS (single account view) -->
       <div id="goals-section" style="display:flex;flex-direction:column;gap:16px;margin-top:8px">
       <div style="font-family:var(--font-body);font-weight:600;font-size:26px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px">Goals</div>
-      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px" id="goals-grid">
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px" id="goals-grid">
 
           <!-- Trading Days + Consistency (separate cards) -->
           <div class="td-consistency-row">
@@ -1268,9 +1268,11 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Consistency Card -->
         <div class="stat-card consistency-card" id="tl-consistency-card" style="background:linear-gradient(135deg,var(--bg3) 0%,var(--ac-07) 60%,var(--ac-18) 100%);border:1px solid var(--ac-20);border-radius:10px;box-shadow:inset 0 0 60px var(--ac-14),inset 0 0 20px var(--ac-09);padding:24px 16px;display:flex;flex-direction:column;justify-content:flex-start;user-select:none;position:relative;cursor:default">
           <div class="stat-card-label" style="margin-bottom:12px">Consistency</div>
-          <div id="tl-consistency-pct" class="consistency-value">0.00%</div>
-          <div id="tl-consistency-status" class="consistency-status">NOT ENOUGH DATA</div>
-          <div id="tl-consistency-sub" class="consistency-sub">Best day: <span class="consistency-sub-value">$0.00</span>&#10;Total profit: <span class="consistency-sub-value">$0.00</span></div>
+          <div class="consistency-card-body">
+            <div id="tl-consistency-pct" class="consistency-value">0.00%</div>
+            <div id="tl-consistency-status" class="consistency-status">NOT ENOUGH DATA</div>
+            <div id="tl-consistency-sub" class="consistency-sub">Best trade: <span class="consistency-sub-value">$0.00</span>&#10;Total profit: <span class="consistency-sub-value">$0.00</span></div>
+          </div>
         </div>
         </div>
 
@@ -2200,7 +2202,7 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
         <!-- EXPORT SCOPE -->
         <div style="background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:12px">
-          <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase">Export scope</div>
+          <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase">Export scope</div>
           <!-- Scope buttons -->
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button id="exp-btn-all" onclick="setExpScope('all')" class="exp-scope-btn exp-scope-active" style="padding:7px 16px;border-radius:7px;font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s;border:1px solid var(--ac-50);background:var(--ac-18);color:var(--purple);font-weight:600">All Trades</button>
@@ -2215,8 +2217,8 @@ window.addEventListener('DOMContentLoaded', function() {
           <div id="exp-date-range" style="display:none;flex-direction:column;gap:10px" class="exp-sub-panel">
             <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
               <!-- FROM -->
-              <div style="flex:1;min-width:160px">
-                <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">From</div>
+              <div style="flex:0 1 132px;min-width:132px;width:132px">
+                <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">From</div>
                 <div id="exp-cal-from-display" onclick="toggleExpCal('from')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--text2);display:flex;align-items:center;gap:8px;transition:border-color .15s;user-select:none" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
                   <span style="font-size:14px; color:var(--text2);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></span>
                   <span id="exp-from-label">Select date</span>
@@ -2224,8 +2226,8 @@ window.addEventListener('DOMContentLoaded', function() {
               </div>
               <div style="display:flex;align-items:center;padding-top:22px;color:var(--text3);font-size:12px;font-family:var(--font-mono)">-></div>
               <!-- TO -->
-              <div style="flex:1;min-width:160px">
-                <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">To</div>
+              <div style="flex:0 1 132px;min-width:132px;width:132px">
+                <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">To</div>
                 <div id="exp-cal-to-display" onclick="toggleExpCal('to')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--text2);display:flex;align-items:center;gap:8px;transition:border-color .15s;user-select:none" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
                   <span style="font-size:14px; color:var(--text2);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></span>
                   <span id="exp-to-label">Select date</span>
@@ -2233,7 +2235,7 @@ window.addEventListener('DOMContentLoaded', function() {
               </div>
               <!-- Range summary -->
               <div id="exp-range-summary" style="display:none;flex:1;min-width:120px;padding-top:22px">
-                <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-bottom:2px">Trades in range</div>
+                <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);font-weight:600;margin-bottom:2px">Trades in range</div>
                 <div id="exp-range-count" style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--purple)">0</div>
               </div>
             </div>
