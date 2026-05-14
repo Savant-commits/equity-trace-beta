@@ -243,6 +243,7 @@ body:has(#landing-screen:not([style*="display:none"]):not([style*="display: none
 .ls .bar{flex:1;border-radius:3px 3px 0 0;min-height:4px}
 .ls .win-bar{background:var(--green2);border:0.5px solid rgba(46,204,138,0.3)}
 .ls .loss-bar{background:var(--red2);border:0.5px solid rgba(232,80,74,0.3)}
+.ls .be-bar{background:var(--purple2);border:0.5px solid rgba(153,93,255,0.3)}
 .ls .log-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;margin-bottom:4px;border:0.5px solid var(--border)}
 .ls .dir-badge{font-size:9px;font-weight:600;padding:3px 7px;border-radius:5px;font-family:var(--font-mono);letter-spacing:.04em;flex-shrink:0}
 .ls .log-sym{font-size:12px;font-weight:600;font-family:var(--font-display);min-width:50px}
@@ -692,6 +693,20 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
+  <!-- SIDEBAR ABOUT SECTION -->
+  <div class="sidebar-about" onclick="window.open('/', '_blank')" style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,0.12);background:linear-gradient(180deg,rgba(72,26,170,0.97) 0%,rgba(82,30,182,0.97) 100%);border-radius:0 0 var(--radius) var(--radius);cursor:pointer" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); window.open('/', '_blank');}">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><img src="logo.png" alt="Equity Trace logo" style="width:100%;height:100%;object-fit:cover"/></div>
+      <div>
+        <div style="font-family:var(--font-display);font-weight:500;font-size:14px;color:#fff">Equity Trace</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.7);font-family:var(--font-mono)">Trading Journal</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;text-align:center">
+      <span id="sidebar-version" style="font-size:11px;color:#fff;padding:2px 6px;font-family:var(--font-mono)">v1.0.0-beta</span>
+    </div>
+  </div>
+
 </nav>
 
 <!-- â•â• MAIN â•â• -->
@@ -782,11 +797,11 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
         <div class="stat-card" id="wr-card" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:21px 18px 18px">
           <div class="stat-card-top" style="width:100%;position:absolute;top:0;left:0;right:0;padding:14px 18px 0;margin-bottom:0">
-            <div class="stat-card-label" style="transition:color .2s;font-size:10px">Win Rate</div>
+            <div class="stat-card-label" style="transition:color .2s;font-size:10px">WIN RATE</div>
             <div class="stat-card-icon" style="opacity:0.4;transition:opacity .2s;position:absolute;top:14px;right:10px; color:var(--purple);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r=".8" fill="currentColor"/></svg></div>
           </div>
           <!-- SVG Ring Chart -->
-          <div style="position:relative;width:120px;height:120px;margin:0 auto 6px">
+          <div style="position:relative;width:120px;height:120px;margin:10px auto 6px">
             <svg id="wr-ring-svg" width="120" height="120" viewBox="0 0 120 120" style="transform:rotate(-90deg);transition:opacity .18s ease">
               <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
               <circle id="wr-ring" cx="60" cy="60" r="50" fill="none" stroke="var(--green)" stroke-width="7"
@@ -844,9 +859,9 @@ window.addEventListener('DOMContentLoaded', function() {
             <span id="tt-sub-text" style="color:var(--text3);text-transform:uppercase;font-family:var(--font-mono);font-size:9px;letter-spacing:.1em">today</span>
           </div>
         </div>
-        <div class="stat-card" id="pf-card" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <div class="stat-card" id="pf-card" style="position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-top:22px">
           <div class="stat-card-top" style="width:100%;position:absolute;top:0;left:0;right:0;padding:14px 18px 0">
-            <div class="stat-card-label" style="transition:color .2s;font-size:10px">Profit Factor</div>
+            <div class="stat-card-label" style="transition:color .2s;font-size:10px">PROFIT FACTOR</div>
             <div class="stat-card-icon" style="opacity:0.4;transition:opacity .2s;position:absolute;top:14px;right:10px; color:var(--blue);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M3 5l2.5 4H0.5L3 5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/><path d="M13 5l2.5 4h-5L13 5z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" fill="none"/><line x1="3" y1="2" x2="13" y2="2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
           </div>
           <div id="pf-val" class="stat-val" style="color:var(--purple);text-align:center;margin-top:12px;font-size:20px;transition:font-size .2s cubic-bezier(.25,0.1,.25,1)">1.82</div>
@@ -2017,6 +2032,10 @@ window.addEventListener('DOMContentLoaded', function() {
               <div style="width:10px;height:18px;border-radius:2px;background:var(--red);opacity:.85"></div>
               <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Loss</span>
             </div>
+            <div id="st-be-legend" style="display:none;align-items:center;gap:6px">
+              <div style="width:10px;height:18px;border-radius:2px;background:var(--purple);opacity:.85"></div>
+              <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Break-even</span>
+            </div>
             <div style="font-size:10px;font-family:var(--font-mono);color:var(--text3);margin-left:auto">Bar height = |P&L|  -  Hover for details</div>
           </div>
         </div>
@@ -3077,25 +3096,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
       </div>
       <!-- â•â• END FAQ SECTION â•â• -->
-
-      <!-- ABOUT -->
-      <div class="about-home-link" style="background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);padding:22px 24px;box-shadow:inset 0 0 60px var(--ac-07);cursor:pointer" onclick="goBackToLanding()" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goBackToLanding();}">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-          <div style="width:32px;height:32px;border-radius:9px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text2)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 7v4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="4.5" r=".9" fill="currentColor"/></svg></div>
-          <div style="font-family:var(--font-display);font-weight:700;font-size:14px">About Equity Trace</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:16px">
-          <div style="width:48px;height:48px;border-radius:13px;background:var(--bg4);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><img src="logo.png" alt="Equity Trace logo" style="width:100%;height:100%;object-fit:cover"/></div>
-          <div>
-            <div style="font-family:var(--font-display);font-weight:700;font-size:16px">Equity Trace</div>
-            <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:2px">Trading Journal &amp; Analytics Platform</div>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <span style="font-size:10px;background:var(--purple2);color:var(--purple);border:1px solid var(--ac-25);border-radius:5px;padding:1px 8px;font-family:var(--font-mono)">v1.0.0-beta</span>
-              <span style="font-size:10px;background:var(--green2);color:var(--green);border:1px solid rgba(46,204,138,.2);border-radius:5px;padding:1px 8px;font-family:var(--font-mono)">All data stored locally</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
 
     </div>

@@ -5889,9 +5889,11 @@ function renderTopbarAcctList() {
       ${selectedAcct===-1?'<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}
     </div>`;
 
-  const rowsHtml = acctStatuses.map(({ a, i, status, pnl }) => {
+  const activeAccts = acctStatuses.filter(x => x.status === 'active');
+  const inactiveAccts = acctStatuses.filter(x => x.status !== 'active');
+
+  const accountRowHtml = ({ a, i, status }) => {
     const isSelected = i === selectedAcct;
-    const menuId = 'acct-card-menu-tb-' + a.id;
     return `
     <div style="display:flex;align-items:center;border-radius:8px;background:${isSelected?'var(--ac-12)':'transparent'};transition:background .12s;position:relative" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${isSelected?'var(--ac-12)':'transparent'}'">
       <div onclick="selectAcctFromTopbar(${i})" style="display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;flex:1;min-width:0">
@@ -5907,9 +5909,26 @@ function renderTopbarAcctList() {
         </div>
       </div>
     </div>`;
-  }).join('');
+  };
 
-  list.innerHTML = allRowHtml + rowsHtml;
+  const sectionLabel = (label, count) => `
+    <div style="padding:8px 10px 4px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;display:flex;align-items:center;gap:10px">
+      <span>${label}</span>
+      <span style="flex:1;height:1px;background:var(--border)"></span>
+      <span style="background:var(--bg5);color:var(--text3);border-radius:10px;padding:3px 8px;font-size:11px">${count}</span>
+    </div>`;
+
+  let html = allRowHtml;
+  if (activeAccts.length) {
+    html += sectionLabel('Active', activeAccts.length);
+    html += activeAccts.map(accountRowHtml).join('');
+  }
+  if (inactiveAccts.length) {
+    html += sectionLabel('Inactive', inactiveAccts.length);
+    html += inactiveAccts.map(accountRowHtml).join('');
+  }
+
+  list.innerHTML = html;
 }
 
 function selectAcctFromTopbar(i) {
@@ -6014,7 +6033,9 @@ function pnlRender(idx, dir) {
   if (periodSub) periodSub.textContent = p.sub;
   [0,1,2,3].forEach(i => {
     const el = $('pnl-val-' + i);
-    el.textContent = PNL_PERIODS[i].val;
+    const value = PNL_PERIODS[i].val || '';
+    el.textContent = value;
+    el.className = 'stat-val ' + (value.trim().startsWith('-') ? 'c-red' : 'c-green');
   });
   $$('.pnl-dot').forEach((d, i) => {
     d.style.background = i === idx ? 'var(--purple)' : 'var(--bg5)';
@@ -6141,12 +6162,12 @@ function calculateTradingDays(period) {
   
   let startDate;
   if (period === 'This Week') {
-    // Get Monday of current week
+    // Get Sunday of current week
     const day = now.getDay();
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
-    monday.setHours(0, 0, 0, 0);
-    startDate = monday;
+    const sunday = new Date(now);
+    sunday.setDate(now.getDate() - day);
+    sunday.setHours(0, 0, 0, 0);
+    startDate = sunday;
   } else if (period === 'This Month') {
     // Get first day of current month
     startDate = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -6527,10 +6548,10 @@ function populateDashboard() {
   const todayGrouped = groupedT.filter(t => t.date === todayStr);
   const todayPnl = todayGrouped.reduce((s,t)=>s+t.pnl,0);
 
-  // This week's trades (count grouped trades)
+  // This week's trades (count grouped trades) — Sunday-start week including weekend trades
   const weekStart = new Date(now);
   const dayOfWeek = now.getDay();
-  weekStart.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+  weekStart.setDate(now.getDate() - dayOfWeek);
   weekStart.setHours(0,0,0,0);
   const weekGrouped = groupedT.filter(t => new Date(t.date) >= weekStart);
   const weekPnl = weekGrouped.reduce((s,t)=>s+t.pnl,0);
@@ -6634,10 +6655,10 @@ function populateDashboard() {
   }
 
   // ── PNL ticker periods ──
-  PNL_PERIODS[0] = { label:'DAILY',   val:(todayPnl>=0?'+':'-')+'$'+Math.abs(todayPnl).toFixed(2),  change:(todayPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(todayPnl).toFixed(2),  sub:'today' };
-  PNL_PERIODS[1] = { label:'WEEKLY',  val:(weekPnl>=0?'+':'-')+'$'+Math.abs(weekPnl).toFixed(2),    change:(weekPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(weekPnl).toFixed(2),    sub:'this week' };
-  PNL_PERIODS[2] = { label:'MONTHLY', val:(monthPnl>=0?'+':'-')+'$'+Math.abs(monthPnl).toFixed(2),  change:(monthPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(monthPnl).toFixed(2),  sub:'this month' };
-  PNL_PERIODS[3] = { label:'OVERALL', val:(netPnl>=0?'+':'-')+'$'+Math.abs(netPnl).toFixed(2),      change:(netPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(netPnl).toFixed(2),      sub:'all time' };
+  PNL_PERIODS[0] = { label:'DAILY',   val:(todayPnl>=0?'+':'-')+'$'+Math.abs(todayPnl).toFixed(1),  change:(todayPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(todayPnl).toFixed(1),  sub:'today' };
+  PNL_PERIODS[1] = { label:'WEEKLY',  val:(weekPnl>=0?'+':'-')+'$'+Math.abs(weekPnl).toFixed(1),    change:(weekPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(weekPnl).toFixed(1),    sub:'this week' };
+  PNL_PERIODS[2] = { label:'MONTHLY', val:(monthPnl>=0?'+':'-')+'$'+Math.abs(monthPnl).toFixed(1),  change:(monthPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(monthPnl).toFixed(1),  sub:'this month' };
+  PNL_PERIODS[3] = { label:'OVERALL', val:(netPnl>=0?'+':'-')+'$'+Math.abs(netPnl).toFixed(1),      change:(netPnl>=0?'↑ ':'↓ ')+'$'+Math.abs(netPnl).toFixed(1),      sub:'all time' };
 
   // ── Win rate card ──
   // Keep thresholds aligned with wr-ring animator in account.js
@@ -9893,4 +9914,31 @@ function updateHiddenCount() {
       section.style.display = 'none';
     }
   }
+}
+
+// ── VERSION FETCHING FROM GITHUB ──
+async function fetchLatestVersion() {
+  try {
+    // Replace with your actual GitHub repo: 'owner/repo'
+    const repo = 'equitytrace/equity-trace'; // Update this when repo is public
+    const response = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
+    if (response.ok) {
+      const data = await response.json();
+      const version = data.tag_name || data.name;
+      const versionEl = $('sidebar-version');
+      if (versionEl && version) {
+        versionEl.textContent = version;
+      }
+    }
+  } catch (e) {
+    console.log('Could not fetch latest version from GitHub:', e);
+    // Keep the default version
+  }
+}
+
+// Call this when the app initializes
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', fetchLatestVersion);
+} else {
+  fetchLatestVersion();
 }

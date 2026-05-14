@@ -2348,14 +2348,19 @@ function initStreaks() {
   const allPnls   = trades.map(t => Math.abs(t.pnl));
   const maxPnl    = Math.max(...allPnls) || 1;
   const MIN_H = 14, MAX_H = 56;
+  const hasBeTrades = trades.some(t => getTradeResult(t) === 'be');
+  const stBeLegend = $('st-be-legend');
+  if (stBeLegend) stBeLegend.style.display = hasBeTrades ? 'flex' : 'none';
 
   timeline.innerHTML = trades.map((t, i) => {
-    const isWin  = t.pnl >= 0;
+    const result = getTradeResult(t);
+    const isWin  = result === 'win';
+    const isLoss = result === 'loss';
     const h      = Math.round(MIN_H + ((Math.abs(t.pnl) / maxPnl) * (MAX_H - MIN_H)));
-    const color  = isWin ? 'var(--green)' : 'var(--red)';
-    const bgAlpha = isWin ? '0.75' : '0.75';
-    const pnlStr = (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2);
-    const tip    = `${t.date}${t.time?' '+(typeof formatTradeTime==='function'?formatTradeTime(t.time):format24to12Hour(t.time)):''} · ${t.symbol||''} · ${pnlStr}`;
+    const color  = isWin ? 'var(--green)' : isLoss ? 'var(--red)' : 'var(--purple)';
+    const bgAlpha = '0.75';
+    const pnlStr = result === 'be' ? '$0.00' : (t.pnl >= 0 ? '+' : '') + '$' + t.pnl.toFixed(2);
+    const tip    = `${t.date}${t.time?' '+(typeof formatTradeTime==='function'?formatTradeTime(t.time):format24to12Hour(t.time)):''}${t.symbol?' · '+t.symbol:''} · ${result === 'be' ? 'BE' : pnlStr}`;
     return `<div title="${tip}" data-trade-id="${t.id}" style="width:10px;height:${h}px;border-radius:2px;background:${color};opacity:${bgAlpha};cursor:pointer;flex-shrink:0;transition:opacity .15s,transform .1s" onmouseenter="this.style.opacity='1';this.style.transform='scaleY(1.1)';showStTip(event,'${tip}')" onmouseleave="this.style.opacity='${bgAlpha}';this.style.transform='';hideStTip()" onclick="(function(id){_detailOriginView='advanalytics';document.querySelector('[data-view=\\'tradelog\\']').click();setTimeout(()=>{const row=document.querySelector('.trade-table tbody tr[data-id=\\''+id+'\\']');const trade=TRADES.find(t=>String(t.id)===String(id));if(trade)showDetail(trade,row||document.createElement('tr'));if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('selected-row');}},80);}('${t.id}'))"></div>`;
   }).join('');
 
