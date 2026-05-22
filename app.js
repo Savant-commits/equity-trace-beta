@@ -319,6 +319,10 @@ window.addEventListener('focus', () => {
   recoverEmptyTradeLogIfStale();
 });
 
+window.addEventListener('load', () => {
+  if (typeof updateFilterAccountVisibility === 'function') updateFilterAccountVisibility();
+});
+
 // ── VIEW SWITCH ──
 // ── Scroll position store ──
 const _viewScrollPos = {};
@@ -391,7 +395,7 @@ function switchView(el) {
     const addTradeBtn = $('add-trade-btn-topbar');
     const showTopbarButtons = (v === 'dashboard' || v === 'tradelog' || v === 'accounts');
     const showTzSwitcher = (v === 'dashboard');
-    const useTradeLogTopbarStyle = (v === 'tradelog' || v === 'analytics' || v === 'advanalytics' || v === 'calendar' || v === 'playbook' || v === 'accounts' || v === 'reports' || v === 'settings');
+    const useTradeLogTopbarStyle = (v === 'tradelog' || v === 'analytics' || v === 'advanalytics' || v === 'calendar' || v === 'playbook' || v === 'accounts' || v === 'reports' || v === 'user-profile' || v === 'settings');
     const hideTopbarTitle = (v !== 'dashboard');
     const showProfileInTopbar = !useTradeLogTopbarStyle;
     const showAuthBadge = (v === 'dashboard');
@@ -775,6 +779,7 @@ function renderTrades(trades) {
 
   const start = (currentPage - 1) * TRADES_PER_PAGE;
   const pageTrades = displayTrades.slice(start, start + TRADES_PER_PAGE);
+  _currentPageTradeIds = pageTrades.map(t => t.id);
 
   const tb = $('trade-tbody');
   if (!tb) {
@@ -797,8 +802,20 @@ function renderTrades(trades) {
       selTh.style.cssText = 'width:36px;padding:9px 10px';
       thead.insertBefore(selTh, thead.firstChild);
     }
+    const allChecked = _currentPageTradeIds.length > 0 && _currentPageTradeIds.every(id => selectedIds.has(id));
+    const anyChecked = _currentPageTradeIds.some(id => selectedIds.has(id));
+    selTh.innerHTML = '';
+    const checkbox = document.createElement('div');
+    checkbox.id = 'sel-cb-all';
+    checkbox.className = 'sel-checkbox';
+    checkbox.style.margin = '0 auto';
+    checkbox.onclick = toggleSelectAll;
+    if (allChecked) checkbox.classList.add('checked');
+    else if (anyChecked) checkbox.classList.add('indeterminate');
+    selTh.appendChild(checkbox);
   } else {
     if (selTh) selTh.remove();
+    _currentPageTradeIds = [];
   }
 
   pageTrades.forEach(t => {
@@ -1574,6 +1591,13 @@ function resetFilters() {
   applyFilters();
   closeFilterPanel();
   if (typeof trcUpdateHover === 'function') trcUpdateHover();
+}
+
+function updateFilterAccountVisibility() {
+  const wrap = $('fp-acct-wrap');
+  if (!wrap) return;
+  // Show account filter only when trade log is not scoped to a single account
+  wrap.style.display = (typeof selectedAcct !== 'undefined' && selectedAcct !== -1) ? 'none' : '';
 }
 
 function filterDir(el, dir) {
@@ -4160,7 +4184,7 @@ function initPlaybook() {
         </div>
         <div style="margin-left:auto;display:flex;gap:6px;align-self:flex-end">
           <button onclick="event.stopPropagation();openPlaybookModal(${i})" title="Edit" style="background:var(--ac-14);border:1px solid var(--ac-25);color:var(--text2);padding:5px 9px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.background='var(--ac-22)'" onmouseleave="this.style.background='var(--ac-14)'">Edit</button>
-          <button onclick="event.stopPropagation();deletePlaybook(${i})" title="Delete" style="background:var(--red2);border:1px solid var(--red3);color:var(--red);padding:5px 9px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.background='var(--red3)'" onmouseleave="this.style.background='var(--red2)'">✕</button>
+          <button onclick="event.stopPropagation();confirmDeletePlaybook(${i})" title="Delete" style="background:var(--red2);border:1px solid var(--red3);color:var(--red);padding:5px 9px;border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.background='var(--red3)'" onmouseleave="this.style.background='var(--red2)'">✕</button>
         </div>
       </div>
     </div>`;
@@ -4168,7 +4192,6 @@ function initPlaybook() {
   if (!plays.length) {
     grid.innerHTML = `
     <div class="playbook-empty">
-      <div class="playbook-empty-badge"><i></i>Entry Models</div>
       <h3>Your playbook vault is empty. Build your first setup and start tracking edge by model.</h3>
       <p>
         Create a playbook for each strategy you trade. As you log trades, this page automatically shows win rate,
@@ -4446,24 +4469,47 @@ function savePlaybook() {
   if (typeof syncModelDropdownFromPlaybooks === 'function') syncModelDropdownFromPlaybooks();
   showToast(_pbEditIdx>=0?'Playbook updated':'Playbook added','success','',1800);
 }
+function confirmDeletePlaybook(idx) {
+  const sampleVisible = localStorage.getItem('eq_sample_pb_dismissed') !== '1';
+  const list = getPbList();
+  let label = SAMPLE_PLAYBOOK.name;
+  let sampleDelete = false;
+
+  if (sampleVisible && idx === 0) {
+    sampleDelete = true;
+  } else {
+    const actualIdx = sampleVisible ? idx - 1 : idx;
+    if (actualIdx >= 0 && actualIdx < list.length) {
+      label = list[actualIdx].name || 'Playbook';
+    }
+  }
+
+  _acctConfirm(
+    '⚠️ Delete Playbook',
+    `Delete <strong>${label}</strong>?`,
+    'Delete Playbook',
+    'danger',
+    () => deletePlaybook(idx)
+  );
+}
+
 function deletePlaybook(idx) {
-  // Handle deletion of sample playbook (index 0)
-  if (idx === 0) {
+  const sampleVisible = localStorage.getItem('eq_sample_pb_dismissed') !== '1';
+  if (sampleVisible && idx === 0) {
     localStorage.setItem('eq_sample_pb_dismissed', '1');
     initPlaybook();
     showToast('Sample playbook removed', 'info', '', 1400);
     return;
   }
-  // Adjust index for user playbooks (skip the sample at index 0 if visible)
-  const sampleVisible = localStorage.getItem('eq_sample_pb_dismissed') !== '1';
-  const actualIdx = sampleVisible ? (idx - 1) : idx;
+  const actualIdx = sampleVisible ? idx - 1 : idx;
   const list = getPbList();
   if (actualIdx >= 0 && actualIdx < list.length) {
+    const deletedName = list[actualIdx].name || 'Playbook';
     list.splice(actualIdx, 1);
     setPbList(list);
     initPlaybook();
     if (typeof syncModelDropdownFromPlaybooks === 'function') syncModelDropdownFromPlaybooks();
-    showToast('Playbook removed', 'info', '', 1400);
+    showToast(`${deletedName} deleted`, 'info', '', 1400);
   }
 }
 
@@ -5744,6 +5790,7 @@ function selectAcct(i) {
   initScorecard(); // Refresh scorecard to match selected account
   if (typeof updateTopbarAcctLabel === 'function') updateTopbarAcctLabel();
   if (typeof applyFilters === 'function') applyFilters();
+  if (typeof updateFilterAccountVisibility === 'function') updateFilterAccountVisibility();
 }
 
 function toggleAcctDropdown() {
@@ -6922,16 +6969,16 @@ function createCalPopup() {
   el.innerHTML = `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <button onclick="calPrevMonth()" style="background:var(--bg4);border:1px solid var(--border);border-radius:7px;width:28px;height:28px;cursor:pointer;color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-50)';this.style.color='#a97de8'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">‹</button>
-      <div id="cal-month-label" style="font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--text);letter-spacing:.02em"></div>
+      <div id="fp-cal-month-label" style="font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--text);letter-spacing:.02em"></div>
       <button onclick="calNextMonth()" style="background:var(--bg4);border:1px solid var(--border);border-radius:7px;width:28px;height:28px;cursor:pointer;color:var(--text2);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-50)';this.style.color='#a97de8'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">›</button>
     </div>
     <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:6px">
       ${['Su','Mo','Tu','We','Th','Fr','Sa'].map(d=>`<div style="text-align:center;font-size:9px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em;padding:3px 0">${d}</div>`).join('')}
     </div>
-    <div id="cal-days" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
+    <div id="fp-cal-days" style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px"></div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
       <button onclick="calClear()" style="background:none;border:none;color:var(--text3);font-size:11px;font-family:var(--font-mono);cursor:pointer;padding:0;transition:color .15s" onmouseenter="this.style.color='var(--red)'" onmouseleave="this.style.color='var(--text3)'"><span style="display:inline-flex;align-items:center;gap:4px"><svg width="8" height="8" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> Clear</span></button>
-      <div id="cal-type-label" style="font-size:9px;font-family:var(--font-mono);color:var(--ac-70);letter-spacing:.1em;text-transform:uppercase">FROM</div>
+      <div id="fp-cal-type-label" style="font-size:9px;font-family:var(--font-mono);color:var(--ac-70);letter-spacing:.1em;text-transform:uppercase">FROM</div>
       <button onclick="calToday()" style="background:none;border:none;color:#a97de8;font-size:11px;font-family:var(--font-mono);cursor:pointer;padding:0;transition:opacity .15s;opacity:.8" onmouseenter="this.style.opacity='1'" onmouseleave="this.style.opacity='.8'">Today</button>
     </div>
   `;
@@ -6957,7 +7004,8 @@ function openCal(which) {
   cal.style.top  = top + 'px';
   cal.style.left = Math.min(rect.left, window.innerWidth - 270) + 'px';
 
-  $('cal-type-label').textContent = which === 'from' ? 'FROM' : 'TO';
+  const _calEl2 = $('fp-cal');
+  if (_calEl2) _calEl2.querySelector('#fp-cal-type-label').textContent = which === 'from' ? 'FROM' : 'TO';
   $('fp-date-from-display').style.borderColor = which==='from' ? 'var(--ac-60)' : 'var(--border)';
   $('fp-date-to-display').style.borderColor   = which==='to'   ? 'var(--ac-60)' : 'var(--border)';
 
@@ -7000,8 +7048,9 @@ function calOutsideClick(e) {
 }
 
 function renderCal() {
-  $('cal-month-label').textContent = `${CAL_MONTHS[calMonth]} ${calYear}`;
-  const grid = $('cal-days');
+  const _cal = $('fp-cal');
+  if (_cal) _cal.querySelector('#fp-cal-month-label').textContent = `${CAL_MONTHS[calMonth]} ${calYear}`;
+  const grid = _cal ? _cal.querySelector('#fp-cal-days') : null;
   const firstDay = new Date(calYear, calMonth, 1).getDay();
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const today = new Date().toISOString().slice(0, 10);
@@ -7018,7 +7067,7 @@ function renderCal() {
     else if (isToday)   { border='1px solid var(--ac-50)'; color='#a97de8'; }
     html += `<div onclick="calPickDay('${ds}')" style="text-align:center;padding:6px 2px;border-radius:${radius};font-size:11px;font-family:var(--font-mono);cursor:pointer;background:${bg};color:${color};border:${border};font-weight:${fw};transition:background .1s,color .1s" onmouseenter="if(!['var(--purple)','var(--purple2)'].includes(this.style.background))this.style.background='var(--bg4)'" onmouseleave="if(this.style.background==='var(--bg4)')this.style.background='transparent'">${d}</div>`;
   }
-  grid.innerHTML = html;
+  if (grid) grid.innerHTML = html;
 }
 
 function calPickDay(ds) {
@@ -7029,7 +7078,7 @@ function calPickDay(ds) {
     window._calJustPicked = true;
     setTimeout(() => { window._calJustPicked = false; }, 100);
     calActive = 'to';
-    $('cal-type-label').textContent = 'TO';
+    const _cal2 = $('fp-cal'); if (_cal2) _cal2.querySelector('#fp-cal-type-label').textContent = 'TO';
     $('fp-date-from-display').style.borderColor = 'var(--border)';
     $('fp-date-to-display').style.borderColor   = 'var(--ac-60)';
   } else {
@@ -7048,6 +7097,7 @@ function calNextMonth() { if(++calMonth > 11){ calMonth=0;  calYear++; } renderC
 
 /* ── SELECT MODE ── */
 // selectModeActive already defined at top
+let _currentPageTradeIds = [];
 let selectedIds = new Set();
 
 function enableSelectMode() {
@@ -7058,9 +7108,9 @@ function enableSelectMode() {
   const selBar = $('sel-mode-bar');
   if (search) search.style.display = 'none';
   if (selBar) selBar.style.display = 'flex';
-  // Highlight options button
+  // Highlight options button with red X
   const btn = $('options-btn');
-  if (btn) { btn.classList.add('active'); btn.style.boxShadow=''; btn.style.borderColor=''; btn.style.color=''; btn.style.background=''; }
+  if (btn) { btn.classList.add('active'); btn.style.position = 'relative'; }
   const lbl = $('options-btn-label');
   if (lbl) lbl.textContent = '';
   renderTrades(getDashboardTrades());
@@ -7076,7 +7126,7 @@ function disableSelectMode() {
   if (selBar) selBar.style.display = 'none';
   // Reset options button
   const btn = $('options-btn');
-  if (btn) { btn.classList.remove('active'); }
+  if (btn) { btn.classList.remove('active'); btn.style.position = ''; }
   const lbl = $('options-btn-label');
   if (lbl) lbl.textContent = '';
   renderTrades(getDashboardTrades());
@@ -7097,7 +7147,7 @@ function toggleSelectRow(id, e) {
 
 function toggleSelectAll(e) {
   e.stopPropagation();
-  const allIds = filteredTrades.map(t => t.id);
+  const allIds = _currentPageTradeIds.length ? [..._currentPageTradeIds] : filteredTrades.map(t => t.id);
   const allSelected = allIds.every(id => selectedIds.has(id));
   if (allSelected) allIds.forEach(id => selectedIds.delete(id));
   else             allIds.forEach(id => selectedIds.add(id));
@@ -7115,14 +7165,13 @@ function updateSelectAllCheckbox() {
   const allCb = $('sel-cb-all');
   const allLabel = $('sel-all-label');
   if (!allCb) return;
-  const allIds = filteredTrades.map(t => t.id);
+  const allIds = _currentPageTradeIds.length ? [..._currentPageTradeIds] : filteredTrades.map(t => t.id);
   const selCount = allIds.filter(id => selectedIds.has(id)).length;
-  allCb.classList.remove('checked','indeterminate');
+  allCb.classList.toggle('checked', selCount === allIds.length && allIds.length > 0);
+  allCb.classList.toggle('indeterminate', selCount > 0 && selCount !== allIds.length);
   if (selCount === allIds.length && allIds.length > 0) {
-    allCb.classList.add('checked');
     if (allLabel) allLabel.textContent = 'Deselect All';
   } else if (selCount > 0) {
-    allCb.classList.add('indeterminate');
     if (allLabel) allLabel.textContent = 'Select All';
   } else {
     if (allLabel) allLabel.textContent = 'Select All';
@@ -7512,6 +7561,14 @@ function calClear() {
 function calToday() { calPickDay(new Date().toISOString().slice(0,10)); }
 
 /* ── OPTIONS MENU ── */
+function handleOptionsButtonClick() {
+  if (selectModeActive) {
+    disableSelectMode();
+  } else {
+    toggleOptionsMenu();
+  }
+}
+
 function toggleOptionsMenu() {
   const menu = $('options-menu');
   const isOpen = menu.style.display !== 'none';
@@ -7623,8 +7680,8 @@ document.addEventListener('keydown', function(e) {
     || $('col-editor-overlay')?.style.display === 'flex'  // Column editor
     || $('cmdk-overlay')?.style.display === 'flex';  // Command palette
   
-  // Block number shortcuts (1-9) when ANY popup is open — but NOT when user is typing in an input
-  if ((e.key >= '1' && e.key <= '9') && anyPopupOpen && !isTyping) {
+  // Block number shortcuts (0-9) when ANY popup is open — but NOT when user is typing in an input
+  if ((e.key >= '0' && e.key <= '9') && anyPopupOpen && !isTyping) {
     e.preventDefault();
     return;
   }
@@ -7746,6 +7803,8 @@ document.addEventListener('keydown', function(e) {
     case '8':
       document.querySelector('[data-view="reports"]')?.click(); break;
     case '9':
+      document.querySelector('[data-view="user-profile"]')?.click(); break;
+    case '0':
       document.querySelector('[data-view="settings"]')?.click(); break;
     case ',':
       e.preventDefault();
@@ -8762,7 +8821,7 @@ function renderAccountsPage() {
 
     return `
     <div class="acct-page-card status-${status}"
-      style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;position:relative;">
+      style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;position:relative;">
 
       ${checkboxHtml}
 
@@ -8950,30 +9009,53 @@ function deleteAccountCard(id) {
     function() {
       const idx = ACCOUNTS.findIndex(x => x.id === id);
       if (idx !== -1) {
-        // Store the deleted account for undo
         const deletedAccount = ACCOUNTS[idx];
         const deletedIdx = idx;
         const deletedLabels = loadAcctLabels();
         const deletedAccountLabels = {...deletedLabels};
-        
+
+        // Snapshot trades and images for Undo
+        const _tradesSnapshot = JSON.stringify(TRADES || []);
+        const _imgsSnapshot = localStorage.getItem('et-trade-images');
+
+        // Helper to match trade.account to account variations
+        function _acctMatchesTrade(trade, acct) {
+          const acctKey = acct.key || acct.phase || '';
+          const acctFull = acct.firm + ' - ' + acctKey;
+          const tAcct = (trade.account || '');
+          return tAcct === acctKey || tAcct === acctFull || tAcct === acct.firm;
+        }
+
+        // Collect trades to be deleted
+        const deletedTrades = TRADES.filter(t => _acctMatchesTrade(t, deletedAccount));
+
         // Remember if this account was hidden before deletion
         const wasHidden = hiddenAccountIds.has(id);
-        
+
+        // Remove account and associated metadata
         ACCOUNTS.splice(idx, 1);
-        // Also remove from hidden accounts set if it was hidden
         hiddenAccountIds.delete(id);
         saveHiddenAccounts();
-        // Clean up its label entry
         const labels = loadAcctLabels();
         delete labels[String(id)];
         saveAcctLabels(labels);
         saveAccounts();
+
+        // Remove associated trades and their images
+        if (deletedTrades.length) {
+          TRADES = TRADES.filter(t => !_acctMatchesTrade(t, deletedAccount));
+          try { saveTradesToStorage(); } catch(e) { console.warn('Error saving trades after account delete:', e); }
+          try {
+            const imgs = JSON.parse(localStorage.getItem('et-trade-images') || '{}');
+            deletedTrades.forEach(dt => { delete imgs[String(dt.id)]; });
+            localStorage.setItem('et-trade-images', JSON.stringify(imgs));
+          } catch(e) { /* ignore */ }
+        }
+
         renderAccountsPage();
-        // Re-render hidden accounts list if section is open
         if (hiddenSectionExpanded) {
           const remainingHidden = ACCOUNTS.filter(a => hiddenAccountIds.has(a.id));
           if (remainingHidden.length === 0) {
-            // No more hidden accounts — hide the section
             hiddenSectionExpanded = false;
             const hiddenSection = $('hidden-accounts-section');
             if (hiddenSection) hiddenSection.style.display = 'none';
@@ -8981,33 +9063,33 @@ function deleteAccountCard(id) {
             renderHiddenAccounts();
           }
         }
+
         renderAllAccountsSection && renderAllAccountsSection();
-        // ── Sync the Add Trade modal account list ──
         if (typeof syncTradeModalAccountList === 'function') {
           syncTradeModalAccountList();
         }
-        
+
         // Show "Account deleted" toast
         showToast('Account deleted', 'info', '🗑️', 2500);
-        
-        // Show "Undo (Ctrl+Z)" toast with undo functionality
+
+        // Show Undo toast to restore everything
         setTimeout(() => {
           showToast('Undo (Ctrl+Z)', 'info', '↶', 4000, function() {
-            // Restore the account
-            ACCOUNTS.splice(deletedIdx, 0, deletedAccount);
-            // If it was hidden before deletion, restore it to hidden set
-            if (wasHidden) {
-              hiddenAccountIds.add(id);
-              saveHiddenAccounts();
-            }
-            saveAcctLabels(deletedAccountLabels);
-            saveAccounts();
+            // Restore account, trades and images snapshot
+            try {
+              ACCOUNTS.splice(deletedIdx, 0, deletedAccount);
+              if (wasHidden) { hiddenAccountIds.add(id); saveHiddenAccounts(); }
+              saveAcctLabels(deletedAccountLabels);
+              saveAccounts();
+              TRADES = JSON.parse(_tradesSnapshot || '[]');
+              try { saveTradesToStorage(); } catch(e) { console.warn('Error restoring trades on undo:', e); }
+              try { localStorage.setItem('et-trade-images', _imgsSnapshot || '{}'); } catch(e) {}
+            } catch(e) { console.warn('Error undoing account delete:', e); }
+
             renderAccountsPage();
-            // Re-render hidden section if it was hidden
             if (wasHidden && hiddenSectionExpanded) {
               renderHiddenAccounts();
             } else if (wasHidden) {
-              // Show the hidden section again since there's a hidden account
               const hiddenSection = $('hidden-accounts-section');
               if (hiddenSection) hiddenSection.style.display = 'block';
             }
@@ -9516,19 +9598,67 @@ function deleteAccountFromModal() {
     'Delete',
     function() {
       const idx = ACCOUNTS.findIndex(x => x.id === idToDelete);
-      if (idx !== -1) ACCOUNTS.splice(idx, 1);
+      if (idx === -1) return;
+      const deletedAcct = ACCOUNTS[idx];
+
+      // Snapshot trades and images for undo
+      const _tradesSnapshot = JSON.stringify(TRADES || []);
+      const _imgsSnapshot = localStorage.getItem('et-trade-images');
+
+      // Helper to match trade.account variations
+      function _acctMatchesTrade(trade, acct) {
+        const acctKey = acct.key || acct.phase || '';
+        const acctFull = acct.firm + ' - ' + acctKey;
+        const tAcct = (trade.account || '');
+        return tAcct === acctKey || tAcct === acctFull || tAcct === acct.firm;
+      }
+
+      const deletedTrades = TRADES.filter(t => _acctMatchesTrade(t, deletedAcct));
+
+      // Remove account
+      ACCOUNTS.splice(idx, 1);
       // Clean up its label entry
       const labels = loadAcctLabels();
       delete labels[String(idToDelete)];
       saveAcctLabels(labels);
       saveAccounts();
+      // Remove associated trades and images
+      if (deletedTrades.length) {
+        TRADES = TRADES.filter(t => !_acctMatchesTrade(t, deletedAcct));
+        try { saveTradesToStorage(); } catch(e) { console.warn('Error saving trades after account delete:', e); }
+        try {
+          const imgs = JSON.parse(localStorage.getItem('et-trade-images') || '{}');
+          deletedTrades.forEach(dt => { delete imgs[String(dt.id)]; });
+          localStorage.setItem('et-trade-images', JSON.stringify(imgs));
+        } catch(e) {}
+      }
+
       renderAccountsPage();
       renderAllAccountsSection && renderAllAccountsSection();
-      // ── Sync the Add Trade modal account list ──
       if (typeof syncTradeModalAccountList === 'function') {
         syncTradeModalAccountList();
       }
       showToast('Account deleted', 'info', '', 2000);
+
+      // Offer undo to restore everything
+      setTimeout(() => {
+        showToast('Undo (Ctrl+Z)', 'info', '↶', 4000, function() {
+          try {
+            ACCOUNTS.splice(idx, 0, deletedAcct);
+            saveAcctLabels(labels);
+            saveAccounts();
+            TRADES = JSON.parse(_tradesSnapshot || '[]');
+            try { saveTradesToStorage(); } catch(e) { console.warn('Error restoring trades on undo:', e); }
+            try { localStorage.setItem('et-trade-images', _imgsSnapshot || '{}'); } catch(e) {}
+          } catch(e) { console.warn('Error undoing account delete:', e); }
+          renderAccountsPage();
+          renderAllAccountsSection && renderAllAccountsSection();
+          if (typeof syncTradeModalAccountList === 'function') {
+            syncTradeModalAccountList();
+          }
+          showToast('Account restored', 'success', '✓', 2000);
+        });
+      }, 300);
     }
   );
 }
@@ -9747,46 +9877,82 @@ function deleteSelectedAccounts() {
     `Delete <strong>${count} account${count > 1 ? 's' : ''}</strong>? Trades linked to them will remain but won't appear under any account.`,
     'Delete All',
     function() {
+      // Snapshot trades and images for undo
+      const _tradesSnapshot = JSON.stringify(TRADES || []);
+      const _imgsSnapshot = localStorage.getItem('et-trade-images');
+
       // Store deleted accounts for undo
       const deletedAccounts = [];
       const deletedLabels = loadAcctLabels();
       const deletedAccountLabels = {...deletedLabels};
-      
+
+      // Helper to match trade.account variations
+      function _acctMatchesTrade(trade, acct) {
+        const acctKey = acct.key || acct.phase || '';
+        const acctFull = acct.firm + ' - ' + acctKey;
+        const tAcct = (trade.account || '');
+        return tAcct === acctKey || tAcct === acctFull || tAcct === acct.firm;
+      }
+
+      // Collect deleted accounts and remove them
+      const accountsToDelete = [];
       selectedAccountIds.forEach(id => {
         const idx = ACCOUNTS.findIndex(x => x.id === id);
         if (idx !== -1) {
+          accountsToDelete.push({ account: ACCOUNTS[idx], index: idx });
           deletedAccounts.push({ account: ACCOUNTS[idx], index: idx });
           ACCOUNTS.splice(idx, 1);
           delete deletedLabels[String(id)];
         }
       });
-      
+
+      // Remove associated trades and images for all deleted accounts
+      if (accountsToDelete.length) {
+        const idsToRemove = new Set();
+        accountsToDelete.forEach(item => {
+          TRADES.forEach(t => { if (_acctMatchesTrade(t, item.account)) idsToRemove.add(t.id); });
+        });
+        if (idsToRemove.size) {
+          TRADES = TRADES.filter(t => !idsToRemove.has(t.id));
+          try { saveTradesToStorage(); } catch(e) { console.warn('Error saving trades after bulk account delete:', e); }
+          try {
+            const imgs = JSON.parse(localStorage.getItem('et-trade-images') || '{}');
+            idsToRemove.forEach(id => { delete imgs[String(id)]; });
+            localStorage.setItem('et-trade-images', JSON.stringify(imgs));
+          } catch(e) {}
+        }
+      }
+
       saveAcctLabels(deletedLabels);
       saveAccounts();
-      
+
       selectedAccountIds.clear();
       updateSelectedCount();
       exitSelectMode();
       $('acct-options-dropdown').style.display = 'none';
       renderAccountsPage();
       renderAllAccountsSection && renderAllAccountsSection();
-      
+
       if (typeof syncTradeModalAccountList === 'function') {
         syncTradeModalAccountList();
       }
-      
+
       // Show deletion toast
       showToast(`${count} account${count > 1 ? 's' : ''} deleted`, 'info', '🗑️', 2500);
-      
+
       // Show undo toast
       setTimeout(() => {
         showToast('Undo (Ctrl+Z)', 'info', '↶', 4000, function() {
-          // Restore all deleted accounts
+          // Restore all deleted accounts and trade/images snapshot
           deletedAccounts.sort((a, b) => a.index - b.index).forEach(item => {
             ACCOUNTS.splice(item.index, 0, item.account);
           });
           saveAcctLabels(deletedAccountLabels);
           saveAccounts();
+          try { TRADES = JSON.parse(_tradesSnapshot || '[]'); } catch(e) { TRADES = []; }
+          try { saveTradesToStorage(); } catch(e) { console.warn('Error restoring trades on undo:', e); }
+          try { localStorage.setItem('et-trade-images', _imgsSnapshot || '{}'); } catch(e) {}
+
           renderAccountsPage();
           renderAllAccountsSection && renderAllAccountsSection();
           if (typeof syncTradeModalAccountList === 'function') {

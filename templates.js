@@ -990,8 +990,38 @@ function confirmDeleteAccount(acctId) {
       const idx = ACCOUNTS.findIndex(a => a.id === acctId);
       const deletedAcct = ACCOUNTS[idx];
       const deletedSelectedAcct = selectedAcct;
+
+      // Snapshot current trades and images for Undo
+      const _tradesSnapshot = JSON.stringify(TRADES || []);
+      const _imgsSnapshot = localStorage.getItem('et-trade-images');
+
+      // Helper to match trade.account variations
+      function _acctMatchesTrade(trade, acct) {
+        const acctKey = acct.key || acct.phase || '';
+        const acctFull = acct.firm + ' - ' + acctKey;
+        const tAcct = (trade.account || '');
+        return tAcct === acctKey || tAcct === acctFull || tAcct === acct.firm;
+      }
+
+      // Collect trades to be deleted
+      const deletedTrades = TRADES.filter(t => _acctMatchesTrade(t, deletedAcct));
+
+      // Remove account
       ACCOUNTS.splice(idx, 1);
       saveAccounts();
+
+      // Remove associated trades and their images
+      if (deletedTrades.length) {
+        TRADES = TRADES.filter(t => !_acctMatchesTrade(t, deletedAcct));
+        try { saveTradesToStorage(); } catch(e) { console.warn('Error saving trades after account delete:', e); }
+        // Remove stored images for deleted trades
+        try {
+          const imgs = JSON.parse(localStorage.getItem('et-trade-images') || '{}');
+          deletedTrades.forEach(dt => { delete imgs[String(dt.id)]; });
+          localStorage.setItem('et-trade-images', JSON.stringify(imgs));
+        } catch(e) { /* ignore */ }
+      }
+
       renderAllAccountsSection();
       if (selectedAcct >= ACCOUNTS.length) { selectedAcct = -1; }
       renderAcctList();
@@ -1014,7 +1044,7 @@ function confirmDeleteAccount(acctId) {
       t.style.cssText = 'display:flex;align-items:center;gap:10px;min-width:220px';
       t.innerHTML = `
         <span class="toast-icon">🗑️</span>
-        <span class="toast-msg" style="flex:1">Account deleted</span>
+        <span class="toast-msg" style="flex:1">Account deleted${deletedTrades.length?(' · '+deletedTrades.length+' trade'+(deletedTrades.length!==1?'s':'')) : ''}</span>
         <button class="t-undo-btn" onclick="this._undone=true;this.closest('.toast')._undone=true;" style="background:var(--ac-20);border:1px solid var(--ac-40);color:#b891f5;font-size:11px;font-family:var(--font-mono);font-weight:600;padding:3px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:background .12s;pointer-events:all" onmouseenter="this.style.background='var(--ac-35)'" onmouseleave="this.style.background='var(--ac-20)'">Undo</button>`;
       container.appendChild(t);
       requestAnimationFrame(() => requestAnimationFrame(() => t.classList.add('show')));
@@ -1026,10 +1056,19 @@ function confirmDeleteAccount(acctId) {
 
       t.querySelector('button').addEventListener('click', function() {
         clearTimeout(undoTimer);
-        // Restore account at original index
-        ACCOUNTS.splice(idx, 0, deletedAcct);
-        saveAccounts();
-        selectedAcct = deletedSelectedAcct;
+        // Restore account and full trade + image snapshots
+        try {
+          ACCOUNTS.splice(idx, 0, deletedAcct);
+          saveAccounts();
+          selectedAcct = deletedSelectedAcct;
+          // Restore trades
+          TRADES = JSON.parse(_tradesSnapshot || '[]');
+          try { saveTradesToStorage(); } catch(e) { console.warn('Error restoring trades on undo:', e); }
+          // Restore images snapshot
+          try { localStorage.setItem('et-trade-images', _imgsSnapshot || '{}'); } catch(e) { /* ignore */ }
+        } catch(e) {
+          console.warn('Error undoing account delete:', e);
+        }
         renderAllAccountsSection();
         renderAcctList();
         if (typeof buildAnAccountBar === 'function') {
@@ -1771,47 +1810,11 @@ function setThemeMode(mode) {
   if (mode === 'medium') cl.add('medium');
   localStorage.setItem('et-theme', mode);
   updateThemeButtons(mode);
-  // Show mode name notification
-  const modeNames = { dark: '🌑 Midnight', light: '☀️ Dawn' };
-  const modeLabel = modeNames[mode] || mode;
-  showThemeModeToast(modeLabel);
   try { if (typeof toggleTheme === 'function') {} } catch(e) {}
 }
 
 function showThemeModeToast(label) {
-  // Remove existing theme toast if any
-  const existing = document.getElementById('theme-mode-toast');
-  if (existing) existing.remove();
-
-  const toast = document.createElement('div');
-  toast.id = 'theme-mode-toast';
-  toast.textContent = label;
-  toast.style.cssText = `
-    position:fixed;bottom:40px;left:50%;transform:translateX(-50%) scale(0.85);
-    background:var(--bg2);border:1px solid var(--ac-30);border-radius:14px;
-    padding:5px 12px;font-family:var(--font-display);font-size:11px;font-weight:600;
-    color:var(--text);letter-spacing:0.02em;
-    box-shadow:0 8px 40px rgba(0,0,0,.5),0 0 0 1px var(--ac-10),inset 0 0 40px var(--ac-06);
-    z-index:999999;pointer-events:none;
-    opacity:0;transition:opacity .18s ease,transform .18s cubic-bezier(.34,1.56,.64,1);
-    white-space:nowrap;
-  `;
-  document.body.appendChild(toast);
-
-  // Animate in
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      toast.style.opacity = '1';
-      toast.style.transform = 'translateX(-50%) scale(1)';
-    });
-  });
-
-  // Animate out and remove
-  setTimeout(() => {
-    toast.style.opacity = '0';
-    toast.style.transform = 'translateX(-50%) scale(0.9)';
-    setTimeout(() => toast.remove(), 200);
-  }, 1200);
+  // Theme change toast disabled.
 }
 function updateThemeButtons(mode) {
   const darkBtn   = $('theme-dark-btn');

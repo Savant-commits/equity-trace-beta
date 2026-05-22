@@ -100,6 +100,7 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{font-size:clamp(13px,1.08vw,17px);-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:1.06rem;min-height:100vh;display:flex;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-feature-settings:'kern' 1,'liga' 1}
+:root:not(.light):not(.medium) body{background:#000000}
 button,input,select,textarea,a{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* ── CALENDAR STAT CARDS ── */
@@ -289,9 +290,9 @@ h1,h2,h3{letter-spacing:-.02em}
 }
 
 /* Hide legacy page title */
-#view-settings .user-profile-typography-title {
+/* #view-settings .user-profile-typography-title {
   display:none !important;
-}
+} */
 
 /* ── Settings typography system ── */
 #view-settings {
@@ -372,6 +373,79 @@ h1,h2,h3{letter-spacing:-.02em}
     inset 0 0 80px var(--ac-05),
     inset 0 1px 0 rgba(255,255,255,.04),
     0 4px 24px rgba(0,0,0,.36) !important;
+}
+
+:root.medium #view-settings .content > div[style*='background:var(--bg3)'],
+:root.medium #view-user-profile .settings-user-profile-card,
+:root.medium #view-user-profile .settings-trader-card {
+  background:linear-gradient(145deg, var(--bg2) 0%, rgba(16,18,26,1) 100%) !important;
+  border:1px solid var(--ac-16) !important;
+  border-radius:16px !important;
+  box-shadow:
+    inset 0 0 80px var(--ac-05),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 4px 24px rgba(0,0,0,.36) !important;
+}
+
+#view-user-profile {
+  --settings-font-stack:'Space Grotesk', 'Outfit', sans-serif;
+}
+
+#view-user-profile .content {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 22px !important;
+  align-items: stretch !important;
+}
+
+#view-user-profile .settings-page-title {
+  width: 100% !important;
+  font-size: 22px !important;
+  color: var(--text) !important;
+}
+
+#view-user-profile .settings-user-profile-title,
+#view-user-profile .settings-trader-title {
+  font-size: 20px !important;
+  font-weight: 480 !important;
+  color: var(--text) !important;
+}
+
+#view-user-profile .form-label {
+  font-size: 11.5px !important;
+  color: var(--text) !important;
+}
+
+#view-user-profile .settings-user-profile-card,
+#view-user-profile .settings-trader-card {
+  max-width: 920px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+#view-user-profile {
+  background: var(--bg) !important;
+}
+
+:root.light #view-user-profile {
+  background: var(--bg3) !important;
+}
+
+:root.light #view-user-profile .settings-user-profile-card,
+:root.light #view-user-profile .settings-trader-card {
+  background: var(--bg) !important;
+  border-color: var(--border2) !important;
+  box-shadow:0 2px 12px rgba(0,0,0,.08) !important;
+}
+
+#view-user-profile,
+#view-user-profile .settings-user-profile-card,
+#view-user-profile .settings-user-profile-card *,
+#view-user-profile .settings-trader-card,
+#view-user-profile .settings-trader-card *,
+#view-user-profile .public-share-card-preview,
+#view-user-profile .public-share-card-preview * {
+  font-weight: 600 !important;
 }
 
 @media (max-width: 1180px) {
@@ -540,9 +614,13 @@ h1,h2,h3{letter-spacing:-.02em}
 }
 
 /* ── Light mode overrides for settings ── */
+:root.light #view-settings {
+  background: var(--bg3) !important;
+}
+
 :root.light #view-settings .settings-user-profile-card,
 :root.light #view-settings .content > div[style*='background:var(--bg3)'] {
-  background:linear-gradient(145deg, var(--bg2) 0%, var(--bg3) 100%) !important;
+  background:var(--bg) !important;
   border-color:var(--border2) !important;
   box-shadow:0 2px 12px rgba(0,0,0,.08) !important;
 }
@@ -553,16 +631,16 @@ h1,h2,h3{letter-spacing:-.02em}
 :root.light #view-settings [id^='setting-'][id$='-btn'],
 :root.light #view-settings #prof-style-btn,
 :root.light #view-settings #prof-exp-btn {
-  background:rgba(255,255,255,.85) !important;
+  background:var(--bg3) !important;
   border-color:var(--border2) !important;
   color:var(--text) !important;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.6) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7) !important;
 }
 
 :root.light #view-settings [id^='setting-'][id$='-dd'],
 :root.light #view-settings #prof-style-dd,
 :root.light #view-settings #prof-exp-dd {
-  background:rgba(255,255,255,.98) !important;
+  background:rgba(255,255,255,.95) !important;
   border-color:var(--border2) !important;
   box-shadow:0 12px 34px rgba(0,0,0,.12) !important;
 }
@@ -651,10 +729,18 @@ h1,h2,h3{letter-spacing:-.02em}
   color:var(--text) !important;
 }
 
+#view-reports {
+  background: var(--bg) !important;
+}
+
+:root.light #view-reports {
+  background: var(--bg3) !important;
+}
+
 :root.light #view-reports .rpt-card,
 :root.light #view-reports .content > div[style*='background:var(--bg3)'] {
-  background:linear-gradient(145deg, var(--bg2) 0%, var(--bg3) 100%) !important;
-  border-color:var(--border2) !important;
+  background: var(--bg) !important;
+  border-color: var(--border2) !important;
   box-shadow:0 2px 12px rgba(0,0,0,.08) !important;
 }
 
@@ -739,6 +825,10 @@ h1,h2,h3{letter-spacing:-.02em}
 
 #view-accounts {
   --accounts-font-stack:'Space Grotesk', 'Outfit', sans-serif;
+  background: var(--bg2) !important;
+}
+:root:not(.light):not(.medium) #view-accounts {
+  background: #000 !important;
 }
 
 #view-accounts .content > div:first-child > div:first-child > div:first-child,
@@ -781,7 +871,7 @@ h1,h2,h3{letter-spacing:-.02em}
 #view-accounts .acct-page-card,
 #view-accounts #hidden-accounts-section > div,
 #view-accounts #acct-select-bar {
-  background:linear-gradient(145deg, var(--bg2) 0%, rgba(16,18,26,1) 100%) !important;
+  background:var(--bg2) !important;
   border:1px solid var(--ac-16) !important;
   border-radius:16px !important;
   box-shadow:
@@ -810,10 +900,14 @@ h1,h2,h3{letter-spacing:-.02em}
   color:var(--text) !important;
 }
 
+:root.light #view-accounts {
+  background: var(--bg3) !important;
+}
+
 :root.light #view-accounts .acct-page-card,
 :root.light #view-accounts #hidden-accounts-section > div,
 :root.light #view-accounts #acct-select-bar {
-  background:linear-gradient(145deg, var(--bg2) 0%, var(--bg3) 100%) !important;
+  background:var(--bg) !important;
   border-color:var(--border2) !important;
   box-shadow:0 2px 12px rgba(0,0,0,.08) !important;
 }
@@ -2138,7 +2232,34 @@ h1,h2,h3{letter-spacing:-.02em}
 ::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px}
 
 /* ─── SIDEBAR ─── */
-.sidebar{width:var(--sidebar-collapsed);min-width:var(--sidebar-collapsed);background:linear-gradient(180deg,rgba(72,26,170,0.97) 0%,rgba(82,30,182,0.97) 100%);border-right:1px solid rgba(153,93,255,0.28);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100000;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden;backdrop-filter:blur(12px);box-shadow:2px 0 24px rgba(0,0,0,.28)}
+.sidebar{width:var(--sidebar-collapsed);min-width:var(--sidebar-collapsed);background:linear-gradient(180deg,rgba(72,26,170,0.97) 0%,rgba(82,30,182,0.97) 100%);border-right:none;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100000;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden;backdrop-filter:blur(12px);box-shadow:2px 0 24px rgba(0,0,0,.28)}
+
+.main{background:var(--bg) !important;border-left:none !important}
+.main, .view, .content, .topbar{border-left:none !important}
+:root.light body,
+:root.light html,
+:root.light .main,
+:root.light .view{background:var(--bg3) !important}
+
+:root.light .panel,
+:root.light .stat-card,
+:root.light .metric-card,
+:root.light .goals-card,
+:root.light .maxloss-card,
+:root.light .td-card,
+:root.light .consistency-card,
+:root.light .rpt-card,
+:root.light .trade-record-card,
+:root.light .acct-page-card,
+:root.light .banner,
+:root.light .cal-stat-card,
+:root.light .accounts-empty,
+:root.light .public-share-card-preview,
+:root.light .detail-panel {
+  background: var(--bg) !important;
+  border-color: var(--border2) !important;
+}
+
 .sidebar:hover{width:var(--sidebar)}
 .logo-wrap{padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;gap:10px;white-space:nowrap}
 .logo-mark{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;transform:translateX(-5px)}
@@ -2188,7 +2309,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .add-trade-btn:active{transform:translateY(0)}
 
 /* ─── VIEWS ─── */
-.view{display:none;flex:1;flex-direction:column}
+.view{display:none;flex:1;flex-direction:column;background:var(--bg) !important}
 .view.active{display:flex}
 .content{padding:20px 24px;flex:1;display:flex;flex-direction:column;gap:18px}
 
@@ -2325,12 +2446,12 @@ h1,h2,h3{letter-spacing:-.02em}
   margin:8px auto 0;
   width:min(900px, 100%);
   border-radius:16px;
-  border:1px solid rgba(77,142,240,.28);
+  border:1px solid rgba(153,93,255,.28);
   background:
-    radial-gradient(760px 300px at -10% -15%, rgba(77,142,240,.17), transparent 62%),
+    radial-gradient(760px 300px at -10% -15%, rgba(153,93,255,.17), transparent 62%),
     radial-gradient(620px 300px at 112% 120%, var(--ac-10), transparent 68%),
-    linear-gradient(135deg, var(--bg3) 0%, rgba(77,142,240,.06) 58%, var(--bg2) 100%);
-  box-shadow:inset 0 0 70px rgba(77,142,240,.09), 0 18px 52px rgba(0,0,0,.28);
+    linear-gradient(135deg, var(--bg3) 0%, rgba(153,93,255,.06) 58%, var(--bg2) 100%);
+  box-shadow:inset 0 0 70px rgba(153,93,255,.09), 0 18px 52px rgba(0,0,0,.28);
   padding:34px 34px 30px;
   position:relative;
   overflow:hidden;
@@ -2342,15 +2463,15 @@ h1,h2,h3{letter-spacing:-.02em}
   top:0;
   width:150px;
   height:2px;
-  background:linear-gradient(90deg, rgba(77,142,240,.65), transparent);
+  background:linear-gradient(90deg, rgba(153,93,255,.65), transparent);
 }
 .accounts-empty-badge{
   display:inline-flex;
   align-items:center;
   gap:7px;
-  border:1px solid rgba(77,142,240,.35);
-  background:rgba(77,142,240,.1);
-  color:#93bbff;
+  border:1px solid rgba(153,93,255,.35);
+  background:rgba(153,93,255,.1);
+  color:var(--purple);
   border-radius:999px;
   padding:6px 11px;
   font-size:10px;
@@ -2362,8 +2483,8 @@ h1,h2,h3{letter-spacing:-.02em}
   width:7px;
   height:7px;
   border-radius:50%;
-  background:var(--blue);
-  box-shadow:0 0 0 0 rgba(77,142,240,.45);
+  background:var(--purple);
+  box-shadow:0 0 0 0 rgba(153,93,255,.45);
   animation:acctPulse 1.9s ease-out infinite;
 }
 .accounts-empty-icon{
@@ -2371,9 +2492,9 @@ h1,h2,h3{letter-spacing:-.02em}
   height:52px;
   border-radius:12px;
   margin-top:14px;
-  border:1px solid rgba(77,142,240,.35);
-  background:rgba(77,142,240,.1);
-  color:#8cb4ff;
+  border:1px solid rgba(153,93,255,.35);
+  background:rgba(153,93,255,.1);
+  color:var(--purple);
   display:flex;
   align-items:center;
   justify-content:center;
@@ -2413,13 +2534,13 @@ h1,h2,h3{letter-spacing:-.02em}
 }
 .accounts-empty-btn:hover{transform:translateY(-1px)}
 .accounts-empty-btn.primary{
-  border:1px solid rgba(77,142,240,.55);
-  background:linear-gradient(135deg, rgba(77,142,240,.22), rgba(77,142,240,.38));
+  border:1px solid rgba(153,93,255,.55);
+  background:linear-gradient(135deg, rgba(153,93,255,.22), rgba(153,93,255,.38));
   color:var(--text);
 }
 .accounts-empty-btn.primary:hover{
-  border-color:rgba(77,142,240,.78);
-  background:linear-gradient(135deg, rgba(77,142,240,.3), rgba(77,142,240,.46));
+  border-color:rgba(153,93,255,.78);
+  background:linear-gradient(135deg, rgba(153,93,255,.3), rgba(153,93,255,.46));
 }
 .accounts-empty-btn.ghost{
   border:1px solid var(--border2);
@@ -2447,9 +2568,9 @@ h1,h2,h3{letter-spacing:-.02em}
   background:var(--bg4);
 }
 @keyframes acctPulse{
-  0%{box-shadow:0 0 0 0 rgba(77,142,240,.45)}
-  70%{box-shadow:0 0 0 9px rgba(77,142,240,0)}
-  100%{box-shadow:0 0 0 0 rgba(77,142,240,0)}
+  0%{box-shadow:0 0 0 0 rgba(153,93,255,.45)}
+  70%{box-shadow:0 0 0 9px rgba(153,93,255,0)}
+  100%{box-shadow:0 0 0 0 rgba(153,93,255,0)}
 }
 @media (max-width: 780px){
   .accounts-empty{padding:24px 20px}
@@ -2671,6 +2792,9 @@ h1,h2,h3{letter-spacing:-.02em}
 .filter-btn.has-filter:hover svg{opacity:0;transition:opacity .15s ease}
 .filter-btn.has-filter:hover::after{content:'×';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:15px;font-weight:700;color:var(--red);pointer-events:none;}
 .filter-btn.active{background:var(--purple2);border-color:var(--ac-65);color:#b891f5;box-shadow:0 0 16px var(--ac-50),inset 0 0 14px var(--ac-18)}
+
+#options-btn.active svg{display:none !important;transition:opacity .15s ease}
+#options-btn.active::after{content:'×';position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:16px;font-weight:700;color:var(--red);pointer-events:none;}
 
 .trade-table{width:100%;border-collapse:collapse}
 .trade-table th{padding:9px 14px;font-size:9px;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;text-align:center;border-bottom:1px solid var(--border);background:rgba(0,0,0,.18);cursor:pointer;user-select:none;white-space:nowrap;transition:color .15s}

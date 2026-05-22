@@ -1,0 +1,9 @@
+// Copy this file to `local-env.js` and fill in your real Supabase values.
+// DO NOT commit `local-env.js`.
+
+// Example (replace with your real values):
+window.SUPABASE_URL = "https://your-project.supabase.co";
+window.SUPABASE_ANON = "your-anon-key-goes-here";
+
+// Usage: include this BEFORE `supabase.js` in your HTML when running locally.
+// <script src="local-env.js"></script>

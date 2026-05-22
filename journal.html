@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236b1fd4'/%3E%3Cpolyline points='4,22 10,14 15,18 21,8 28,12' stroke='%232ecc8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
 <link rel="icon" href="logo.png" type="image/png">
-<link rel="shortcut icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236b1fd4'/%3E%3Cpolyline points='4,22 10,14 15,18 21,8 28,12' stroke='%232ecc8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">>
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236b1fd4'/%3E%3Cpolyline points='4,22 10,14 15,18 21,8 28,12' stroke='%232ecc8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
+<link rel="shortcut icon" href="logo.png" type="image/png">
+<link rel="apple-touch-icon" href="logo.png">
 <meta name="theme-color" content="#995dff">
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json">
@@ -27,9 +27,12 @@
 <link rel="stylesheet" href="styles.css"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
 
+<!-- Local Supabase Configuration (for development) -->
+<script src="local-env.js"></script>
+
 <!-- Supabase SDK + Backend -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
+<script type="module" defer src="supabase.js"></script>
 
 <!-- External Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -656,7 +659,7 @@ window.addEventListener('DOMContentLoaded', function() {
 <!-- Mobile sidebar backdrop -->
 <div id="mob-nav-overlay" onclick="closeMobileSidebar()"></div>
 
-<!-- â•â• SIDEBAR â•â• -->
+<!-- == SIDEBAR == -->
 <nav class="sidebar" style="display:none">
   <div class="logo-wrap">
     <div class="logo-mark" style="background:none;padding:0;overflow:hidden;width:32px;height:32px;border-radius:9px;flex-shrink:0"><img src="logo.png" style="width:32px;height:32px;border-radius:9px;object-fit:cover;flex-shrink:0" alt="Equity Trace"/></div>
@@ -683,10 +686,13 @@ window.addEventListener('DOMContentLoaded', function() {
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 3C8 3 5 2 2 3v9c3-1 6 0 6 0V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity=".9"/><path d="M8 3c0 0 3-1 6 0v9c-3-1-6 0-6 0V3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none" opacity=".9"/></svg></span><span class="nav-text"> Entry Models</span>
     </div>
     <div class="nav-item" data-view="accounts" onclick="if(typeof switchView==='function') { console.log('Clicked accounts'); switchView(this); } else { console.error('switchView not defined'); }">
-      <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".9"/></svg></span><span class="nav-text"> Accounts</span>
+      <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 7.5L8 3l6 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><rect x="2" y="7.5" width="12" height="5" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="4" y1="12" x2="4" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="8" y1="12" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="12" y1="12" x2="12" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/></svg></span><span class="nav-text"> Accounts</span>
     </div>
     <div class="nav-item" onclick="if(typeof switchView==='function') { console.log('Clicked reports'); switchView(this); } else { console.error('switchView not defined'); }" data-view="reports">
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="8" y1="1.5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><polyline points="5,4.5 8,1.5 11,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".9"/></svg></span><span class="nav-text"> Reports</span>
+    </div>
+    <div class="nav-item" onclick="if(typeof switchView==='function') { console.log('Clicked user-profile'); switchView(this); } else { console.error('switchView not defined'); }" data-view="user-profile">
+      <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none" opacity=".9"/><path d="M4 11c1-2 3-3 4-3s3 1 4 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/></svg></span><span class="nav-text"> User Profile</span>
     </div>
     <div class="nav-item" onclick="if(typeof switchView==='function') { console.log('Clicked settings'); switchView(this); } else { console.error('switchView not defined'); }" data-view="settings">
       <span class="ni"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.5" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M2.93 2.93l1.41 1.41M11.66 11.66l1.41 1.41M2.93 13.07l1.41-1.41M11.66 4.34l1.41-1.41" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/></svg></span><span class="nav-text"> Settings</span>
@@ -709,7 +715,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </nav>
 
-<!-- â•â• MAIN â•â• -->
+<!-- == MAIN == -->
 <main class="main" style="display:none">
   <!-- TOPBAR -->
   <header class="topbar">
@@ -719,7 +725,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </button>
     <div class="topbar-title">Your edge, Quantified</div>
     <div class="topbar-right">
-              <div onclick="goToSettings()" class="topbar-hero-outline" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;padding:6px 8px;min-height:42px" title="Edit profile">
+              <div onclick="handleTopbarProfileClick()" class="topbar-hero-outline" style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0;padding:6px 8px;min-height:42px" title="Edit profile">
                 <div id="topbar-avatar" style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--blue));display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:rgba(255,255,255,.9)">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>
                 </div>
@@ -728,7 +734,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </header>
 
-  <!-- â•â• DASHBOARD VIEW â•â• -->
+  <!-- == DASHBOARD VIEW == -->
   <div class="view active" id="view-dashboard">
     <div class="content">
 
@@ -1133,7 +1139,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• TRADE LOG VIEW â•â• -->
+  <!-- == TRADE LOG VIEW == -->
   <div class="view" id="view-tradelog">
     <div class="content" style="gap:12px;padding:16px 18px">
 
@@ -1307,7 +1313,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 <span id="sel-count-inline-wrap" style="display:none;font-size:11px;color:var(--text3);font-family:var(--font-mono)"><span id="sel-count-inline">0</span> selected</span>
               </div>
               <div style="position:relative;margin-left:auto" id="options-wrap">
-                <button class="filter-btn" id="options-btn" onclick="toggleOptionsMenu()" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;flex-shrink:0">
+                <button class="filter-btn" id="options-btn" onclick="handleOptionsButtonClick()" style="display:flex;align-items:center;justify-content:center;width:32px;height:32px;padding:0;flex-shrink:0">
                   <svg id="options-btn-icon" width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="opacity:.7"><circle cx="8" cy="2" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="14" r="1.5"/></svg>
                   <span id="options-btn-label"></span>
                 </button>
@@ -1317,11 +1323,6 @@ window.addEventListener('DOMContentLoaded', function() {
                   </button>
                   <button onclick="enableSelectMode();closeOptionsMenu()" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;background:transparent;border:none;color:var(--text);font-size:12.5px;font-family:var(--font-body);cursor:pointer;transition:background .12s;text-align:left" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background='transparent'">
                     <span style="font-size:13px">☑</span> Select
-                  </button>
-                  <div style="height:1px;background:var(--border);margin:4px 6px"></div>
-                  <button onclick="exportTrades();closeOptionsMenu()" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;background:transparent;border:none;color:var(--text);font-size:12.5px;font-family:var(--font-body);cursor:pointer;transition:background .12s;text-align:left" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background='transparent'">
-                    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="opacity:.6"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
-                    Export CSV
                   </button>
                   <div style="height:1px;background:var(--border);margin:4px 6px"></div>
                   <button onclick="openColumnEditor();closeOptionsMenu()" style="width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;background:transparent;border:none;color:var(--text);font-size:12.5px;font-family:var(--font-body);cursor:pointer;transition:background .12s;text-align:left" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background='transparent'">
@@ -1396,7 +1397,11 @@ window.addEventListener('DOMContentLoaded', function() {
                 </div>
               </div>
             </div>
-            <input type="hidden" id="fp-account" value=""/>
+            <div id="fp-acct-wrap">
+              <div style="font-size:9px;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:7px">Account</div>
+              <button id="fp-acct-trigger" onclick="toggleFpAcctDd()" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:7px 12px;color:var(--text2);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-40)'" onmouseleave="this.style.borderColor='var(--border)'"><span id="fp-acct-label">All Accounts</span><svg id="fp-acct-chevron" width="10" height="10" viewBox="0 0 10 10" fill="currentColor" style="opacity:.6"><path d="M5 7L1 3h8z"/></svg></button>
+              <input type="hidden" id="fp-account" value=""/>
+            </div>
             <!-- Emotion filter -->
             <div style="grid-column:1/-1;margin-top:4px">
               <div style="font-size:9px;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:7px">Emotion</div>
@@ -1453,7 +1458,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• ANALYTICS VIEW â•â• -->
+  <!-- == ANALYTICS VIEW == -->
   <div class="view" id="view-analytics">
     <div class="content">
 
@@ -1670,7 +1675,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• PLAYBOOK VIEW â•â• -->
+  <!-- == PLAYBOOK VIEW == -->
   <div class="view" id="view-playbook">
     <div class="content">
       <!-- Header -->
@@ -1685,7 +1690,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• PLAYBOOK MODAL (Add / Edit) â•â• -->
+  <!-- == PLAYBOOK MODAL (Add / Edit) == -->
   <div id="pb-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100001;align-items:flex-start;justify-content:center;overflow-y:auto;padding:40px 0">
     <div style="background:var(--bg2);border:1px solid var(--ac-25);border-radius:16px;width:520px;max-width:94vw;box-shadow:0 32px 80px rgba(0,0,0,.8),inset 0 0 60px var(--ac-05);margin:auto">
       <!-- Modal header -->
@@ -1725,7 +1730,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <!-- Description -->
         <div>
           <div style="font-size:10px;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:6px">Description / Rules</div>
-          <textarea id="pb-desc" rows="3" placeholder="Entry criteria, rules, notes…" style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:12.5px;color:var(--text);font-family:var(--font-body);outline:none;resize:vertical;transition:border-color .15s;line-height:1.5" onfocus="this.style.borderColor='var(--ac-50)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
+          <textarea id="pb-desc" rows="3" placeholder="Entry criteria, rules, notes…" style="width:100%;background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--text);font-family:var(--font-body);outline:none;resize:vertical;transition:border-color .15s;line-height:1.5" onfocus="this.style.borderColor='var(--ac-50)'" onblur="this.style.borderColor='var(--border2)'"></textarea>
         </div>
 
         <!-- Avg Expected RR -->
@@ -1806,7 +1811,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• TIMEFRAME PICKER OVERLAY â•â• -->
+  <!-- == TIMEFRAME PICKER OVERLAY == -->
   <div id="tf-picker-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100000;align-items:center;justify-content:center;flex-direction:column;backdrop-filter:blur(4px)">
     <div onclick="event.stopPropagation()" style="background:var(--bg3);border:1px solid var(--ac-30);border-radius:14px;padding:24px;max-width:450px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.6)">
       <!-- Header -->
@@ -1825,10 +1830,10 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• FILE INPUT FOR TRADE IMAGES â•â• -->
+  <!-- == FILE INPUT FOR TRADE IMAGES == -->
   <input type="file" id="trade-img-file-input" accept="image/*" multiple style="display:none" onchange="handleTradeImgUpload(this)">
 
-  <!-- â•â• ADVANCED ANALYTICS VIEW â•â• -->
+  <!-- == ADVANCED ANALYTICS VIEW == -->
   <div class="view" id="view-advanalytics">
     <div class="content">
 
@@ -2131,7 +2136,7 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- â•â• OTHER VIEWS â•â• -->
+  <!-- == OTHER VIEWS == -->
   <div class="view" id="view-calendar">
     <div class="content" style="gap:14px">
 
@@ -2321,16 +2326,16 @@ window.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 
-  <!-- SETTINGS VIEW -->
-  <div class="view" id="view-settings">
+  <!-- USER PROFILE VIEW -->
+  <div class="view" id="view-user-profile">
     <div class="content" style="gap:22px">
-      <div class="settings-page-title user-profile-typography-title" style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Settings</div>
+      <div class="settings-page-title user-profile-typography-title" style="font-family:var(--font-body);font-weight:600;font-size:20px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">User Profile</div>
 
       <!-- USER PROFILE -->
       <div class="settings-user-profile-card" style="background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);padding:22px 24px;box-shadow:inset 0 0 60px var(--ac-07)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
           <div style="width:32px;height:32px;border-radius:9px;background:var(--ac-15);border:1px solid var(--ac-25);display:flex;align-items:center;justify-content:center;font-size:15px; color:var(--purple);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5.5" r="3" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M2 14.5c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/></svg></div>
-          <div><div class="settings-user-profile-title" style="font-family:var(--font-display);font-weight:700;font-size:14px">User Profile</div></div>
+          <div><div class="settings-user-profile-title" style="font-family:var(--font-display);font-weight:480;font-size:20px">User Profile</div></div>
         </div>
         <div style="display:flex;align-items:flex-start;gap:24px">
           <!-- Avatar -->
@@ -2450,7 +2455,7 @@ window.addEventListener('DOMContentLoaded', function() {
       <div class="settings-trader-card" style="background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);padding:22px 24px;box-shadow:inset 0 0 60px var(--ac-07)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
           <div style="width:32px;height:32px;border-radius:9px;background:rgba(47,138,226,.12);border:1px solid rgba(47,138,226,.25);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--blue)"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="3" y="3" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M5 8h6M8 5v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></div>
-          <div><div style="font-family:var(--font-display);font-weight:700;font-size:14px">Trader Card</div><div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Shareable trader stats and card preview</div></div>
+          <div><div class="settings-trader-title" style="font-family:var(--font-display);font-weight:500;font-size:18px">Trader Card</div><div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px"></div></div>
         </div>
         <div class="public-share-panel">
           <div class="public-share-toolbar">
@@ -2501,8 +2506,15 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- APPEARANCE -->
+  <!-- SETTINGS VIEW -->
+  <div class="view" id="view-settings">
+    <div class="content" style="gap:22px">
+      <div class="settings-page-title user-profile-typography-title" style="font-family:var(--font-body);font-weight:600;font-size:20px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Settings</div>
+
+
       <div style="background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);padding:22px 24px;box-shadow:inset 0 0 60px var(--ac-07)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
           <div style="width:32px;height:32px;border-radius:9px;background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.25);display:flex;align-items:center;justify-content:center;font-size:15px; color:var(--purple);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5A6.5 6.5 0 1 0 14.5 8c0-1.5-1-2-2-2h-1c-1 0-2-.5-2-1.5 0-.5.5-1.5.5-2C10 1.5 9 1.5 8 1.5z" stroke="currentColor" stroke-width="1.4" fill="none"/><circle cx="5" cy="6" r=".9" fill="currentColor"/><circle cx="5" cy="10" r=".9" fill="currentColor"/><circle cx="8" cy="12" r=".9" fill="currentColor"/><circle cx="11" cy="10" r=".9" fill="currentColor"/></svg></div>
@@ -2612,10 +2624,6 @@ window.addEventListener('DOMContentLoaded', function() {
             </select>
           </div>
         </div>
-        <div style="margin-top:14px;padding:12px 14px;background:var(--bg4);border-radius:8px;border:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">Current display time</div>
-          <div id="tz-clock" style="font-family:var(--font-mono);font-size:13px;color:var(--text)">-</div>
-        </div>
       </div>
 
       <!-- TRADING PREFERENCES -->
@@ -2667,27 +2675,11 @@ window.addEventListener('DOMContentLoaded', function() {
               <option value="Random">Random</option>
             </select>
           </div>
-          <div class="form-group">
-            <div class="form-label">Default Trade Size</div>
-            <input id="setting-default-size" class="form-input" type="number" min="0.01" step="0.01" placeholder="1.00" oninput="saveSetting('defaultSize', this.value)">
-          </div>
         </div>
         <div style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
           <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border-radius:8px;border:1px solid var(--border);cursor:pointer">
             <span style="font-size:12.5px;color:var(--text2)">Show confirmation before deleting a trade</span>
             <div class="toggle-switch" id="tog-delete-confirm" onclick="toggleSetting('deleteConfirm')" data-on="true"></div>
-          </label>
-          <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border-radius:8px;border:1px solid var(--border);cursor:pointer">
-            <span style="font-size:12.5px;color:var(--text2)">Auto-calculate P&amp;L from entry/exit</span>
-            <div class="toggle-switch" id="tog-auto-pnl" onclick="toggleSetting('autoPnl')" data-on="true"></div>
-          </label>
-          <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border-radius:8px;border:1px solid var(--border);cursor:pointer">
-            <span style="font-size:12.5px;color:var(--text2)">Show emotion tags on trade rows</span>
-            <div class="toggle-switch" id="tog-show-emotions" onclick="toggleSetting('showEmotions')" data-on="false"></div>
-          </label>
-          <label style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg4);border-radius:8px;border:1px solid var(--border);cursor:pointer">
-            <span style="font-size:12.5px;color:var(--text2)">Sound effects on actions</span>
-            <div class="toggle-switch" id="tog-sound" onclick="toggleSetting('soundFx')" data-on="false"></div>
           </label>
         </div>
 
@@ -2724,31 +2716,26 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="width:32px;height:32px;border-radius:9px;background:rgba(77,142,240,.12);border:1px solid rgba(77,142,240,.25);display:flex;align-items:center;justify-content:center;font-size:15px; color:var(--green);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 2h9l3 3v9H2V2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/><rect x="5" y="9" width="6" height="5" rx="0.5" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M5 2h5v4H5z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg></div>
           <div><div style="font-family:var(--font-display);font-weight:700;font-size:14px">Data Management</div><div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Import, backup &amp; reset your journal data</div></div>
         </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-          <button onclick="exportReport('json')" style="background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12.5px;font-family:var(--font-body);display:flex;align-items:center;gap:6px;transition:all .15s" onmouseenter="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="8" y1="1.5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="5,4.5 8,1.5 11,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Export Backup (JSON)</span></button>
-          <button onclick="exportReport('csv')" style="background:var(--bg4);border:1px solid var(--border);color:var(--text2);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12.5px;font-family:var(--font-body);display:flex;align-items:center;gap:6px;transition:all .15s" onmouseenter="this.style.borderColor='var(--border2)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="9" width="3" height="6" rx="1" fill="currentColor"/><rect x="6" y="5" width="3" height="10" rx="1" fill="currentColor"/><rect x="11" y="1" width="3" height="14" rx="1" fill="currentColor"/></svg> Export as CSV</span></button>
-          <button onclick="importJSONData()" style="background:var(--bg4);border:1px solid var(--border2);color:var(--text2);padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12.5px;font-family:var(--font-body);display:flex;align-items:center;gap:6px;transition:all .15s" onmouseenter="this.style.color='var(--text)'" onmouseleave="this.style.color='var(--text2)'"><span style="display:inline-flex;align-items:center;gap:6px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="8" y1="1" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="5,6 8,9 11,6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Import JSON Backup</span></button>
-          <input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(this)">
-        </div>
         <div style="padding:14px 16px;background:rgba(232,80,74,.06);border:1px solid rgba(232,80,74,.2);border-radius:8px;display:flex;align-items:center;justify-content:space-between;gap:12px">
           <div>
-            <div style="font-size:12.5px;color:var(--red);font-weight:600">Danger Zone</div>
-            <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:2px">This permanently deletes all journal data</div>
+            <div style="font-size:13.5px;color:var(--red);font-weight:600">Danger Zone</div>
+            <div style="font-size:12.5px;color:var(--text3);font-family:var(--font-mono);margin-top:2px">This permanently deletes all journal data</div>
           </div>
           <button onclick="confirmResetData()" style="background:rgba(232,80,74,.15);border:1px solid rgba(232,80,74,.4);color:var(--red);padding:7px 16px;border-radius:7px;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.background='rgba(232,80,74,.25)'" onmouseleave="this.style.background='rgba(232,80,74,.15)'"><span style="display:flex;align-items:center;gap:5px"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M5 4V2.5h6V4M6 7v5M10 7v5M3 4l1 9.5h8L13 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Reset All Data</span></button>
         </div>
       </div>
 
-      <!-- â•â• FAQ SECTION â•â• -->
+      <!-- == FAQ SECTION == -->
       <div style="display:flex;flex-direction:column;gap:0;margin-top:8px">
-        <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px;margin-bottom:16px">FAQs</div>
+        <div style="font-family:var(--font-body);font-weight:600;font-size:22px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px;margin-bottom:8px">FAQs</div>
+        <div style="font-family:var(--font-body);font-size:14px;color:var(--text2);line-height:1.7;max-width:760px;margin-left:6px;margin-bottom:18px">Updated answers for the latest journal, accounts, and settings changes. The current Data section focuses on local storage reset controls rather than direct import/export buttons.</div>
 
         <style>
           .faq-group{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;background:var(--bg2)}
           .faq-group-header{display:flex;align-items:center;gap:0;padding:14px 16px;cursor:pointer;user-select:none;transition:background .15s}
           .faq-group-header:hover{background:var(--ac-06)}
           .faq-group-icon{display:none}
-          .faq-group-title{font-family:var(--font-display);font-weight:600;font-size:13px;color:var(--text);flex:1}
+          .faq-group-title{font-family:var(--font-display);font-weight:500;font-size:14px;color:var(--text);flex:1}
           .faq-group-count{font-size:9px;font-family:var(--font-mono);color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:2px 8px}
           .faq-group-chevron{color:var(--text3);transition:transform .2s;font-size:0;display:flex;align-items:center;justify-content:center;width:12px}
           .faq-group-chevron::before{content:'>';font-size:11px;line-height:1}
@@ -2756,10 +2743,10 @@ window.addEventListener('DOMContentLoaded', function() {
           .faq-item{padding:14px 18px;border-bottom:1px solid var(--border)}
           .faq-item:last-child{border-bottom:none}
           .faq-q{display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none}
-          .faq-q-text{font-family:var(--font-body);font-size:12.5px;font-weight:600;color:var(--text);flex:1;line-height:1.4}
+          .faq-q-text{font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--text);flex:1;line-height:1.5}
           .faq-q-arrow{color:var(--text3);font-size:0;transition:transform .2s;flex-shrink:0;margin-top:2px;width:10px;display:flex;align-items:center;justify-content:center}
           .faq-q-arrow::before{content:'>';font-size:10px;line-height:1}
-          .faq-a{display:none;margin-top:10px;font-family:var(--font-body);font-size:12px;color:var(--text2);line-height:1.7;padding-left:20px}
+          .faq-a{display:none;margin-top:10px;font-family:var(--font-body);font-size:13px;color:var(--text2);line-height:1.85;padding-left:20px}
           .faq-a code{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:var(--font-mono);font-size:11px;color:var(--purple)!important}
           .faq-a ul{padding-left:16px;margin-top:4px}
           .faq-a ul li{margin-bottom:4px}
@@ -2795,21 +2782,21 @@ window.addEventListener('DOMContentLoaded', function() {
                 <div class="faq-q-text">Where is my data stored?</div>
                 <div class="faq-q-arrow">▶</div>
               </div>
-              <div class="faq-a">All your data is stored <strong>locally in your browser</strong> using localStorage. Nothing is sent to any server. This means your data stays on your device - but also means clearing your browser data will erase it. Use the <code>Export</code> feature regularly to back up your trades.</div>
+              <div class="faq-a">All your data is stored <strong>locally in your browser</strong> using localStorage. Nothing is sent to any server. This means your data stays on your device, but clearing browser data or uninstalling the app will erase it. The Data section now focuses on local reset controls, so keep your browser profile intact for the most reliable storage.</div>
             </div>
             <div class="faq-item">
               <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
                 <div class="faq-q-text">How do I back up or transfer my data?</div>
                 <div class="faq-q-arrow">▶</div>
               </div>
-              <div class="faq-a">Go to <code>Settings -> Data</code> and use the <code>Export</code> button to download your trades as a CSV or JSON file. To restore, use the <code>Import</code> button and select your backup file. To transfer to another device, export on the old device and import on the new one.</div>
+              <div class="faq-a">The app stores trades locally, and the current settings experience no longer exposes import/export controls in the Data section. If you need to keep your journal safe, avoid clearing browser storage and use the available report export tools elsewhere in the app for summaries and backups.</div>
             </div>
             <div class="faq-item">
               <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
                 <div class="faq-q-text">What does the version number mean?</div>
                 <div class="faq-q-arrow">▶</div>
               </div>
-              <div class="faq-a">The app is currently in <code>v1.0.0-beta</code>. Beta means the core features are complete and stable, but some features are still being refined. You may encounter minor bugs - if you do, note what you were doing and report it.</div>
+              <div class="faq-a">The app is currently in a preview release with the journal, accounts, and analytics features available. It is stable for daily tracking but still being refined, so report any issues and your current workflow if you encounter one.</div>
             </div>
           </div>
         </div>
@@ -2974,7 +2961,8 @@ window.addEventListener('DOMContentLoaded', function() {
                   <li><code>6</code> - Entry Models (Playbook)</li>
                   <li><code>7</code> - Accounts</li>
                   <li><code>8</code> - Reports</li>
-                  <li><code>9</code> - Settings</li>
+                  <li><code>9</code> - User Profile</li>
+                  <li><code>0</code> - Settings</li>
                   <li><code>Cmd+K</code> / <code>Ctrl+K</code> - Command palette</li>
                   <li><code>Backspace</code> - Close detail panel / go back</li>
                   <li><code>Ctrl+Enter</code> - Save trade (when form is open)</li>
@@ -3095,14 +3083,14 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
       </div>
-      <!-- â•â• END FAQ SECTION â•â• -->
+      <!-- == END FAQ SECTION == -->
 
 
     </div>
   </div>
 
 
-  <!-- â•â• ACCOUNTS VIEW â•â• -->
+  <!-- == ACCOUNTS VIEW == -->
   <div class="view" id="view-accounts">
     <div class="content">
 
@@ -3181,14 +3169,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
       <!-- Empty State -->
       <div id="accounts-page-empty" class="accounts-empty" style="display:none">
-        <div class="accounts-empty-badge"><i></i>Account Setup</div>
-        <div class="accounts-empty-icon" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <rect x="3" y="6" width="18" height="13" rx="3" stroke="currentColor" stroke-width="1.6"/>
-            <path d="M3 11h18" stroke="currentColor" stroke-width="1.6"/>
-            <path d="M8 15h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-          </svg>
-        </div>
         <h3>No accounts linked yet</h3>
         <p>
           Add your first prop firm or personal trading account to unlock account-level risk tracking,
@@ -3253,7 +3233,7 @@ window.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>
 
-<!-- â•â• TRADE DETAIL PANEL â•â• -->
+<!-- == TRADE DETAIL PANEL == -->
 <div class="detail-panel" id="detail-panel">
   <div class="detail-head">
     <div style="font-family:var(--font-display);font-weight:600;font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;margin-right:8px" id="detail-sym">Trade Details</div>
@@ -3270,7 +3250,7 @@ window.addEventListener('DOMContentLoaded', function() {
   <div class="detail-body" id="detail-body"></div>
 </div>
 
-<!-- â•â• ADD TRADE MODAL â•â• -->
+<!-- == ADD TRADE MODAL == -->
 <div class="overlay" id="modal-overlay" onclick="closeModalOutside(event)">
   <div class="modal" onclick="event.stopPropagation()">
     <div class="modal-head">
@@ -3508,7 +3488,7 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 
-<!-- â•â• OVERLAYS & MODALS (injected from split) â•â• -->
+<!-- == OVERLAYS & MODALS (injected from split) == -->
 
 
 <!-- â”€â”€ KEYBOARD SHORTCUT HELP OVERLAY â”€â”€ -->
@@ -3819,7 +3799,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
-<!-- â•â• ADD ACCOUNT MODAL â•â• -->
+<!-- == ADD ACCOUNT MODAL == -->
 <div id="add-account-overlay" onclick="if(event.target===this)closeLegacyAddAccountModal()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;overflow-y:auto;padding:68px 16px 24px">
   <div style="background:var(--bg2);border:1px solid var(--ac-25);border-radius:14px;width:100%;max-width:440px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.6)">
 
@@ -3936,7 +3916,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 
 
-<!-- â•â• ADD / EDIT ACCOUNT MODAL â•â• -->
+<!-- == ADD / EDIT ACCOUNT MODAL == -->
 <!-- Confirm Modal (shared) -->
 <div id="confirm-modal" onclick="if(event.target===this)closeConfirmModal()" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);align-items:center;justify-content:center">
   <div onclick="event.stopPropagation()" style="background:var(--bg2);border:1px solid var(--border2);border-radius:14px;width:400px;max-width:94vw;padding:28px 26px;box-shadow:0 32px 80px rgba(0,0,0,.65)">
@@ -4145,14 +4125,14 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- App Scripts (order matters) -->
-<script src="app.js"></script>
-<script src="calendar.js"></script>
-<script src="reports.js"></script>
-<script src="settings.js"></script>
-<script src="account.js"></script>
-<script src="templates.js"></script>
-<script src="images.js"></script>
-<script src="import-trades.js"></script>
+<script defer src="app.js"></script>
+<script defer src="calendar.js"></script>
+<script defer src="reports.js"></script>
+<script defer src="settings.js"></script>
+<script defer src="account.js"></script>
+<script defer src="templates.js"></script>
+<script defer src="images.js"></script>
+<script defer src="import-trades.js"></script>
 <script>
   // Verify scripts loaded (will be checked again after DOM ready in app.js)
   console.log('OK All scripts loaded');
@@ -4241,7 +4221,7 @@ document.addEventListener('DOMContentLoaded', function() {
     border-right: 1px solid rgba(255,255,255,.05);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
   }
 
   .auth-brand-row {
@@ -4253,13 +4233,13 @@ document.addEventListener('DOMContentLoaded', function() {
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    border: 1px solid var(--ac-35);
-    background: linear-gradient(135deg, var(--ac-25), rgba(99,102,241,.14));
+    border: none;
+    background: transparent;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    box-shadow: none;
   }
   #auth-logo {
     width: 30px;
@@ -4283,17 +4263,30 @@ document.addEventListener('DOMContentLoaded', function() {
     margin: 0 0 16px;
     font-family: var(--font-display);
     font-weight: 400;
-    font-size: clamp(34px, 4.6vw, 58px);
+    font-size: clamp(24px, 3.2vw, 40px);
     line-height: 1.08;
     letter-spacing: .01em;
     color: #f5f7ff;
   }
+  .auth-word-discipline { color: #3F4A78; }
+  .auth-pnl-letter { font-style: normal; }
+  .auth-pnl-letter.auth-pnl-p { color: var(--green); }
+  .auth-pnl-letter.auth-pnl-l { color: var(--red); }
   .auth-hero p {
     margin: 0;
     color: rgba(224,230,245,.82);
     max-width: 500px;
     font-size: 17px;
     line-height: 1.5;
+  }
+  .auth-hero-motto {
+    margin-top: 18px;
+    color: rgba(245,247,255,.92);
+    max-width: 520px;
+    font-size: 16px;
+    line-height: 1.7;
+    letter-spacing: .01em;
+    font-family: var(--font-body);
   }
 
   .auth-note-card {
@@ -4386,6 +4379,7 @@ document.addEventListener('DOMContentLoaded', function() {
     color: #fff;
     background: linear-gradient(135deg, #9658ff, #6b4ef6);
     box-shadow: 0 8px 20px rgba(128, 76, 255, .34);
+    font-weight: 800;
   }
 
   .auth-alert {
@@ -4413,10 +4407,10 @@ document.addEventListener('DOMContentLoaded', function() {
   .auth-field label {
     display: block;
     margin-bottom: 7px;
-    font-size: 11px;
+    font-size: 14px;
     letter-spacing: .11em;
     text-transform: uppercase;
-    color: rgba(222, 229, 245, .86);
+    color: #ffffff;
     font-family: var(--font-mono);
   }
   .auth-input {
@@ -4496,6 +4490,58 @@ document.addEventListener('DOMContentLoaded', function() {
     color: var(--purple);
   }
 
+  .auth-panel,
+  .auth-panel * {
+    color: #eef2ff;
+  }
+  /* Ensure descriptive text inside the right auth card has full contrast:
+     - white in dark and aura modes
+     - dark in light mode */
+  :root.light .auth-panel,
+  :root.light .auth-panel * {
+    color: #101227;
+  }
+  :root.medium .auth-panel,
+  :root.medium .auth-panel * {
+    color: #eef2ff;
+  }
+  #auth-tagline,
+  .auth-row,
+  .auth-field label,
+  .auth-offline button {
+    color: rgba(238, 242, 255, .92);
+  }
+  .auth-row .forgot {
+    color: rgba(218, 226, 250, .88);
+  }
+  .auth-row .forgot:hover {
+    color: #ffffff;
+  }
+
+  .auth-skip-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 190px;
+    padding: 11px 18px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, #995dff, #6f54f5);
+    color: #ffffff;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 12px 24px rgba(153, 93, 255, .22);
+    transition: transform .16s, box-shadow .16s, filter .16s;
+    margin: 0 auto;
+  }
+  .auth-skip-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 24px rgba(153, 93, 255, .28);
+    filter: brightness(1.04);
+  }
+
   #auth-submit-btn {
     width: 100%;
     border: 0;
@@ -4556,39 +4602,42 @@ document.addEventListener('DOMContentLoaded', function() {
     background: linear-gradient(165deg, #f7f8fe 0%, #eef1fb 58%, #f4f6fc 100%);
     border-right-color: rgba(139,92,246,.16);
   }
-  :root.light .auth-brand-name { color: #14172a; }
+  :root.light .auth-brand-name { color: #101227; }
   :root.light .auth-hero h2 { color: #101227; }
-  :root.light .auth-hero p { color: #4b5574; }
+  :root.light .auth-hero p { color: #334155; }
+  :root.light .auth-hero-motto { color: #1f2937; }
   :root.light .auth-note-card {
     background: #ffffff;
     border-color: rgba(139,92,246,.16);
   }
   :root.light .auth-note-card .meta { color: var(--purple); }
-  :root.light .auth-note-card .txt { color: #4b5574; }
+  :root.light .auth-note-card .txt { color: #334155; }
   :root.light .auth-right {
-    background: linear-gradient(180deg, rgba(248,250,255,.86), rgba(238,242,251,.86));
+    background: linear-gradient(180deg, rgba(248,250,255,.96), rgba(238,242,251,.96));
   }
   :root.light .auth-panel {
     background: #ffffff;
     border-color: rgba(139,92,246,.18);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 18px 48px rgba(0,0,0,.12);
   }
-  :root.light .auth-panel h3 { color: #14172a; font-weight: 400; }
-  :root.light #auth-tagline { color: #5c677f; font-weight: 600; }
-  :root.light .auth-tab-switch { background: rgba(232,238,255,.72); border-color: rgba(139,92,246,.15); }
-  :root.light .auth-tab-btn { color: #4b5574; }
-  :root.light .auth-tab-btn.active { color: #111827; background: linear-gradient(135deg, #9562ff, #6e54f5); box-shadow: 0 8px 20px rgba(128,76,255,.18); }
-  :root.light .auth-field label { color: #5f6b86; }
-  :root.light .auth-input { background: #f5f7ff; color: #101227; border-color: rgba(139,92,246,.2); }
-  :root.light .auth-input::placeholder { color: rgba(89,101,136,.45); }
+  :root.light .auth-panel h3 { color: #111827; font-weight: 500; }
+  :root.light #auth-tagline { color: #334155; font-weight: 600; }
+  :root.light .auth-tab-switch { background: rgba(232,238,255,.92); border-color: rgba(139,92,246,.15); }
+  :root.light .auth-tab-btn { color: #24303f; }
+  :root.light .auth-tab-btn.active { color: #ffffff; background: linear-gradient(135deg, #9562ff, #6e54f5); box-shadow: 0 8px 20px rgba(128,76,255,.18); font-weight: 800; }
+  :root.light .auth-field label { color: #334155; }
+  :root.light .auth-panel .auth-field label { color: #334155; }
+  :root.light .auth-input { background: #f5f7ff; color: #101227; border-color: rgba(139,92,246,.28); }
+  :root.light .auth-input::placeholder { color: rgba(71,85,105,.55); }
   :root.light .auth-input:focus { border-color: #6f53f3; box-shadow: 0 0 0 2px rgba(139,92,246,.12); background: #f8f9ff; }
-  :root.light .auth-password-reveal { color: rgba(89,101,136,.8); }
+  :root.light .auth-brand-logo-wrap { box-shadow: none; background: transparent; border: none; }
+  :root.light .auth-password-reveal { color: rgba(71,85,105,.8); }
   :root.light .auth-password-reveal:hover { color: #14172a; background: rgba(139,92,246,.08); }
-  :root.light .auth-row { color: #5f6b86; }
-  :root.light .auth-row .forgot { color: #5f6b86; }
+  :root.light .auth-row { color: #334155; }
+  :root.light .auth-row .forgot { color: #334155; }
   :root.light #auth-submit-btn { background: linear-gradient(135deg, #6b4ef6, #8a63ff); box-shadow: 0 14px 30px rgba(107,78,246,.22); }
   :root.light .auth-offline { border-top-color: rgba(139,92,246,.18); }
-  :root.light .auth-offline button { color: #5c677f; }
+  :root.light .auth-offline button { color: #334155; }
 
   @media (max-width: 980px) {
     #auth-container {
@@ -4636,21 +4685,17 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <div class="auth-hero">
-          <h2>Your Trading Journal Starts Here</h2>
+          <h2>Track <span class="auth-word-discipline">discipline</span>.</h2>
+          <h2>Not just <span class="auth-pnl-letter auth-pnl-p">P</span><span class="auth-pnl-letter">n</span><span class="auth-pnl-letter auth-pnl-l">L</span>.</h2>
           <p>Track every trade, monitor performance, and keep your discipline sharp with one focused workspace built for serious traders.</p>
+          <div class="auth-hero-motto">Trade with clarity, journal with confidence.</div>
         </div>
-      </div>
-
-      <div class="auth-note-card">
-        <div class="meta">Live Sync + Local Safety</div>
-        <div class="txt">Use your account to sync across devices, or continue offline and keep everything stored locally until you are ready.</div>
       </div>
     </div>
 
     <div class="auth-right">
       <div class="auth-panel">
         <h3 id="auth-title">Welcome Back</h3>
-        <div id="auth-tagline">Sign in to sync your trades across devices</div>
 
         <div class="auth-tab-switch">
           <button id="auth-tab-signin" class="auth-tab-btn active" onclick="authShowTab('signin')">Sign In</button>
@@ -4699,10 +4744,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <button id="auth-submit-btn" onclick="authSubmit()">Sign In</button>
 
         <div class="auth-offline">
-          <button onclick="authSkip()">Take a look at the journal</button>
-          <div style="margin-top:8px">
-            <button onclick="goBackToLanding()" style="font-size:11px;color:var(--text3);background:transparent;border:none;cursor:pointer;font-family:var(--font-mono);letter-spacing:.04em;transition:color .15s" onmouseenter="this.style.color='var(--purple)'" onmouseleave="this.style.color='var(--text3)'">← Back to overview</button>
-          </div>
+          <button class="auth-skip-btn" onclick="authSkip()">Take a look at the journal</button>
         </div>
       </div>
     </div>
@@ -4804,7 +4846,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <!-- Footer -->
     <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;flex-shrink:0">
       <button onclick="closeImportModal()" style="padding:8px 18px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);font-size:14px;color:var(--text2);cursor:pointer;font-family:var(--font-body);transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-40)';this.style.color='var(--text)'" onmouseleave="this.style.borderColor='var(--border)';this.style.color='var(--text2)'">Cancel</button>
-      <button id="import-submit-btn" onclick="confirmImportTrades()" style="padding:8px 22px;border-radius:8px;background:var(--purple);border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:opacity .15s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'"disabled>Import Trades</button>
+      <button id="import-submit-btn" onclick="confirmImportTrades()" style="padding:8px 22px;border-radius:8px;background:var(--purple);border:none;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font-body);transition:opacity .15s" onmouseenter="this.style.opacity='.85'" onmouseleave="this.style.opacity='1'" disabled>Import Trades</button>
     </div>
   </div>
 </div>
@@ -4941,11 +4983,16 @@ function authShowTab(mode) {
   const btn = document.getElementById('auth-submit-btn');
   const tagline = document.getElementById('auth-tagline');
   const confirmWrapper = document.getElementById('auth-confirm-wrapper');
+
+  if (!si || !su || !title || !btn || !tagline || !confirmWrapper) {
+    console.warn('Auth UI not available yet, skipping auth tab render.', { si, su, title, btn, tagline, confirmWrapper });
+    return;
+  }
   
   if (mode === 'signin') {
     si.classList.add('active');
     su.classList.remove('active');
-    if (title) title.textContent = 'Welcome Back';
+    title.textContent = 'Welcome Back';
     btn.textContent = 'Sign In';
     tagline.textContent = 'Sign in to sync your trades across devices';
     confirmWrapper.style.display = 'none';
@@ -5069,6 +5116,19 @@ function closeUserMenuOutside(e) {
   const badge = document.getElementById('auth-user-badge');
   if (!badge.contains(e.target)) {
     document.getElementById('user-menu-dd').style.display = 'none';
+  }
+}
+
+function handleTopbarProfileClick() {
+  if (typeof switchView === 'function') {
+    const el = document.querySelector('[data-view="user-profile"]');
+    if (el) {
+      switchView(el);
+    } else {
+      console.error('user-profile nav item not found');
+    }
+  } else {
+    console.error('switchView not defined');
   }
 }
 

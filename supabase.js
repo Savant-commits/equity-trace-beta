@@ -4,11 +4,19 @@
 //  BEFORE all other <script> tags in index.html
 // ═══════════════════════════════════════════════════════════════
 
-// ── YOUR SUPABASE CREDENTIALS ──────────────────────────────────
-// Replace these two values after you create your project
-const SUPABASE_URL  = 'https://gxvuemshiulgwnboyswn.supabase.co';
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd4dnVlbXNoaXVsZ3duYm95c3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5ODEwMjIsImV4cCI6MjA5MDU1NzAyMn0.pE-ii1y1e_4stbiSQuTU_JXxJ-YyNIJ3tiE9MKArHCA';
-// ──────────────────────────────────────────────────────────────
+// ── Supabase credentials are loaded from Vite environment variables ──
+// Create a .env file with VITE_SUPABASE_URL and VITE_SUPABASE_ANON.
+let _env = {};
+try {
+  if (typeof import.meta !== 'undefined' && import.meta.env) _env = import.meta.env || {};
+} catch (e) {
+  _env = {};
+}
+if ((!_env || Object.keys(_env).length === 0) && typeof window !== 'undefined') {
+  _env = window.__APP_ENV__ || window.APP_ENV || {};
+}
+const SUPABASE_URL = (_env?.VITE_SUPABASE_URL || _env?.SUPABASE_URL || window?.VITE_SUPABASE_URL || window?.SUPABASE_URL || '');
+const SUPABASE_ANON = (_env?.VITE_SUPABASE_ANON || _env?.SUPABASE_ANON || window?.VITE_SUPABASE_ANON || window?.SUPABASE_ANON || '');
 
 // ── Load Supabase JS SDK from CDN ──
 // (already injected via index.html <script> tag — see setup guide)
@@ -16,8 +24,18 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 let _supabase = null;
 let _publicProfileInfraAvailable = true;
 
+if (!SUPABASE_URL || !SUPABASE_ANON) {
+  console.info('Supabase backend not configured. Running in local-only mode. To enable syncing, set SUPABASE_URL/SUPABASE_ANON in local-env.js or VITE_SUPABASE_URL/VITE_SUPABASE_ANON in .env.');
+  _publicProfileInfraAvailable = false;
+}
+
 function getSupabase() {
   if (!_supabase) {
+    if (!SUPABASE_URL || !SUPABASE_ANON) {
+      console.error('Supabase not configured; SUPABASE_URL or SUPABASE_ANON missing.');
+      _publicProfileInfraAvailable = false;
+      return null;
+    }
     if (typeof supabase === 'undefined' || !supabase.createClient) {
       console.error('Supabase SDK not loaded. Check your index.html script tag.');
       return null;
@@ -25,6 +43,12 @@ function getSupabase() {
     _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
   }
   return _supabase;
+}
+
+function requireClient() {
+  const client = getSupabase();
+  if (!client) throw new Error('Supabase not configured');
+  return client;
 }
 
 function normalizePublicUsername(value) {
@@ -54,49 +78,86 @@ function markPublicProfileInfraUnavailable(error) {
   console.warn('Public profile infra unavailable in Supabase. Falling back to local-only mode.', error);
 }
 
+const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON);
+if (!isSupabaseConfigured) {
+  console.info('Supabase backend not configured; running in local-only mode. Add local-env.js with SUPABASE_URL and SUPABASE_ANON or use a Vite env file.');
+  _publicProfileInfraAvailable = false;
+}
+
+function createSupabaseStub() {
+  const noop = async () => null;
+  return {
+    signUp: async () => { throw new Error('Supabase not configured'); },
+    signIn: async () => { throw new Error('Supabase not configured'); },
+    resetPassword: async () => { throw new Error('Supabase not configured'); },
+    updatePassword: async () => { throw new Error('Supabase not configured'); },
+    signOut: async () => null,
+    getUser: async () => null,
+    onAuthChange: () => () => {},
+    loadTrades: async () => [],
+    saveTrade: noop,
+    deleteTrade: noop,
+    saveAllTrades: noop,
+    loadAccounts: async () => [],
+    saveAccount: noop,
+    deleteAccount: noop,
+    saveAllAccounts: noop,
+    loadPlaybooks: async () => [],
+    savePlaybooks: noop,
+    loadTradeImages: async () => [],
+    saveTradeImages: noop,
+    loadOwnPublicProfile: async () => null,
+    savePublicProfile: noop,
+    getPublicTraderStats: async () => null,
+    getSetting: async () => null,
+    setSetting: noop,
+    migrateFromLocalStorage: noop,
+  };
+}
+
 
 // ═══════════════════════════════════════════════════════════════
 //  AUTH
 // ═══════════════════════════════════════════════════════════════
 
 async function sbSignUp(email, password) {
-  const { data, error } = await getSupabase().auth.signUp({ email, password });
+  const { data, error } = await requireClient().auth.signUp({ email, password });
   if (error) throw error;
   return data;
 }
 
 async function sbSignIn(email, password) {
-  const { data, error } = await getSupabase().auth.signInWithPassword({ email, password });
+  const { data, error } = await requireClient().auth.signInWithPassword({ email, password });
   if (error) throw error;
   return data;
 }
 
 async function sbResetPassword(email) {
   const redirectTo = window.location.origin + window.location.pathname;
-  const { data, error } = await getSupabase().auth.resetPasswordForEmail(email, { redirectTo });
+  const { data, error } = await requireClient().auth.resetPasswordForEmail(email, { redirectTo });
   if (error) throw error;
   return data;
 }
 
 async function sbSignOut() {
-  const { error } = await getSupabase().auth.signOut();
+  const { error } = await requireClient().auth.signOut();
   if (error) throw error;
 }
 
 async function sbGetUser() {
-  const { data: { user } } = await getSupabase().auth.getUser();
+  const { data: { user } } = await requireClient().auth.getUser();
   return user;
 }
 
 // Listen for auth state changes (login / logout / token refresh)
 function sbOnAuthChange(callback) {
-  return getSupabase().auth.onAuthStateChange((event, session) => {
+  return requireClient().auth.onAuthStateChange((event, session) => {
     callback(session?.user ?? null, event);
   });
 }
 
 async function sbUpdatePassword(newPassword) {
-  const client = getSupabase();
+  const client = requireClient();
 
   const { data: userData } = await client.auth.getUser();
   let user = userData?.user;
@@ -135,7 +196,7 @@ async function sbLoadOwnPublicProfile() {
   const user = await sbGetUser();
   if (!user) return null;
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('public_profiles')
     .select('username, bio, is_public')
     .eq('user_id', user.id)
@@ -165,14 +226,14 @@ async function sbSavePublicProfile(profile) {
   const username = normalizePublicUsername(profile?.publicUsername || profile?.handle || '');
 
   // Best effort update only; avoid insert/upsert on profiles to prevent RLS insert violations.
-  await getSupabase()
+  await requireClient()
     .from('profiles')
     .update({
       display_name: profile?.name || null,
     })
     .eq('id', user.id);
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('public_profiles')
     .upsert({
       user_id: user.id,
@@ -202,7 +263,7 @@ async function sbGetPublicTraderStats(username) {
   const normalized = normalizePublicUsername(username);
   if (!normalized) return null;
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .rpc('get_public_trader_stats', { profile_username: normalized });
 
   if (error) {
@@ -280,7 +341,7 @@ async function sbLoadTrades() {
   const user = await sbGetUser();
   if (!user) return [];
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('trades')
     .select('*')
     .eq('user_id', user.id)
@@ -299,7 +360,7 @@ async function sbSaveTrade(trade) {
 
   // If trade has a UUID already, update; otherwise insert
   if (trade._uuid) {
-    const { data, error } = await getSupabase()
+    const { data, error } = await requireClient()
       .from('trades')
       .update(payload)
       .eq('id', trade._uuid)
@@ -309,7 +370,7 @@ async function sbSaveTrade(trade) {
     if (error) throw error;
     return dbToTrade(data);
   } else {
-    const { data, error } = await getSupabase()
+    const { data, error } = await requireClient()
       .from('trades')
       .insert(payload)
       .select()
@@ -324,7 +385,7 @@ async function sbDeleteTrade(trade) {
   if (!user) throw new Error('Not authenticated');
 
   const uuid = trade._uuid || trade.id;
-  const { error } = await getSupabase()
+  const { error } = await requireClient()
     .from('trades')
     .delete()
     .eq('id', uuid)
@@ -343,7 +404,7 @@ async function sbSaveAllTrades(trades) {
   const CHUNK = 200;
   for (let i = 0; i < payloads.length; i += CHUNK) {
     const chunk = payloads.slice(i, i + CHUNK);
-    const { error } = await getSupabase()
+    const { error } = await requireClient()
       .from('trades')
       .upsert(chunk, { onConflict: 'user_id,legacy_id', ignoreDuplicates: false });
     if (error) throw error;
@@ -399,7 +460,7 @@ async function sbLoadAccounts() {
   const user = await sbGetUser();
   if (!user) return [];
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('accounts')
     .select('*')
     .eq('user_id', user.id)
@@ -416,7 +477,7 @@ async function sbSaveAccount(acct) {
   const payload = accountToDb(acct, user.id);
 
   if (acct._uuid) {
-    const { data, error } = await getSupabase()
+    const { data, error } = await requireClient()
       .from('accounts')
       .update(payload)
       .eq('id', acct._uuid)
@@ -426,7 +487,7 @@ async function sbSaveAccount(acct) {
     if (error) throw error;
     return dbToAccount(data);
   } else {
-    const { data, error } = await getSupabase()
+    const { data, error } = await requireClient()
       .from('accounts')
       .insert(payload)
       .select()
@@ -442,7 +503,7 @@ async function sbDeleteAccount(acct) {
 
   const uuid = acct._uuid;
   if (!uuid) return;
-  const { error } = await getSupabase()
+  const { error } = await requireClient()
     .from('accounts')
     .delete()
     .eq('id', uuid)
@@ -455,7 +516,7 @@ async function sbSaveAllAccounts(accounts) {
   if (!user) throw new Error('Not authenticated');
 
   const payloads = accounts.map(a => accountToDb(a, user.id));
-  const { error } = await getSupabase()
+  const { error } = await requireClient()
     .from('accounts')
     .upsert(payloads, { onConflict: 'user_id,legacy_id', ignoreDuplicates: false });
   if (error) throw error;
@@ -481,7 +542,7 @@ async function sbLoadPlaybooks() {
   const user = await sbGetUser();
   if (!user) return null;  // null means "use localStorage fallback"
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('playbooks')
     .select('*')
     .eq('user_id', user.id)
@@ -497,7 +558,7 @@ async function sbSavePlaybooks(playbooks) {
   if (!user) throw new Error('Not authenticated');
 
   // Delete all existing, re-insert (simplest for small arrays)
-  await getSupabase().from('playbooks').delete().eq('user_id', user.id);
+  await requireClient().from('playbooks').delete().eq('user_id', user.id);
 
   if (playbooks.length === 0) return;
 
@@ -510,7 +571,7 @@ async function sbSavePlaybooks(playbooks) {
     sort_order:  i,
   }));
 
-  const { error } = await getSupabase().from('playbooks').insert(payloads);
+  const { error } = await requireClient().from('playbooks').insert(payloads);
   if (error) throw error;
 }
 
@@ -523,7 +584,7 @@ async function sbLoadTradeImages(tradeUuid) {
   const user = await sbGetUser();
   if (!user) return [];
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('trade_images')
     .select('*')
     .eq('trade_id', tradeUuid)
@@ -543,7 +604,7 @@ async function sbSaveTradeImages(tradeUuid, images) {
   if (!user) throw new Error('Not authenticated');
 
   // Delete existing images for this trade, then re-insert
-  await getSupabase()
+  await requireClient()
     .from('trade_images')
     .delete()
     .eq('trade_id', tradeUuid)
@@ -559,7 +620,7 @@ async function sbSaveTradeImages(tradeUuid, images) {
     sort_order: i,
   }));
 
-  const { error } = await getSupabase().from('trade_images').insert(payloads);
+  const { error } = await requireClient().from('trade_images').insert(payloads);
   if (error) throw error;
 }
 
@@ -572,7 +633,7 @@ async function sbGetSetting(key) {
   const user = await sbGetUser();
   if (!user) return null;
 
-  const { data, error } = await getSupabase()
+  const { data, error } = await requireClient()
     .from('user_settings')
     .select('value')
     .eq('user_id', user.id)
@@ -587,7 +648,7 @@ async function sbSetSetting(key, value) {
   const user = await sbGetUser();
   if (!user) throw new Error('Not authenticated');
 
-  const { error } = await getSupabase()
+  const { error } = await requireClient()
     .from('user_settings')
     .upsert({ user_id: user.id, key, value }, { onConflict: 'user_id,key' });
 
@@ -683,7 +744,7 @@ async function migrateLocalStorageToSupabase() {
 // ═══════════════════════════════════════════════════════════════
 //  CONVENIENCE: expose on window so app.js can call directly
 // ═══════════════════════════════════════════════════════════════
-window.SB = {
+window.SB = isSupabaseConfigured ? {
   // auth
   signUp:    sbSignUp,
   signIn:    sbSignIn,
@@ -717,6 +778,6 @@ window.SB = {
   setSetting: sbSetSetting,
   // migration
   migrateFromLocalStorage: migrateLocalStorageToSupabase,
-};
+} : createSupabaseStub();
 
 console.log('✓ supabase.js loaded');
