@@ -1043,6 +1043,7 @@ function mpClearFilter() {
 
 function initMonthlyPnL() {
   const canvas = $('mp-chart');
+  const chartWrap = $('mp-chart-wrap');
   if (!canvas) return;
 
   // Group ALL trades by YYYY-MM first (to build chips)
@@ -1204,6 +1205,11 @@ function initMonthlyPnL() {
 
   if (mpChartInst) { mpChartInst.destroy(); mpChartInst = null; }
 
+  // Use a fixed scrollable width and keep the latest 6 months visible by default
+  const minCanvasWidth = 6 * 72;
+  const desiredWidth = Math.max(minCanvasWidth, months.length * 72, (chartWrap ? chartWrap.clientWidth : 0));
+  canvas.style.width = desiredWidth + 'px';
+
   const mpZeroLine = {
     id: 'mpZeroLine',
     afterDraw(chart) {
@@ -1345,6 +1351,9 @@ function initMonthlyPnL() {
     },
     plugins: [mpZeroLine]
   });
+  if (chartWrap) {
+    setTimeout(() => { chartWrap.scrollLeft = chartWrap.scrollWidth; }, 20);
+  }
 
   // Click a bar → jump to Trade Log filtered to that month + account
   canvas.addEventListener('click', function(e) {
