@@ -3340,6 +3340,7 @@ window.switchView = function(el) {
   _origSV2.apply(this, arguments);
   const view = el?.dataset?.view;
   if (view === 'reports')  { requestAnimationFrame(() => { initReportsPage(); updateStorageUsageBar(); }); }
+  if (view === 'summary')  { requestAnimationFrame(() => { initSummaryView(); }); }
   if (view === 'settings') { requestAnimationFrame(() => { initSettingsUI(); initProfileUI(); }); }
 };
 

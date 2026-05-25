@@ -7272,9 +7272,9 @@ function selShowSummary() {
   const isPos  = netPnl >= 0;
   const m = $('sel-summary-modal');
   $('sel-sum-body').innerHTML =
-    '<div style="text-align:center;padding:10px 0 16px">' +
-      '<div style="font-size:9px;letter-spacing:.12em;color:var(--text3);font-family:\'JetBrains Mono\',monospace;text-transform:uppercase;margin-bottom:6px">Net P&amp;L &middot; ' + rows.length + ' trades</div>' +
-      '<div style="font-family:\'Clash Display\',sans-serif;font-weight:700;font-size:40px;color:' + (isPos?'var(--green)':'var(--red)') + '">' + (isPos?'+':'') + '$' + Math.abs(netPnl).toFixed(2) + '</div>' +
+    '<div class="sel-summary-header">' +
+      '<div class="sel-summary-meta">Net P&amp;L &middot; ' + rows.length + ' trades</div>' +
+      '<div class="sel-summary-total" style="color:' + (isPos?'var(--green)':'var(--red)') + '">' + (isPos?'+':'') + '$' + Math.abs(netPnl).toFixed(2) + '</div>' +
     '</div>' +
     '<div class="sel-summary-grid">' +
       '<div class="sel-sum-card"><div class="sel-sum-label">Win Rate</div><div class="sel-sum-val" style="color:var(--green)">' + wr + '%</div><div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:\'JetBrains Mono\',monospace">' + wins.length + 'W &middot; ' + losses.length + 'L</div></div>' +

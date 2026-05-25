@@ -342,7 +342,14 @@ function syncTopbarOffset() {
 
 function goToView(view) {
   var el = document.querySelector('[data-view="' + view + '"]');
-  if (el) switchView(el);
+  if (el) return switchView(el);
+
+  var viewEl = document.getElementById('view-' + view);
+  if (viewEl) {
+    var fakeNav = document.createElement('div');
+    fakeNav.dataset.view = view;
+    return switchView(fakeNav);
+  }
 }
 function goToSettings() {
   var el = document.querySelector('[data-view="settings"]');
@@ -366,6 +373,15 @@ function switchView(el) {
     console.log('  → Added active class to:', el.dataset?.view);
     const v = el.dataset.view;
     console.log('  → Switching to view:', v);
+
+    // Fullscreen summary mode: hide sidebar and topbar via body class
+    try {
+      if (v === 'summary') {
+        document.body.classList.add('summary-fullscreen');
+      } else {
+        document.body.classList.remove('summary-fullscreen');
+      }
+    } catch (e) { /* ignore */ }
 
     if (currentViewId === 'view-tradelog' && v !== 'tradelog' && window._tradeLogDrilldownActive) {
       clearTradeLogTransientFilters(true);
@@ -393,6 +409,7 @@ function switchView(el) {
     const authUserBadge = document.getElementById('auth-user-badge');
     const importBtn = $('import-trades-btn');
     const addTradeBtn = $('add-trade-btn-topbar');
+    const summaryBtn = $('summary-btn-dashboard');
     const showTopbarButtons = (v === 'dashboard' || v === 'tradelog' || v === 'accounts');
     const showTzSwitcher = (v === 'dashboard');
     const useTradeLogTopbarStyle = (v === 'tradelog' || v === 'analytics' || v === 'advanalytics' || v === 'calendar' || v === 'playbook' || v === 'accounts' || v === 'reports' || v === 'user-profile' || v === 'settings');
@@ -415,6 +432,7 @@ function switchView(el) {
     }
     if (importBtn) importBtn.style.display = showTopbarButtons ? '' : 'none';
     if (addTradeBtn) addTradeBtn.style.display = showTopbarButtons ? '' : 'none';
+    if (summaryBtn) summaryBtn.style.display = (v === 'dashboard') ? '' : 'none';
 
     // Initialize view-specific content
     try {
@@ -7272,9 +7290,9 @@ function selShowSummary() {
   const isPos  = netPnl >= 0;
   const m = $('sel-summary-modal');
   $('sel-sum-body').innerHTML =
-    '<div style="text-align:center;padding:10px 0 16px">' +
-      '<div style="font-size:9px;letter-spacing:.12em;color:var(--text3);font-family:\'JetBrains Mono\',monospace;text-transform:uppercase;margin-bottom:6px">Net P&amp;L &middot; ' + rows.length + ' trades</div>' +
-      '<div style="font-family:\'Clash Display\',sans-serif;font-weight:700;font-size:40px;color:' + (isPos?'var(--green)':'var(--red)') + '">' + (isPos?'+':'') + '$' + Math.abs(netPnl).toFixed(2) + '</div>' +
+    '<div class="sel-summary-header">' +
+      '<div class="sel-summary-meta">Net P&amp;L &middot; ' + rows.length + ' trades</div>' +
+      '<div class="sel-summary-total" style="color:' + (isPos?'var(--green)':'var(--red)') + '">' + (isPos?'+':'') + '$' + Math.abs(netPnl).toFixed(2) + '</div>' +
     '</div>' +
     '<div class="sel-summary-grid">' +
       '<div class="sel-sum-card"><div class="sel-sum-label">Win Rate</div><div class="sel-sum-val" style="color:var(--green)">' + wr + '%</div><div style="font-size:10px;color:var(--text3);margin-top:3px;font-family:\'JetBrains Mono\',monospace">' + wins.length + 'W &middot; ' + losses.length + 'L</div></div>' +
