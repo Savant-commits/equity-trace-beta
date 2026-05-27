@@ -34,6 +34,23 @@ function parseTradeDate(value) {
   return isNaN(tradeDate.getTime()) ? null : tradeDate;
 }
 
+// ESC handler for public summary: return to dashboard when summary fullscreen active
+function summaryEscHandler(e) {
+  if (!e) return;
+  const key = e.key || e.keyCode;
+  const isEsc = key === 'Escape' || key === 'Esc' || key === 27;
+  if (!isEsc) return;
+  try {
+    if (!document.body.classList.contains('summary-fullscreen')) return;
+    if (typeof goToView === 'function') {
+      goToView('dashboard');
+    } else if (typeof switchView === 'function') {
+      const nav = document.querySelector('[data-view="dashboard"]');
+      if (nav) switchView(nav);
+    }
+  } catch (err) { /* ignore */ }
+}
+
 // Get trades for the specified month
 function getMonthTrades(date) {
   const trades = (typeof TRADES !== 'undefined' && Array.isArray(TRADES)) ? TRADES : [];
@@ -428,4 +445,8 @@ function summaryNextMonth() {
 function initSummaryView() {
   _currentSummaryMonth = new Date(); // Reset to current month
   populateSummarySummary();
+  try {
+    document.removeEventListener('keydown', summaryEscHandler);
+    document.addEventListener('keydown', summaryEscHandler);
+  } catch (e) { /* ignore */ }
 }

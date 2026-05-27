@@ -1998,6 +1998,26 @@ h1,h2,h3{letter-spacing:-.02em}
   letter-spacing:-.04em;
 }
 
+/* Summary page: grey card backgrounds with purple glow (dark mode only) */
+:root:not(.light) #view-summary .summary-card,
+:root:not(.light) #view-summary .summary-panel,
+:root:not(.light) #view-summary .summary-card .summary-card-content {
+  background: linear-gradient(180deg, var(--bg3) 0%, var(--bg4) 100%) !important;
+  border: 1px solid rgba(153,93,255,0.12) !important;
+  box-shadow: inset 0 0 40px rgba(255,255,255,0.03), 0 10px 40px rgba(153,93,255,0.10) !important;
+  transition:box-shadow .18s ease,transform .18s ease;
+}
+
+:root:not(.light) #view-summary .summary-card:hover,
+:root:not(.light) #view-summary .summary-panel:hover {
+  box-shadow: inset 0 0 48px rgba(255,255,255,0.04), 0 18px 60px rgba(153,93,255,0.18) !important;
+  transform:translateY(-2px);
+}
+
+/* ensure light mode keeps existing styling */
+.light #view-summary .summary-card,
+.light #view-summary .summary-panel { background: initial; border-color: initial; box-shadow: initial; }
+
 .public-trader-stat-value.small {
   font-size:20px;
   line-height:1.25;
@@ -3777,20 +3797,21 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 .summary-card-icon {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
   flex-shrink: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
-.summary-card-icon::before {
-  content: attr(data-icon);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--text);
+.summary-card-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 .summary-card-value {

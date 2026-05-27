@@ -2,8 +2,11 @@
 <div class="view" id="view-summary">
   <div class="content">
     <!-- HEADER -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-left:6px;margin-right:6px;gap:12px;flex-wrap:wrap;margin-bottom:20px">
-      <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Monthly Summary</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-left:6px;margin-right:6px;gap:12px;flex-wrap:wrap;margin-bottom:5px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px">Monthly Summary</div>
+        <button id="summary-back-btn" class="topbar-action-btn" onclick="goToView('dashboard')" title="Back to dashboard" style="margin-left:8px;font-size:12px;line-height:1">↩</button>
+      </div>
       <div style="display:flex;align-items:center;gap:10px">
         <button id="summary-prev-month" class="topbar-action-btn" onclick="summaryPrevMonth()" title="Previous month">←</button>
         <div id="summary-month-label" style="font-size:13px;font-family:var(--font-body);font-weight:600;color:var(--text);min-width:140px;text-align:center">January 2025</div>
@@ -12,13 +15,15 @@
     </div>
 
     <!-- ANIMATED STAT CARDS GRID -->
-    <div id="summary-cards-grid" style="display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:16px;margin:20px 6px">
+    <div id="summary-cards-grid" style="display:grid;grid-template-columns:repeat(4,minmax(220px,1fr));gap:16px;margin:5px 6px">
       
       <!-- Total Trades Card -->
       <div class="summary-card" style="animation-delay:0.0s">
         <div class="summary-card-header">
           <div class="summary-card-label">TOTAL TRADES</div>
-          <div class="summary-card-icon" data-icon="TR"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 16 10 10 14 13 20 6"/><circle cx="4" cy="16" r="1.5" fill="currentColor"/><circle cx="10" cy="10" r="1.5" fill="currentColor"/><circle cx="14" cy="13" r="1.5" fill="currentColor"/><circle cx="20" cy="6" r="1.5" fill="currentColor"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-total-trades">0</div>
         <div class="summary-card-subtext" id="summary-trades-info">Placeholder</div>
@@ -28,7 +33,9 @@
       <div class="summary-card" style="animation-delay:0.1s">
         <div class="summary-card-header">
           <div class="summary-card-label">NET P&L</div>
-          <div class="summary-card-icon" data-icon="$"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7c-3 0-4 2-4 4s1 4 4 4 4 2 4 4-1 4-4 4"/><path d="M8 6h8"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-net-pnl" style="color:var(--green)">$0.00</div>
         <div class="summary-card-subtext" id="summary-pnl-info">Placeholder</div>
@@ -38,7 +45,9 @@
       <div class="summary-card" style="animation-delay:0.2s">
         <div class="summary-card-header">
           <div class="summary-card-label">WIN RATE</div>
-          <div class="summary-card-icon" data-icon="%"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><path d="M12 2v4"/><path d="M12 18v4"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-win-rate">0%</div>
         <div class="summary-card-subtext" id="summary-winrate-info">Placeholder</div>
@@ -48,7 +57,9 @@
       <div class="summary-card" style="animation-delay:0.3s">
         <div class="summary-card-header">
           <div class="summary-card-label">PROFIT FACTOR</div>
-          <div class="summary-card-icon" data-icon="PF"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8h12"/><path d="M12 8v11"/><path d="M4 19h16"/><path d="M7 8l-3 6h6l-3-6z"/><path d="M17 8l-3 6h6l-3-6z"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-profit-factor">0.00</div>
         <div class="summary-card-subtext" id="summary-pf-info">Placeholder</div>
@@ -58,7 +69,9 @@
       <div class="summary-card" style="animation-delay:0.4s">
         <div class="summary-card-header">
           <div class="summary-card-label">BEST TRADE</div>
-          <div class="summary-card-icon" data-icon="BT"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v3c0 2-1 4-4 4s-4-2-4-4V4z"/><path d="M8 12v4h8v-4"/><path d="M9 20h6"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-best-trade" style="color:var(--green)">$0.00</div>
         <div class="summary-card-subtext" id="summary-best-trade-info">Placeholder</div>
@@ -68,7 +81,9 @@
       <div class="summary-card summary-card-worst" style="animation-delay:0.5s">
         <div class="summary-card-header">
           <div class="summary-card-label">WORST TRADE</div>
-          <div class="summary-card-icon" data-icon="WT"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8l6 6 6-6"/><path d="M12 2v14"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-worst-trade" style="color:var(--red)">$0.00</div>
         <div class="summary-card-subtext" id="summary-worst-trade-info">Placeholder</div>
@@ -78,7 +93,9 @@
       <div class="summary-card summary-card-large" style="animation-delay:0.6s">
         <div class="summary-card-header">
           <div class="summary-card-label">EQUITY CURVE</div>
-          <div class="summary-card-icon" data-icon="EC"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16c3-5 6-8 10-8s6 3 10 8"/><path d="M4 16l4-3.5L12 13l4-6 4 8"/></svg>
+          </div>
         </div>
         <div class="summary-card-chart">
           <canvas id="summary-equity-curve-chart"></canvas>
@@ -90,7 +107,9 @@
       <div class="summary-card summary-card-avgwin" style="animation-delay:0.7s">
         <div class="summary-card-header">
           <div class="summary-card-label">AVG WIN</div>
-          <div class="summary-card-icon" data-icon="AW"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 14l6-6 6 6"/><path d="M12 8v12"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-avg-win" style="color:var(--green)">$0.00</div>
         <div class="summary-card-subtext" id="summary-avg-win-info">Placeholder</div>
@@ -100,7 +119,9 @@
       <div class="summary-card" style="animation-delay:0.7s">
         <div class="summary-card-header">
           <div class="summary-card-label">AVG LOSS</div>
-          <div class="summary-card-icon" data-icon="AL"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10l6 6 6-6"/><path d="M12 16V4"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-avg-loss" style="color:var(--red)">$0.00</div>
         <div class="summary-card-subtext" id="summary-avg-loss-info">Placeholder</div>
@@ -110,7 +131,9 @@
       <div class="summary-card" style="animation-delay:0.8s">
         <div class="summary-card-header">
           <div class="summary-card-label">WIN / LOSS</div>
-          <div class="summary-card-icon" data-icon="W/L"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 15l2-2 2 2"/><path d="M10 13v6"/><path d="M16 9l2 2 2-2"/><path d="M18 10v6"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-win-loss-ratio">0 / 0</div>
         <div class="summary-card-subtext" id="summary-wl-info">Placeholder</div>
@@ -120,7 +143,9 @@
       <div class="summary-card" style="animation-delay:0.9s">
         <div class="summary-card-header">
           <div class="summary-card-label">TRADING DAYS</div>
-          <div class="summary-card-icon" data-icon="D"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/><path d="M3 11h18"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-trading-days">0</div>
         <div class="summary-card-subtext" id="summary-trading-days-info">Placeholder</div>
@@ -130,7 +155,9 @@
       <div class="summary-card" style="animation-delay:1.1s">
         <div class="summary-card-header">
           <div class="summary-card-label">WIN STREAK</div>
-          <div class="summary-card-icon" data-icon="ST"></div>
+          <div class="summary-card-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 4-4 8-4 10a4 4 0 0 0 8 0c0-2-1-5-4-8z"/><path d="M12 3c2 3 2 5 2 6a2 2 0 0 1-4 0c0-1 0-3 2-6z"/></svg>
+          </div>
         </div>
         <div class="summary-card-value" id="summary-win-streak">0</div>
         <div class="summary-card-subtext" id="summary-streak-info">Placeholder</div>
@@ -140,7 +167,9 @@
           <div class="summary-card" style="animation-delay:1.15s">
             <div class="summary-card-header">
               <div class="summary-card-label">CONSISTENCY</div>
-              <div class="summary-card-icon" data-icon="CS"></div>
+              <div class="summary-card-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4-3 8-7 9-4-1-7-5-7-9V7l7-4z"/></svg>
+              </div>
             </div>
             <div class="summary-card-value" id="summary-consistency">—</div>
             <div class="summary-card-subtext" id="summary-consistency-info">Monthly consistency score</div>
@@ -271,20 +300,26 @@
 .summary-card-icon {
   width: 46px;
   height: 46px;
-  border-radius: 14px;
+  border-radius: 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
   flex-shrink: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.summary-card-icon svg {
+  width: 22px;
+  height: 22px;
+  display: block;
 }
 
 .summary-card-icon::before {
-  content: attr(data-icon);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: var(--text);
+  content: none;
+  display: none;
 }
 
 .summary-card-value {

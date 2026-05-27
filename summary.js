@@ -4,6 +4,67 @@
 
 let _currentSummaryMonth = new Date(); // Track which month to display
 
+// ─── Display Timezone Helpers ───
+function getDisplayTimezoneSummary() {
+  try {
+    if (typeof loadSettings === 'function') {
+      const s = loadSettings();
+      if (s && s.displayTimezone) return s.displayTimezone;
+      if (s && s.timezone) return s.timezone;
+    }
+  } catch (_) {}
+  return 'UTC';
+}
+
+function _formatPartsInDisplayTzSummary(dateObj, tz) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: tz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(dateObj);
+  const pick = type => parts.find(p => p.type === type)?.value;
+  return {
+    year: parseInt(pick('year'), 10),
+    month: parseInt(pick('month'), 10),
+    day: parseInt(pick('day'), 10)
+  };
+}
+
+function getTradeDisplayDateSummary(trade, displayTz) {
+  if (!trade || !trade.date) return '';
+  if (typeof convertTradeDateTimeBetweenZones !== 'function') return trade.date;
+  try {
+    const journalTz = (typeof getJournalTimezone === 'function')
+      ? getJournalTimezone()
+      : ((typeof loadSettings === 'function') ? (loadSettings().tradingTimezone || loadSettings().displayTimezone || loadSettings().timezone) : 'UTC');
+    if (journalTz === displayTz) return trade.date;
+    const timeStr = trade.time || '00:00';
+    const converted = convertTradeDateTimeBetweenZones(trade.date, timeStr, journalTz, displayTz);
+    return converted.date || trade.date;
+  } catch (_) {
+    return trade.date;
+  }
+}
+
+// ESC handler: when summary is active, pressing Escape returns to dashboard
+function summaryEscHandler(e) {
+  if (!e) return;
+  const key = e.key || e.keyCode;
+  const isEsc = key === 'Escape' || key === 'Esc' || key === 27;
+  if (!isEsc) return;
+  // Only act when summary fullscreen mode is active
+  try {
+    if (!document.body.classList.contains('summary-fullscreen')) return;
+    if (typeof goToView === 'function') {
+      goToView('dashboard');
+    } else if (typeof switchView === 'function') {
+      const nav = document.querySelector('[data-view="dashboard"]');
+      if (nav) switchView(nav);
+    }
+  } catch (err) { /* ignore */ }
+}
+
 // Format month display (e.g., "January 2025")
 function formatSummaryMonthLabel(date) {
   const months = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -36,19 +97,33 @@ function parseTradeDate(value) {
 
 // Get trades for the specified month
 function getMonthTrades(date) {
+  const displayTz = getDisplayTimezoneSummary();
   const trades = (typeof TRADES !== 'undefined' && Array.isArray(TRADES)) ? TRADES : [];
-  const year = date.getFullYear();
-  const month = date.getMonth();
+  
+  // Get year and month in display timezone
+  const dateParts = _formatPartsInDisplayTzSummary(date, displayTz);
+  const year = dateParts.year;
+  const month = dateParts.month;
 
   return trades.filter(trade => {
     if (!trade || !trade.date) return false;
-    const tradeDate = parseTradeDate(trade.date);
-    return tradeDate && tradeDate.getFullYear() === year && tradeDate.getMonth() === month;
+    const tradeDisplayDate = getTradeDisplayDateSummary(trade, displayTz);
+    if (!tradeDisplayDate) return false;
+    
+    // Parse display date (YYYY-MM-DD format)
+    const parts = tradeDisplayDate.match(/^(\d{4})-(\d{2})/);
+    if (!parts) return false;
+    
+    const tradeYear = parseInt(parts[1], 10);
+    const tradeMonth = parseInt(parts[2], 10);
+    
+    return tradeYear === year && tradeMonth === month;
   });
 }
 
 // Calculate monthly statistics
 function calculateMonthlySummary(trades) {
+  const displayTz = getDisplayTimezoneSummary();
   const summary = {
     totalTrades: 0,
     totalPnl: 0,
@@ -70,11 +145,11 @@ function calculateMonthlySummary(trades) {
 
   summary.totalTrades = trades.length;
 
-  // Sort trades by date for streak calculation
+  // Sort trades by display date for streak calculation
   const sortedTrades = [...trades].sort((a, b) => {
-    const dateA = new Date(a.date || 0);
-    const dateB = new Date(b.date || 0);
-    return dateA - dateB;
+    const dateA = getTradeDisplayDateSummary(a, displayTz) || a.date || '';
+    const dateB = getTradeDisplayDateSummary(b, displayTz) || b.date || '';
+    return dateA.localeCompare(dateB);
   });
 
   let currentStreak = 0;
@@ -107,10 +182,13 @@ function calculateMonthlySummary(trades) {
       summary.worstTrade = pnl;
     }
 
-    // Track trading days
+    // Track trading days using display timezone
     if (trade.date) {
-      const dateStr = typeof trade.date === 'string' ? trade.date.split(' ')[0] : trade.date;
-      summary.tradingDays.add(dateStr);
+      const displayDate = getTradeDisplayDateSummary(trade, displayTz);
+      if (displayDate) {
+        const dateStr = displayDate.split(' ')[0]; // Get just the date part
+        summary.tradingDays.add(dateStr);
+      }
     }
   });
 
@@ -135,12 +213,14 @@ function formatPercent(value) {
 }
 
 function calculateMonthlyConsistencyScore(trades) {
+  const displayTz = getDisplayTimezoneSummary();
   const dailyTotals = new Map();
   trades.forEach(trade => {
-    const tradeDate = parseTradeDate(trade.date);
-    if (!tradeDate) return;
-    const key = `${tradeDate.getFullYear()}-${tradeDate.getMonth()}-${tradeDate.getDate()}`;
-    dailyTotals.set(key, (dailyTotals.get(key) || 0) + (Number(trade.pnl) || 0));
+    const tradeDisplayDate = getTradeDisplayDateSummary(trade, displayTz);
+    if (!tradeDisplayDate) return;
+    // Use the display date as key (YYYY-MM-DD format)
+    const dateKey = tradeDisplayDate.split(' ')[0];
+    dailyTotals.set(dateKey, (dailyTotals.get(dateKey) || 0) + (Number(trade.pnl) || 0));
   });
 
   const totalDays = dailyTotals.size;
@@ -169,18 +249,38 @@ function getSummaryChartBase() {
 }
 
 function calculateEquityCurve(trades) {
+  const displayTz = getDisplayTimezoneSummary();
   const dailyMap = new Map();
-  const year = _currentSummaryMonth.getFullYear();
-  const month = _currentSummaryMonth.getMonth();
-  const monthDays = new Date(year, month + 1, 0).getDate();
+  
+  // Get year and month in display timezone
+  const summaryDateParts = _formatPartsInDisplayTzSummary(
+    new Date(_currentSummaryMonth.getFullYear(), _currentSummaryMonth.getMonth(), 1),
+    displayTz
+  );
+  const year = summaryDateParts.year;
+  const month = summaryDateParts.month;
+  
+  // Calculate number of days in the month (in display timezone)
+  const firstDayOfMonth = new Date(year, month - 1, 1);
+  const lastDayOfMonth = new Date(year, month, 0);
+  const monthDays = lastDayOfMonth.getDate();
 
   trades.forEach(trade => {
-    const tradeDate = parseTradeDate(trade.date);
-    if (!tradeDate) return;
-    if (tradeDate.getFullYear() !== year || tradeDate.getMonth() !== month) return;
-    const day = tradeDate.getDate();
+    const tradeDisplayDate = getTradeDisplayDateSummary(trade, displayTz);
+    if (!tradeDisplayDate) return;
+    
+    // Parse display date (YYYY-MM-DD format)
+    const dateParts = tradeDisplayDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!dateParts) return;
+    
+    const tradeYear = parseInt(dateParts[1], 10);
+    const tradeMonth = parseInt(dateParts[2], 10);
+    const tradeDay = parseInt(dateParts[3], 10);
+    
+    if (tradeYear !== year || tradeMonth !== month) return;
+    
     const pnl = Number(trade.pnl) || 0;
-    dailyMap.set(day, (dailyMap.get(day) || 0) + pnl);
+    dailyMap.set(tradeDay, (dailyMap.get(tradeDay) || 0) + pnl);
   });
 
   let cumulative = 0;
@@ -428,4 +528,9 @@ function summaryNextMonth() {
 function initSummaryView() {
   _currentSummaryMonth = new Date(); // Reset to current month
   populateSummarySummary();
+  // Ensure single registration
+  try {
+    document.removeEventListener('keydown', summaryEscHandler);
+    document.addEventListener('keydown', summaryEscHandler);
+  } catch (e) { /* ignore */ }
 }
