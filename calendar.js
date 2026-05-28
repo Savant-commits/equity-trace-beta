@@ -660,12 +660,14 @@ function initEquityCurve(period) {
   const baseline = acct ? acct.startBal : (ACCOUNTS[0]?.startBal || 25000);
   const profitTarget = acct ? Math.round(baseline*(1+(acct.profitTarget||8)/100)) : Math.round(baseline*1.08);
   const maxLoss      = acct ? Math.round(baseline*(1-(acct.maxDrawdown||8)/100))  : Math.round(baseline*0.92);
-  const dailyLossVal = acct ? Math.round(baseline*(1-(acct.dailyLoss||4)/100))    : Math.round(baseline*0.97);
 
   let running = baseline;
   const data   = [running];
   const labels = ['Start'];
   allSorted.forEach((t,i) => { running += (t.pnl||0); data.push(running); labels.push(`#${i+1}`); });
+
+  const currentEquity = running;
+  const dailyLossVal = acct ? Math.round(currentEquity*(1-(acct.dailyLoss||4)/100)) : Math.round(currentEquity*0.97);
 
   const pad  = Math.round((profitTarget - maxLoss) * 0.05);
   const yMin = maxLoss - pad;
@@ -759,6 +761,7 @@ function initEquityCurve(period) {
     id: 'ecRefLines',
     afterDraw(chart) {
       const { ctx: c, chartArea:{left,right}, scales:{y} } = chart;
+      const isLight = document.documentElement.classList.contains('light');
       refLines.forEach(({value,color,label}) => {
         const yPos = y.getPixelForValue(value);
         if (yPos < y.top || yPos > y.bottom) return;
@@ -767,8 +770,15 @@ function initEquityCurve(period) {
         c.setLineDash([3,4]); c.strokeStyle=color; c.lineWidth=isHov?2:1.5; c.globalAlpha=isHov?1:0.6;
         c.beginPath(); c.moveTo(left,yPos); c.lineTo(right,yPos); c.stroke();
         c.setLineDash([]);
-        c.font='9px "JetBrains Mono",monospace'; c.fillStyle=color; c.globalAlpha=isHov?1:0.6;
+        c.font='9px "JetBrains Mono",monospace';
         c.textAlign='right'; c.textBaseline='bottom';
+        if (isLight) {
+          c.fillStyle = '#0a0b10';
+          c.globalAlpha = isHov ? 1 : 0.9;
+        } else {
+          c.fillStyle = color;
+          c.globalAlpha = isHov ? 1 : 0.6;
+        }
         c.fillText(label+'  $'+value.toFixed(2), right-4, yPos-2);
         c.restore();
       });

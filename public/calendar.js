@@ -759,6 +759,7 @@ function initEquityCurve(period) {
     id: 'ecRefLines',
     afterDraw(chart) {
       const { ctx: c, chartArea:{left,right}, scales:{y} } = chart;
+      const isLight = document.documentElement.classList.contains('light');
       refLines.forEach(({value,color,label}) => {
         const yPos = y.getPixelForValue(value);
         if (yPos < y.top || yPos > y.bottom) return;
@@ -767,8 +768,15 @@ function initEquityCurve(period) {
         c.setLineDash([3,4]); c.strokeStyle=color; c.lineWidth=isHov?2:1.5; c.globalAlpha=isHov?1:0.6;
         c.beginPath(); c.moveTo(left,yPos); c.lineTo(right,yPos); c.stroke();
         c.setLineDash([]);
-        c.font='9px "JetBrains Mono",monospace'; c.fillStyle=color; c.globalAlpha=isHov?1:0.6;
+        c.font='9px "JetBrains Mono",monospace';
         c.textAlign='right'; c.textBaseline='bottom';
+        if (isLight) {
+          c.fillStyle = '#0a0b10';
+          c.globalAlpha = isHov ? 1 : 0.9;
+        } else {
+          c.fillStyle = color;
+          c.globalAlpha = isHov ? 1 : 0.6;
+        }
         c.fillText(label+'  $'+value.toFixed(2), right-4, yPos-2);
         c.restore();
       });

@@ -3009,17 +3009,21 @@ function anSetAccount(acct) {
 
 function toggleAnAcctDropdown(btn) {
   const dd = btn.nextElementSibling;
+  const chevron = btn.querySelector('.an-acct-chevron');
   const open = btn.dataset.open === 'true';
   if (open) {
     dd.style.display = 'none';
     btn.dataset.open = 'false';
+    if (chevron) chevron.style.transform = 'rotate(0)';
   } else {
     dd.style.display = 'block';
     btn.dataset.open = 'true';
+    if (chevron) chevron.style.transform = 'rotate(180deg)';
     setTimeout(() => document.addEventListener('click', function h(e) {
       if (!dd.contains(e.target) && !btn.contains(e.target)) {
         dd.style.display = 'none';
         btn.dataset.open = 'false';
+        if (chevron) chevron.style.transform = 'rotate(0)';
         document.removeEventListener('click', h);
       }
     }), 0);
@@ -3028,28 +3032,68 @@ function toggleAnAcctDropdown(btn) {
 
 function buildAnAccountBar() {
   const allActive = !anCurrentAccount || anCurrentAccount === '__all__';
-  const options = [
-    `<div onclick="anSetAccount('__all__');$$('.an-acct-dd').forEach(d=>{d.style.display='none'});$$('.an-acct-trigger').forEach(t=>{t.dataset.open='false'});$$('.an-acct-chevron').forEach(c=>{c.style.transform=''})"
-      style="display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:11px;font-family:var(--font-mono);cursor:pointer;color:${allActive?'var(--purple)':'var(--text2)'};background:${allActive?'var(--ac-10)':'transparent'};transition:background .1s;white-space:nowrap"
-      onmouseenter="this.style.background='var(--ac-08)';this.style.color='var(--text)'"
-      onmouseleave="this.style.background='${allActive?'var(--ac-10)':'transparent'}';this.style.color='${allActive?'var(--purple)':'var(--text2)'}'">
-      <span style="width:7px;height:7px;border-radius:50%;background:${allActive?'var(--purple)':'var(--text3)'};flex-shrink:0"></span>
-      <span style="flex:1">All Accounts</span>
-      ${allActive ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1.5 6l3 3 6-6" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
-    </div>`,
-    ...ACCOUNTS.map(a => {
-      const name = a.key || a.phase;
-      const active = anCurrentAccount === name;
-      return `<div onclick="anSetAccount('${name.replace(/'/g,"\\'")}');$$('.an-acct-dd').forEach(d=>{d.style.display='none'});$$('.an-acct-trigger').forEach(t=>{t.dataset.open='false'});$$('.an-acct-chevron').forEach(c=>{c.style.transform=''})"
-        style="display:flex;align-items:center;gap:8px;padding:7px 12px;font-size:11px;font-family:var(--font-mono);cursor:pointer;color:${active?'var(--purple)':'var(--text2)'};background:${active?'var(--ac-10)':'transparent'};transition:background .1s;white-space:nowrap"
-        onmouseenter="this.style.background='var(--ac-08)';this.style.color='var(--text)'"
-        onmouseleave="this.style.background='${active?'var(--ac-10)':'transparent'}';this.style.color='${active?'var(--purple)':'var(--text2)'}'">
-        <span style="width:7px;height:7px;border-radius:50%;background:${active?'var(--purple)':'var(--text3)'};flex-shrink:0"></span>
-        <span style="flex:1">${name}</span>
-        ${active ? '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1.5 6l3 3 6-6" stroke="var(--purple)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
-      </div>`;
-    })
-  ].join('');
+
+  const acctStatuses = ACCOUNTS.map((a, i) => {
+    const an = a.key || a.phase;
+    const at = TRADES.filter(t => (t.account || '') === an);
+    const pnl = at.reduce((s, t) => s + t.pnl, 0);
+    const ml = a.startBal * (a.maxDrawdown / 100);
+    const dl = a.startBal * (a.dailyLoss / 100);
+    const pt = a.startBal * (a.profitTarget / 100);
+    const dm = {};
+    at.forEach(t => { dm[t.date] = (dm[t.date] || 0) + t.pnl; });
+    const wd = Math.min(0, ...Object.values(dm).concat([0]));
+    let status = 'active';
+    if (pnl <= -ml || Math.abs(wd) >= dl) status = 'breached';
+    else if (a.profitTarget > 0 && pnl >= pt) status = 'passed';
+    return { a, i, status, name: an, selected: anCurrentAccount === an };
+  });
+
+  const activeAccts = acctStatuses.filter(x => x.status === 'active');
+  const inactiveAccts = acctStatuses.filter(x => x.status !== 'active');
+
+  const sectionLabel = (label, count) => `
+    <div style="padding:8px 10px 4px;font-size:12px;font-weight:700;letter-spacing:.12em;color:var(--text3);font-family:var(--font-mono);text-transform:uppercase;display:flex;align-items:center;gap:10px">
+      <span>${label}</span>
+      <span style="flex:1;height:1px;background:var(--border)"></span>
+      <span style="background:var(--bg5);color:var(--text3);border-radius:10px;padding:3px 8px;font-size:11px">${count}</span>
+    </div>`;
+
+  const accountRow = ({ a, i, selected }) => {
+    const safeName = (a.key || a.phase).replace(/'/g, "\\'");
+    return `
+    <div style="display:flex;align-items:center;border-radius:8px;background:${selected ? 'var(--ac-12)' : 'transparent'};transition:background .12s;position:relative" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${selected ? 'var(--ac-12)' : 'transparent'}'">
+      <div onclick="anSetAccount('${safeName}');$$('.an-acct-dd').forEach(d=>{d.style.display='none'});$$('.an-acct-trigger').forEach(t=>{t.dataset.open='false'});$$('.an-acct-chevron').forEach(c=>{c.style.transform=''})"
+        style="display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;flex:1;min-width:0">
+        <div style="flex-shrink:0">${accountNumberHTML(i + 1, 30, 8)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;color:${selected ? 'var(--text)' : 'var(--text2)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">${formatAccountPhase(a)} · ${a.balance}</div>
+        </div>
+        <div style="flex-shrink:0">${selected ? '<svg width="10" height="10" viewBox="0 0 16 16" fill="none" style="margin-top:2px"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}</div>
+      </div>
+    </div>`;
+  };
+
+  let options = `
+    <div onclick="anSetAccount('__all__');$$('.an-acct-dd').forEach(d=>{d.style.display='none'});$$('.an-acct-trigger').forEach(t=>{t.dataset.open='false'});$$('.an-acct-chevron').forEach(c=>{c.style.transform=''})"
+      style="display:flex;align-items:center;gap:10px;padding:9px 10px;cursor:pointer;transition:background .12s;border-radius:8px;background:${allActive ? 'var(--ac-12)' : 'transparent'};" onmouseenter="this.style.background='var(--ac-08)'" onmouseleave="this.style.background='${allActive ? 'var(--ac-12)' : 'transparent'}'">
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--ac-18);border:1px solid var(--ac-30);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:var(--font-mono);color:var(--purple);flex-shrink:0">∑</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:600;color:var(--text)">All Accounts</div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Combined portfolio view</div>
+      </div>
+      ${allActive ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l4 4 7-8" stroke="var(--purple)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : ''}
+    </div>`;
+
+  if (activeAccts.length) {
+    options += sectionLabel('Active', activeAccts.length);
+    options += activeAccts.map(accountRow).join('');
+  }
+  if (inactiveAccts.length) {
+    options += sectionLabel('Inactive', inactiveAccts.length);
+    options += inactiveAccts.map(accountRow).join('');
+  }
 
   const displayLabel = allActive ? 'All Accounts' : (anCurrentAccount || 'Select account');
 
@@ -3059,7 +3103,7 @@ function buildAnAccountBar() {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-16a1 1 0 0 1-1-1v-9z"/><path d="M4 11h16" stroke-linecap="round"/><path d="M8 20v-6" stroke-linecap="round"/><path d="M12 20v-6" stroke-linecap="round"/><path d="M16 20v-6" stroke-linecap="round"/></svg>
       </span>
     </button>
-    <div class="an-acct-dd" style="display:none;position:absolute;top:calc(100% + 6px);right:0;left:auto;background:var(--bg2);border:1px solid var(--ac-20);border-radius:12px;min-width:260px;overflow:hidden;z-index:9999;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px var(--ac-08)">
+    <div class="an-acct-dd" style="display:none;position:absolute;top:calc(100% + 6px);right:0;left:auto;background:var(--bg2);border:1px solid var(--ac-20);border-radius:12px;min-width:320px;overflow:hidden;z-index:100005;box-shadow:0 12px 40px rgba(0,0,0,.6),0 0 0 1px var(--ac-08)">
       ${options}
     </div>`;
 }
@@ -3246,8 +3290,13 @@ function anNavigateBestWorst(whichOrId, toastLabel) {
 
 function updateAnalyticsCards() {
   const trades = getAnTrades();
-  const wins   = trades.filter(t => t.pnl > 0);
-  const losses = trades.filter(t => t.pnl < 0);
+  const wins = [];
+  const losses = [];
+  trades.forEach(t => {
+    const result = getTradeResult(t);
+    if (result === 'win') wins.push(t);
+    else if (result === 'loss') losses.push(t);
+  });
   const avgWin  = wins.length   ? wins.reduce((s,t)=>s+t.pnl,0)/wins.length    : 0;
   const avgLoss = losses.length ? losses.reduce((s,t)=>s+t.pnl,0)/losses.length : 0;
   const best    = wins.length ? wins.reduce((b,t)=>t.pnl>b.pnl?t:b, wins[0]) : null;

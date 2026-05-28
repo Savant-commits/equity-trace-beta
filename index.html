@@ -35,6 +35,14 @@ body{
   min-height:100vh;overflow-x:hidden;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
+html, body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+html::-webkit-scrollbar, body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
 a{text-decoration:none;color:inherit}
 button{border:none;outline:none;cursor:pointer;font-family:inherit}
 img{display:block;max-width:100%}
@@ -97,8 +105,8 @@ img{display:block;max-width:100%}
 }
 .nav.scrolled{background:rgba(2,2,8,.82);box-shadow:0 8px 50px rgba(0,0,0,.6);border-color:rgba(153,93,255,.20)}
 .nav-logo{display:flex;align-items:center;gap:10px}
-.nav-logo img{width:28px;height:28px;border-radius:7px}
-.nav-logo span{font-family:var(--font-display);font-size:17px;font-weight:600;color:#fff;letter-spacing:-.4px}
+.nav-logo img{width:34px;height:34px;border-radius:8px}
+.nav-logo span{font-family:var(--font-display);font-size:19px;font-weight:510;color:#fff;letter-spacing:-.4px}
 .nav-center{display:flex;gap:28px}
 .nav-center a{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.55);transition:color .2s;position:relative}
 .nav-center a::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1.5px;background:var(--purple);transform:scaleX(0);transition:transform .25s cubic-bezier(.22,1,.36,1)}
@@ -127,7 +135,7 @@ img{display:block;max-width:100%}
 
 h1.hero-title{
   font-family:var(--font-display);font-weight:600;
-  font-size:clamp(36px,5.6vw,66px);line-height:.95;letter-spacing:-.055em;
+  font-size:clamp(30px,5vw,56px);line-height:.95;letter-spacing:-.055em;
   margin-bottom:22px;
   background:linear-gradient(135deg,#fff 30%,rgba(201,168,255,.9) 70%,rgba(153,93,255,.85));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
@@ -142,7 +150,7 @@ h1.hero-title{
   background:linear-gradient(90deg,var(--purple),rgba(153,93,255,.2));border-radius:2px
 }
 
-.hero-desc{max-width:540px;font-size:16px;line-height:1.82;color:var(--text2);margin-bottom:30px}
+.hero-desc{max-width:540px;font-size:17px;line-height:1.82;color:var(--text);margin-bottom:30px}
 .hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:34px}
 
 .btn-p{
@@ -193,9 +201,9 @@ h1.hero-title{
 .dash-card{
   padding:16px;border-radius:16px;border:1px solid var(--border);
   background:linear-gradient(155deg,rgba(14,19,34,.95),rgba(22,29,48,.9));
-  transition:border-color .25s,background .25s
+  transition:border-color .25s,background .25s,transform .4s cubic-bezier(.22,1,.36,1),box-shadow .4s cubic-bezier(.22,1,.36,1)
 }
-.dash-card:hover{border-color:rgba(153,93,255,.18)}
+.dash-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .dash-card.wide{grid-column:1/-1;background:linear-gradient(145deg,rgba(153,93,255,.10),rgba(77,142,240,.06) 50%,rgba(14,19,34,.98));border-color:rgba(153,93,255,.18)}
 .dc-label{font-size:9px;font-family:var(--font-mono);letter-spacing:.14em;text-transform:uppercase;color:var(--text4);margin-bottom:8px}
 .dc-big{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:600;font-size:32px;line-height:1;letter-spacing:-.04em}
@@ -222,7 +230,7 @@ h1.hero-title{
 .sec-border{border-top:1px solid var(--border)}
 .sec-kicker{font-size:10px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;color:var(--purple);font-family:var(--font-mono);margin-bottom:8px}
 .sec-hd{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:600;font-size:30px;letter-spacing:-.04em;margin-bottom:10px;line-height:1.15}
-.sec-sub{font-size:15px;color:var(--text2);max-width:560px;line-height:1.8;margin-bottom:44px}
+.sec-sub{font-size:16px;color:var(--text);max-width:560px;line-height:1.8;margin-bottom:44px}
 
 /* ══ FEATURE CARDS STRIP ══ */
 .feat-strip{
@@ -240,12 +248,12 @@ h1.hero-title{
   background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(153,93,255,.08) 0%,transparent 50%);
   opacity:0;transition:opacity .35s
 }
-.feat-card:hover{border-color:rgba(153,93,255,.22);transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.3),inset 0 0 30px rgba(153,93,255,.05)}
+.feat-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .feat-card:hover::before{opacity:1}
 .feat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
 .feat-name{font-size:14px;font-family:'Outfit','Space Grotesk',sans-serif;font-weight:500;letter-spacing:-.02em}
 .feat-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
-.feat-desc{font-size:12px;line-height:1.72;color:var(--text3)}
+.feat-desc{font-size:13px;line-height:1.75;color:var(--text)}
 
 /* ══ PLATFORM SECTION ══ */
 .split{display:grid;grid-template-columns:1.08fr .92fr;gap:48px;align-items:center}
@@ -259,14 +267,14 @@ h1.hero-title{
   box-shadow:0 30px 80px rgba(0,0,0,.45),inset 0 0 60px rgba(153,93,255,.03);
   overflow:hidden;transition:all .35s
 }
-.collage:hover{border-color:rgba(153,93,255,.20);box-shadow:0 36px 90px rgba(0,0,0,.5),inset 0 0 60px rgba(153,93,255,.05)}
+.collage:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .collage::before{content:'';position:absolute;top:-12%;right:55%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(153,93,255,.12),transparent 60%);pointer-events:none}
 .co-bar{display:flex;align-items:center;gap:7px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--border)}
 .co-dot{width:7px;height:7px;border-radius:50%;background:var(--border3)}
 .co-lbl{margin-left:auto;font-size:9px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.14em;text-transform:uppercase}
 .co-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
-.co-card{padding:16px;border-radius:16px;border:1px solid var(--border);background:linear-gradient(155deg,var(--bg3),rgba(20,26,40,.94));overflow:hidden;transition:border-color .25s}
-.co-card:hover{border-color:rgba(153,93,255,.14)}
+.co-card{padding:16px;border-radius:16px;border:1px solid var(--border);background:linear-gradient(155deg,var(--bg3),rgba(20,26,40,.94));overflow:hidden;transition:border-color .25s,transform .4s cubic-bezier(.22,1,.36,1),box-shadow .4s cubic-bezier(.22,1,.36,1)}
+.co-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .co-card.hero-c{grid-column:1/-1;background:linear-gradient(145deg,rgba(153,93,255,.10),rgba(77,142,240,.06) 50%,rgba(14,19,34,.98));border-color:rgba(153,93,255,.16)}
 .co-title{font-size:9px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
 .co-headline{font-family:'Space Grotesk','Outfit',sans-serif;font-size:20px;font-weight:500;letter-spacing:-.04em;line-height:1.15}
@@ -282,9 +290,9 @@ h1.hero-title{
 
 /* Feature text */
 .ft h2{font-family:'Space Grotesk','Outfit',sans-serif;font-weight:500;font-size:24px;letter-spacing:-.04em;margin-bottom:14px;line-height:1.26}
-.ft p{font-size:14px;color:var(--text2);line-height:1.8;margin-bottom:20px}
+.ft p{font-size:15px;color:var(--text);line-height:1.8;margin-bottom:20px}
 .ft-list{list-style:none}
-.ft-list li{font-size:13px;color:var(--text2);padding:9px 0;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--border)}
+.ft-list li{font-size:14px;color:var(--text);padding:9px 0;display:flex;align-items:flex-start;gap:10px;border-bottom:1px solid var(--border)}
 .ft-list li:last-child{border-bottom:none}
 .chk{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;background:rgba(153,93,255,.12);color:#c9a8ff;box-shadow:0 0 0 1px rgba(153,93,255,.12),0 0 18px rgba(153,93,255,.15)}
 .ft-cta{margin-top:22px;display:inline-flex;text-decoration:none}
@@ -298,7 +306,7 @@ h1.hero-title{
   background:linear-gradient(145deg,rgba(153,93,255,.07),rgba(77,142,240,.04) 55%,rgba(46,204,138,.03));
   transition:all .3s
 }
-.hi-shell:hover{border-color:rgba(153,93,255,.20);box-shadow:0 8px 36px rgba(0,0,0,.25)}
+.hi-shell:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .hi-title{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:500;font-size:21px;letter-spacing:-.04em;max-width:520px;line-height:1.3}
 .hi-pills{display:flex;gap:8px;flex-wrap:wrap}
 .hi-pill{padding:8px 13px;border-radius:999px;background:rgba(255,255,255,.03);border:1px solid var(--border2);font-size:10px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.08em;text-transform:uppercase;transition:all .2s}
@@ -316,11 +324,11 @@ h1.hero-title{
   background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(153,93,255,.07) 0%,transparent 50%);
   opacity:0;transition:opacity .35s
 }
-.out-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px);box-shadow:0 14px 46px rgba(0,0,0,.35)}
+.out-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .out-card:hover::before{opacity:1}
 .out-kkr{font-size:10px;font-family:var(--font-mono);letter-spacing:.18em;text-transform:uppercase;color:var(--text4);margin-bottom:16px}
 .out-title{font-family:'Space Grotesk','Outfit',sans-serif;font-weight:500;font-size:20px;letter-spacing:-.04em;margin-bottom:10px;line-height:1.22}
-.out-copy{font-size:13px;line-height:1.75;color:var(--text2);margin-bottom:18px}
+.out-copy{font-size:14px;line-height:1.75;color:var(--text);margin-bottom:18px}
 .out-tag{padding-top:14px;border-top:1px solid var(--border);font-size:11px;font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--purple)}
 
 /* ══ TRUST SECTION ══ */
@@ -337,10 +345,10 @@ h1.hero-title{
   background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(153,93,255,.06) 0%,transparent 50%);
   opacity:0;transition:opacity .3s
 }
-.tr-block:hover{border-color:rgba(153,93,255,.16);transform:translateY(-2px)}
+.tr-block:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .tr-block:hover::before{opacity:1}
 .tr-block h3{font-family:'Cabinet Grotesk','Space Grotesk',sans-serif;font-weight:500;font-size:16px;letter-spacing:-.03em;margin-bottom:8px}
-.tr-block p{font-size:13px;line-height:1.75;color:var(--text2)}
+.tr-block p{font-size:14px;line-height:1.75;color:var(--text)}
 
 /* ══ TESTIMONIALS ══ */
 .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
@@ -353,12 +361,12 @@ h1.hero-title{
   background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(153,93,255,.06) 0%,transparent 50%);
   opacity:0;transition:opacity .3s
 }
-.testi:hover{border-color:rgba(153,93,255,.18);transform:translateY(-3px)}
+.testi:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .testi:hover::before{opacity:1}
-.testi-qt{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:18px;font-style:italic;position:relative}
+.testi-qt{font-size:14px;color:var(--text);line-height:1.75;margin-bottom:18px;font-style:italic;position:relative}
 .testi-who{display:flex;align-items:center;gap:10px;position:relative}
 .testi-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
-.testi-nm{font-size:12px;font-weight:600;font-family:var(--font-display)}
+.testi-nm{font-size:16px;font-weight:500;font-family:var(--font-display)}
 .testi-rl{font-size:10px;color:var(--text4);font-family:var(--font-mono)}
 
 /* ══ STATS ROW ══ */
@@ -368,14 +376,14 @@ h1.hero-title{
 }
 .stat-box{background:var(--bg2);padding:28px 22px;transition:background .2s}
 .stat-box:hover{background:var(--bg3)}
-.stat-num{font-size:32px;font-weight:700;font-family:var(--font-display);letter-spacing:-1.2px;margin-bottom:4px}
+.stat-num{font-size:32px;font-weight:520;font-family:var(--font-display);letter-spacing:-1.2px;margin-bottom:4px}
 .stat-lbl{font-size:10px;color:var(--text4);font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.12em}
 
 /* ══ CTA ══ */
 .cta{padding:90px 36px;text-align:center;position:relative;overflow:hidden;background:linear-gradient(180deg,rgba(8,12,24,.90),rgba(2,2,8,.98))}
 .cta::before{content:'';position:absolute;bottom:-120px;left:50%;transform:translateX(-50%);width:700px;height:400px;background:radial-gradient(ellipse,rgba(153,93,255,.16) 0%,transparent 60%);pointer-events:none}
 .cta h2{font-family:'Space Grotesk','Outfit',sans-serif;font-weight:600;font-size:32px;letter-spacing:-.04em;margin-bottom:14px;position:relative}
-.cta p{font-size:15px;color:var(--text2);margin-bottom:30px;position:relative}
+.cta p{font-size:16px;color:var(--text);margin-bottom:30px;position:relative}
 .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
 
 /* ══ FOOTER ══ */
@@ -440,7 +448,6 @@ h1.hero-title{
   <div class="nav-center">
     <a href="#platform">Platform</a>
     <a href="#outcomes">Outcomes</a>
-    <a href="#trust">Trust</a>
     <a href="#reviews">Reviews</a>
   </div>
   <div class="nav-end">
@@ -453,8 +460,7 @@ h1.hero-title{
 <section class="hero" id="hero">
   <div class="hero-inner">
     <div class="rv-l">
-      <div class="hero-badge"><span class="pulse"></span> Journal · Review · Improve</div>
-      <h1 class="hero-title">Automated trade journaling that reveals your <span class="hero-accent">real edge</span>.</h1>
+      <h1 class="hero-title">Trade  journaling  that  reveals  your  <span class="hero-accent"> real  edge </span>.</h1>
       <p class="hero-desc">Equity Trace pulls your imports, account rules, setups, and execution data into one review system — so you can see what makes money, what leaks capital, and what needs to stop.</p>
       <div class="hero-btns">
         <button class="btn-p" onclick="window.location.href='journal.html?auth=signup'">
@@ -655,32 +661,6 @@ h1.hero-title{
   </div>
 </div>
 
-<!-- TRUST -->
-<div class="trust-sec" id="trust">
-  <div class="sec">
-    <div class="split flip">
-      <div class="ft rv-l">
-        <h2>Trust matters when the product holds your trading record.</h2>
-        <p>Equity Trace keeps your private journal separate from public presence. The homepage sells the product; the journal page is where work happens.</p>
-        <ul class="ft-list">
-          <li><div class="chk">✓</div>Homepage and journal live as separate pages</li>
-          <li><div class="chk">✓</div>Private cloud sync with local fallback</li>
-          <li><div class="chk">✓</div>Trade Card showcases consistency and execution quality</li>
-          <li><div class="chk">✓</div>Fast navigation back into the working journal</li>
-        </ul>
-      </div>
-      <div class="rv-r">
-        <div class="tr-grid">
-          <div class="tr-block" data-hover-glow><h3>Privacy-first sync</h3><p>Private data stays in the product. Share only summary stats you explicitly publish.</p></div>
-          <div class="tr-block" data-hover-glow><h3>Dedicated journal page</h3><p>Users land on a separate journal page — not a mixed landing screen.</p></div>
-          <div class="tr-block" data-hover-glow><h3>Cloud access</h3><p>Sign in across devices, or continue in local mode when needed.</p></div>
-          <div class="tr-block" data-hover-glow><h3>Review-ready sharing</h3><p>Trade Card highlights consistency, win rate, and execution quality.</p></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- TESTIMONIALS -->
 <div class="sec" id="reviews">
   <div class="rv">
@@ -691,15 +671,15 @@ h1.hero-title{
   <div class="testi-grid stg">
     <div class="testi" data-hover-glow>
       <div class="testi-qt">"Finally a journal that doesn't feel like homework. The playbook tracking changed how I approach setups."</div>
-      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#6b1fd4,#995dff)">JK</div><div><div class="testi-nm">Jake K.</div><div class="testi-rl">Futures Trader</div></div></div>
+      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#6b1fd4,#995dff)">JK</div><div><div class="testi-nm">Anthony Gunner</div><div class="testi-rl">Futures Trader</div></div></div>
     </div>
     <div class="testi" data-hover-glow>
       <div class="testi-qt">"The calendar heatmap alone saved my month. I could see exactly when I was overtrading and bleeding."</div>
-      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#1a9e62,#2ecc8a)">MR</div><div><div class="testi-nm">Maria R.</div><div class="testi-rl">Forex · Prop Trader</div></div></div>
+      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#1a9e62,#2ecc8a)">MR</div><div><div class="testi-nm">Jake conners</div><div class="testi-rl">Forex · Prop Trader</div></div></div>
     </div>
     <div class="testi" data-hover-glow>
       <div class="testi-qt">"Beautiful design, fast import, and the public profile is perfect for funding applications."</div>
-      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#2d6fd4,#4d8ef0)">AP</div><div><div class="testi-nm">Arun P.</div><div class="testi-rl">Index Scalper</div></div></div>
+      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#2d6fd4,#4d8ef0)">AP</div><div><div class="testi-nm">Pritheesh G</div><div class="testi-rl">Index Scalper</div></div></div>
     </div>
   </div>
 
@@ -729,7 +709,6 @@ h1.hero-title{
   <div class="ftr-links">
     <a href="#platform">Platform</a>
     <a href="#outcomes">Outcomes</a>
-    <a href="#trust">Trust</a>
     <a href="journal.html?auth=signin">Journal</a>
   </div>
 </footer>
@@ -759,25 +738,19 @@ h1.hero-title{
     constructor(){this.reset()}
     reset(){
       this.x=Math.random()*W;this.y=Math.random()*H;
-      this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;
+      this.vx=(Math.random()-.5)*1.2;this.vy=(Math.random()-.5)*1.2;
       this.r=Math.random()*1.8+.6;
       this.baseAlpha=Math.random()*.35+.08;
       this.alpha=this.baseAlpha;
       this.hue=Math.random()>.6?270:160; // purple or green
     }
     update(){
-      // Mouse attraction
-      const dx=mx-this.x,dy=my-this.y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<MOUSE_RADIUS){
-        const force=(1-dist/MOUSE_RADIUS)*.015;
-        this.vx+=dx*force;this.vy+=dy*force;
-        this.alpha=this.baseAlpha+(1-dist/MOUSE_RADIUS)*.3;
-      }else{
-        this.alpha+=(this.baseAlpha-this.alpha)*.05;
-      }
-      // Damping
-      this.vx*=.98;this.vy*=.98;
+      // Particles move independently without mouse attraction
+      this.alpha+=(this.baseAlpha-this.alpha)*.05;
+      // Add subtle random drift for natural space-like motion
+      this.vx+=(Math.random()-.5)*.01;this.vy+=(Math.random()-.5)*.01;
+      // Very minimal damping to maintain momentum for minutes
+      this.vx*=.9999;this.vy*=.9999;
       this.x+=this.vx;this.y+=this.vy;
       // Boundaries
       if(this.x<0)this.x=W;if(this.x>W)this.x=0;
@@ -811,21 +784,6 @@ h1.hero-title{
           ctx.lineWidth=.5;
           ctx.stroke();
         }
-      }
-    }
-
-    // Mouse connections
-    for(let i=0;i<particles.length;i++){
-      const dx=mx-particles[i].x,dy=my-particles[i].y;
-      const dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<MOUSE_RADIUS){
-        const alpha=(1-dist/MOUSE_RADIUS)*.2;
-        ctx.beginPath();
-        ctx.moveTo(particles[i].x,particles[i].y);
-        ctx.lineTo(mx,my);
-        ctx.strokeStyle=`rgba(153,93,255,${alpha})`;
-        ctx.lineWidth=.7;
-        ctx.stroke();
       }
     }
 
@@ -953,17 +911,19 @@ function resetNum(el){
   obs.observe(barsWrap);
 })();
 
-// ══ 3D TILT ON HERO DASH ══
+// ══ 3D TILT ON HERO DASH + PLATFORM OVERVIEW ══
 (function(){
-  const dash=document.getElementById('hero-dash');
-  if(!dash)return;
-  dash.addEventListener('mousemove',e=>{
-    const r=dash.getBoundingClientRect();
-    const x=(e.clientX-r.left)/r.width-.5;
-    const y=(e.clientY-r.top)/r.height-.5;
-    dash.style.transform=`perspective(1000px) rotateY(${x*4}deg) rotateX(${-y*4}deg) translateY(-4px) scale(1.005)`;
+  const cards = document.querySelectorAll('#hero-dash, .collage');
+  if(!cards.length)return;
+  cards.forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      card.style.transform = `perspective(1000px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg) translateY(-4px) scale(1.005)`;
+    });
+    card.addEventListener('mouseleave', () => { card.style.transform = ''; });
   });
-  dash.addEventListener('mouseleave',()=>{dash.style.transform=''});
 })();
 
 // ══ PWA INSTALL PROMPT ══

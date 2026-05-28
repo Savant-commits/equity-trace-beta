@@ -251,13 +251,17 @@ function initAccountCalendarModule() {
           borderColor = 'rgba(232,80,74,.4)'; bgColor = 'rgba(232,80,74,.08)';
           pnlColor = 'var(--red)'; glowColor = 'rgba(232,80,74,.12)'; hoverBg = 'rgba(232,80,74,.15)';
           weekPnl += data.pnl; weekTraded++;
+        } else if (data && data.pnl === 0) {
+          borderColor = 'rgba(153,93,255,.4)'; bgColor = 'rgba(153,93,255,.12)';
+          pnlColor = 'var(--purple)'; glowColor = 'rgba(153,93,255,.18)'; hoverBg = 'rgba(153,93,255,.22)';
+          weekTraded++;
         } else if (data) {
           borderColor = 'rgba(160,168,190,.25)'; bgColor = 'rgba(160,168,190,.06)';
           pnlColor = 'var(--text3)'; glowColor = 'transparent'; hoverBg = 'rgba(160,168,190,.1)';
           weekTraded++;
         } else {
-          borderColor = isToday ? 'var(--ac-55)' : (isWeekend ? 'rgba(255,255,255,.04)' : 'rgba(255,255,255,.06)');
-          bgColor = isWeekend ? 'rgba(0,0,0,.15)' : 'var(--bg4)';
+          borderColor = isToday ? 'var(--ac-55)' : 'rgba(255,255,255,.04)';
+          bgColor = 'rgba(0,0,0,.15)';
           pnlColor = 'var(--text4)'; glowColor = 'transparent'; hoverBg = bgColor;
         }
 
@@ -289,9 +293,9 @@ function initAccountCalendarModule() {
         </div>`;
       }).join('');
 
-      const weekColor = weekPnl > 0 ? 'var(--green)' : weekPnl < 0 ? 'var(--red)' : 'var(--text3)';
-      const weekBg    = weekPnl > 0 ? 'rgba(46,204,138,.07)' : weekPnl < 0 ? 'rgba(232,80,74,.07)' : 'transparent';
-      const weekBorder= weekPnl > 0 ? 'rgba(46,204,138,.3)' : weekPnl < 0 ? 'rgba(232,80,74,.3)' : 'var(--border)';
+      const weekColor = weekPnl > 0 ? 'var(--green)' : weekPnl < 0 ? 'var(--red)' : 'var(--purple)';
+      const weekBg    = weekPnl > 0 ? 'rgba(46,204,138,.07)' : weekPnl < 0 ? 'rgba(232,80,74,.07)' : 'rgba(153,93,255,.07)';
+      const weekBorder= weekPnl > 0 ? 'rgba(46,204,138,.3)' : weekPnl < 0 ? 'rgba(232,80,74,.3)' : 'rgba(153,93,255,.3)';
       const weekCell  = `<div style="border-left:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 10px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;background:${weekBg}">
         <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:2px">WEEK</div>
         ${weekTraded > 0
