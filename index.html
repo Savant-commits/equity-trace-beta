@@ -33,6 +33,7 @@ body{
   font-family:'Cabinet Grotesk','Space Grotesk','Outfit',system-ui,-apple-system,sans-serif;
   min-height:100vh;overflow-x:hidden;
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  word-spacing:0.06em;
 }
 html, body {
   scrollbar-width: none;
@@ -134,7 +135,7 @@ img{display:block;max-width:100%}
 
 h1.hero-title{
   font-family:var(--font-display);font-weight:600;
-  font-size:clamp(30px,5vw,56px);line-height:.95;letter-spacing:-.055em;
+  font-size:clamp(30px,5vw,56px);line-height:1.02;letter-spacing:-.055em;word-spacing:.22em;
   margin-bottom:22px;
   background:linear-gradient(135deg,#fff 30%,rgba(201,168,255,.9) 70%,rgba(153,93,255,.85));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;
@@ -231,7 +232,7 @@ h1.hero-title{
 .sec{padding:72px 36px;max-width:1240px;margin:0 auto}
 .sec-border{border-top:1px solid var(--border)}
 .sec-kicker{font-size:10px;font-weight:500;letter-spacing:1.8px;text-transform:uppercase;color:var(--purple);font-family:var(--font-mono);margin-bottom:8px}
-.sec-hd{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:600;font-size:30px;letter-spacing:-.04em;margin-bottom:10px;line-height:1.15}
+.sec-hd{font-family:'Outfit','Space Grotesk',sans-serif;font-weight:600;font-size:30px;letter-spacing:-.04em;margin-bottom:10px;line-height:1.15;word-spacing:.12em}
 .sec-sub{font-size:16px;color:var(--text);max-width:560px;line-height:1.8;margin-bottom:44px}
 
 /* ══ FEATURE CARDS STRIP ══ */
@@ -253,8 +254,9 @@ h1.hero-title{
 .feat-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .feat-card:hover::before{opacity:1}
 .feat-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.feat-name{font-size:14px;font-family:'Outfit','Space Grotesk',sans-serif;font-weight:500;letter-spacing:-.02em}
-.feat-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.feat-name{font-size:14px;font-family:'Outfit','Space Grotesk',sans-serif;font-weight:500;letter-spacing:-.02em;color:#fff}
+.feat-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff}
+.feat-ico svg{width:18px;height:18px;display:block;stroke:currentColor;fill:none}
 .feat-desc{font-size:13px;line-height:1.75;color:var(--text)}
 
 /* ══ PLATFORM SECTION ══ */
@@ -622,19 +624,20 @@ h1.hero-title{
 <!-- FEATURE STRIP -->
 <div class="feat-strip stg" id="feat-strip">
   <div class="feat-card" data-hover-glow>
-    <div class="feat-head"><span class="feat-name">One-click Import</span><span class="feat-ico" style="background:rgba(153,93,255,.10)">📥</span></div>
+    <div class="feat-head"><span class="feat-name">One-click Import</span><span class="feat-ico" style="background:rgba(153,93,255,.10)"><svg viewBox="0 0 24 24"><path d="M12 3v10m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="M6 18h12v2H6v-2z" fill="currentColor"/></svg></span></div>
     <div class="feat-desc">Drop CSV or JSON exports. MT4, Tradovate, and generic formats supported out of the box.</div>
   </div>
   <div class="feat-card" data-hover-glow>
-    <div class="feat-head"><span class="feat-name">Playbook Tracking</span><span class="feat-ico" style="background:rgba(46,204,138,.10)">📘</span></div>
+    <div class="feat-head"><span class="feat-name">Playbook Tracking</span><span class="feat-ico" style="background:rgba(46,204,138,.10)"><svg viewBox="0 0 24 24"><path d="M6 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M9 8h6M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg></span></div>
     <div class="feat-desc">Tag trades by setup. See which models generate edge — and which leak capital over time.</div>
   </div>
   <div class="feat-card" data-hover-glow>
-    <div class="feat-head"><span class="feat-name">Calendar Heatmap</span><span class="feat-ico" style="background:rgba(77,142,240,.10)">📅</span></div>
+    <div class="feat-head"><span class="feat-name">Calendar Heatmap</span><span class="feat-ico" style="background:rgba(77,142,240,.10)"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2" stroke="currentColor" stroke-width="1.8" fill="none"/>
+<path d="M8 2v4M16 2v4M5 10h14M9 14h2M13 14h2M9 18h2" stroke="currentColor" stroke-width="1.8" fill="none"/></svg></span></div>
     <div class="feat-desc">Visual daily P&amp;L calendar. Spot patterns in your trading rhythm at a glance.</div>
   </div>
   <div class="feat-card" data-hover-glow>
-    <div class="feat-head"><span class="feat-name">Public Trader Page</span><span class="feat-ico" style="background:rgba(232,80,74,.10)">🔗</span></div>
+    <div class="feat-head"><span class="feat-name">Public Trader Page</span><span class="feat-ico" style="background:rgba(232,80,74,.10)"><svg viewBox="0 0 24 24"><path d="M10 13a3 3 0 0 1 0-6h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M14 11a3 3 0 0 1 0 6h-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/><path d="M7 9l2-2m6 6l2-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></div>
     <div class="feat-desc">Share verified stats publicly. Build credibility without revealing your private journal.</div>
   </div>
 </div>
