@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Equity Trace Help</title>
+<meta name="description" content="Equity Trace help page with FAQs for journal, accounts, and settings."/>
+<link rel="icon" type="image/png" href="logo.png">
+<meta name="theme-color" content="#995dff">
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Equity Trace">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/>
+<link rel="preconnect" href="https://api.fontshare.com"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@300,400,500,700,800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);margin:0;min-height:100vh}
+html{scroll-behavior:smooth}
+.help-page{padding:70px 24px 60px;max-width:1080px;margin:0 auto}
+.help-header{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:32px}
+.help-header h1{font-family:var(--font-display);font-size:clamp(32px,5vw,48px);margin:0;line-height:1.05}
+.help-header p{max-width:680px;color:var(--text2);margin:0}
+.help-nav{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:36px}
+.help-nav a{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);font-size:13px;text-decoration:none;transition:background .2s,border-color .2s}
+.help-nav a:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2)}
+.faq-group{border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:14px;background:var(--bg2)}
+.faq-group-header{display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;user-select:none;transition:background .15s}
+.faq-group-header:hover{background:var(--ac-06)}
+.faq-group-icon{display:inline-flex;align-items:center;justify-content:center;color:#fff;font-size:18px;line-height:1;background:none;border:none;box-shadow:none;padding:0;margin:0}
+.faq-group-icon svg{width:18px;height:18px;fill:currentColor}
+.faq-group-title{font-family:var(--font-display);font-weight:500;font-size:15px;color:var(--text);flex:1}
+.faq-group-count{font-size:10px;font-family:var(--font-mono);color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:4px 10px}
+.faq-group-chevron{color:var(--text3);transition:transform .2s;font-size:13px;display:flex;align-items:center;justify-content:center;width:18px}
+.faq-group-body{display:none;border-top:1px solid var(--border);padding:0}
+.faq-item{padding:16px 18px;border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{display:flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none}
+.faq-q-text{font-family:var(--font-body);font-size:14px;font-weight:500;color:var(--text);flex:1;line-height:1.65}
+.faq-q-arrow{color:var(--text3);font-size:12px;transition:transform .2s;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.faq-a{display:none;margin-top:12px;font-family:var(--font-body);font-size:14px;color:var(--text2);line-height:1.9;padding-left:20px}
+.faq-a code{background:var(--bg4);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-family:var(--font-mono);font-size:12px;color:var(--purple)!important}
+.faq-a ul{padding-left:18px;margin-top:8px}
+.faq-a ul li{margin-bottom:6px}
+.faq-item.open .faq-q-arrow{transform:rotate(90deg)}
+.faq-item.open .faq-a{display:block}
+</style>
+</head>
+<body>
+<div class="help-page">
+  <div class="help-nav">
+    <a href="index.html">← Home</a>
+    <a href="journal.html?auth=signin">Open Journal</a>
+  </div>
+  <header class="help-header">
+    <div>
+      <h1>Equity Trace Help</h1>
+      <p>Find the latest answers for journal setup, accounts, data storage, and analytics in one place.</p>
+    </div>
+  </header>
+  <div class="faq-root">
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M12 2l3.5 10.5L22 13l-6 4.5L14 22l-2-7.5L6 13l6.5-.5L12 2z"/></svg></div>
+        <div class="faq-group-title">Getting Started</div>
+        <div class="faq-group-count">5 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I add my first trade?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Click the <code>+ Add Trade</code> button in the top-right corner, or press <code>N</code> on your keyboard. Fill in the required fields — symbol, direction, entry/exit prices, date, time, and P&amp;L. Optional fields like setup, session, and notes help build better analytics over time.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I add an account?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Go to <code>Settings → Accounts</code> and click <code>+ Add Account</code>. Enter your prop firm name, phase, account size, and drawdown limits. Each account is tracked independently and can be selected from the account switcher in the header.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">Where is my data stored?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">All your data is stored <strong>locally in your browser</strong> using localStorage. Nothing is sent to any server. This means your data stays on your device, but clearing browser data or uninstalling the app will erase it.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I back up or transfer my data?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The app stores trades locally, and the current settings experience no longer exposes import/export controls in the Data section. If you need to keep your journal safe, avoid clearing browser storage and use the available report export tools elsewhere in the app for summaries and backups.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What does the version number mean?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The app is currently in a preview release with the journal, accounts, and analytics features available. It is stable for daily tracking but still being refined, so report any issues and your current workflow if you encounter one.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M5 5h4v14H5V5zm6 4h4v10h-4V9zm6-4h4v14h-4V5z"/></svg></div>
+        <div class="faq-group-title">Dashboard &amp; Overview</div>
+        <div class="faq-group-count">5 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What does "All Accounts" mode show?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">When <code>All Accounts</code> is selected, the dashboard aggregates data across all your accounts — total P&amp;L, combined win rate, and portfolio overview. The Daily P&amp;L chart switches to dollar values instead of percentages since each account has a different size.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">Why does the Profit Factor show infinity?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Profit Factor = Total Wins ÷ Total Losses. If you have no losing trades (or haven't entered any losses yet), the denominator is zero — which results in ∞. This is mathematically correct and means your trading has been 100% profitable so far.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What is the Setup Scorecard?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The Setup Scorecard ranks your trades by a composite score based on win/loss result, risk management quality, kill zone alignment, instrument traded, and win streak multiplier.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What are the Goals cards tracking?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The Goals section shows Max Loss, Profit Target, and Daily Loss metrics configured per account. These are the main prop firm rules to monitor while trading.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How does the Equity Curve work?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The equity curve plots your running account balance after each trade. Use filters to zoom into a specific period and click any point to view that trade’s detail.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M6 4h12v2H6V4zm0 5h12v2H6V9zm0 5h8v2H6v-2zm0 5h8v2H6v-2z"/></svg></div>
+        <div class="faq-group-title">Trade Journal</div>
+        <div class="faq-group-count">5 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I edit a trade?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Click any trade row in the Trade Journal to open the detail panel, then click the Edit button to update the trade.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I add screenshots to a trade?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Use drag &amp; drop, paste from clipboard, or file browse in the trade detail screenshot section.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What is the Rating (stars) for?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The rating captures execution quality separate from profitability. Use it to compare trade quality over time.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I filter trades?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Use the filter bar at the top of the Trade Journal to choose direction, result, symbol, session, date, and account filters.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What is Bulk Edit?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Select multiple trades using the checkboxes and then use the action bar to update account, session, setup, or model fields in bulk.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M4 16h3v4H4v-4zm5-4h3v8H9v-8zm5-6h3v14h-3V6zm5 8h3v6h-3v-6z"/></svg></div>
+        <div class="faq-group-title">Analytics &amp; Charts</div>
+        <div class="faq-group-count">4 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What is the Heatmap showing?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The calendar heatmap shows daily P&amp;L at a glance. Green days are profitable and red days are losses.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What does the Daily P&amp;L chart show?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">It plots net P&amp;L for each day, with green rightward bars for profit and red leftward bars for loss.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What is the P&amp;L by Session chart?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">It breaks down P&amp;L by London, New York, Asia, and other trading sessions so you can compare performance by time zone.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How is R-Multiple calculated?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">R-Multiple = Exit P&amp;L ÷ Risk Amount. For example, risking $100 and making $150 results in 1.5R.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4V6zm2 2v2h2V8H6zm4 0v2h2V8h-2zm4 0v2h2V8h-2zm4 0v2h2V8h-2zm-12 4v2h2v-2H6zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2zm4 0v2h2v-2h-2z"/></svg></div>
+        <div class="faq-group-title">Keyboard Shortcuts</div>
+        <div class="faq-group-count">1 topic</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What keyboard shortcuts are available?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a"><ul><li><code>N</code> - Open Add Trade modal</li><li><code>D</code> - Cycle themes</li><li><code>1</code>-<code>9</code> - Jump to main app sections</li><li><code>Ctrl+K</code> / <code>Cmd+K</code> - Command palette</li><li><code>Escape</code> - Close modal or panel</li></ul></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 3.865 3.135 7 7 7s7-3.135 7-7a7 7 0 0 0-7-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z"/></svg></div>
+        <div class="faq-group-title">Themes &amp; Appearance</div>
+        <div class="faq-group-count">3 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What are the three themes?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a"><ul><li><strong>Midnight</strong> - Pure black background for low-light focus.</li><li><strong>Aura</strong> - Dark grey with vivid accent fills.</li><li><strong>Dawn</strong> - Light background for daytime use.</li></ul></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">My theme resets every time I open the app</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Theme preferences are saved in localStorage. If your browser clears site data on close or you're in private mode, theme settings may not persist.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M4 10h16v2H4v-2zm2-4h12v2H6V6zm-2 8h16v6H4v-6zm4 2v2h2v-2H8zm4 0v2h2v-2h-2z"/></svg></div>
+        <div class="faq-group-title">Prop Firm &amp; Accounts</div>
+        <div class="faq-group-count">4 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How do I set up a prop firm account?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">In <code>Settings → Accounts</code>, click <code>+ Add Account</code> and fill in the firm name, phase, account size, drawdown limits, and profit target.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">What is the difference between Trailing and Static drawdown?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a"><ul><li><strong>Static</strong> - Drawdown is fixed from your starting balance.</li><li><strong>Trailing</strong> - Drawdown follows your best equity point as you profit.</li></ul></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">How does the Daily Loss timer reset work?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">The timer counts down to the next daily reset, typically midnight local time or the firm's reset time, and then resets your daily P&amp;L counter.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">Can I track multiple accounts at once?</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Yes. Add multiple accounts and choose <code>All Accounts</code> to view combined metrics, or select a single account to view its specific performance.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-group">
+      <div class="faq-group-header" onclick="faqToggleGroup(this)">
+        <div class="faq-group-icon"><svg viewBox="0 0 24 24"><path d="M9.5 2l1 4H8l1.5-4zm5 0L14 6h-2.5l1-4h2zm-8.5 8h16v2H6V10zm0 4h10v2H6v-2zm0 4h6v2H6v-2z"/></svg></div>
+        <div class="faq-group-title">Troubleshooting</div>
+        <div class="faq-group-count">4 topics</div>
+        <div class="faq-group-chevron">▶</div>
+      </div>
+      <div class="faq-group-body">
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">My data disappeared after opening the app</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">This can happen if the browser cleared localStorage, or if you're in incognito/private mode. Avoid clearing site data and keep backups if possible.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">Charts are not displaying correctly</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Refresh the page, disable extensions that block scripts, or use a modern browser like Chrome, Edge, or Firefox.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">The app looks different on my phone</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Equity Trace is optimized for desktop. On smaller screens, some panels condense and additional scrolling may be required.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
+            <div class="faq-q-text">A keyboard shortcut is not working</div>
+            <div class="faq-q-arrow">▶</div>
+          </div>
+          <div class="faq-a">Shortcuts are disabled when an input field is focused or a modal is open. Click outside the form first and try again.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function faqToggleGroup(header){
+  const body = header.nextElementSibling;
+  const chevron = header.querySelector('.faq-group-chevron');
+  const isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+}
+function faqToggleItem(item){
+  item.classList.toggle('open');
+}
+</script>
+</body>
+</html>

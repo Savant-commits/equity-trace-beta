@@ -7,8 +7,7 @@
 <meta name="description" content="Equity Trace is a modern trading journal for serious traders. Import trades, review performance, track playbooks, and protect capital — all in one premium workspace."/>
 <link rel="icon" type="image/png" href="logo.png">
 <meta name="theme-color" content="#995dff">
-<!-- PWA Support -->
-<link rel="manifest" href="manifest.json">
+<!-- PWA Support is disabled on home page -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -192,9 +191,12 @@ h1.hero-title{
 .hero-dash::before{content:'';position:absolute;top:-20%;right:-15%;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(46,204,138,.12),transparent 60%);pointer-events:none}
 .hero-dash::after{content:'';position:absolute;bottom:-10%;left:-10%;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(153,93,255,.10),transparent 60%);pointer-events:none}
 
-.dash-bar{display:flex;align-items:center;gap:7px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.dash-bar{display:flex;align-items:center;gap:7px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
 .dash-dot{width:8px;height:8px;border-radius:50%}
-.dash-label{margin-left:auto;font-size:9px;font-family:var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:var(--text4)}
+.dash-dot:nth-child(1){background:#ff5f57}
+.dash-dot:nth-child(2){background:#ffbd2e}
+.dash-dot:nth-child(3){background:#28c840}
+.dash-label{margin-left:auto;font-size:9px;font-family:var(--font-mono);letter-spacing:.16em;text-transform:uppercase;color:#fff;font-weight:700}
 
 .dash-body{padding:16px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1;flex:1}
 .dash-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -269,9 +271,12 @@ h1.hero-title{
 }
 .collage:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
 .collage::before{content:'';position:absolute;top:-12%;right:55%;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(153,93,255,.12),transparent 60%);pointer-events:none}
-.co-bar{display:flex;align-items:center;gap:7px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--border)}
+.co-bar{display:flex;align-items:center;gap:7px;padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.12)}
 .co-dot{width:7px;height:7px;border-radius:50%;background:var(--border3)}
-.co-lbl{margin-left:auto;font-size:9px;color:var(--text4);font-family:var(--font-mono);letter-spacing:.14em;text-transform:uppercase}
+.co-dot:nth-child(1){background:#ff5f57}
+.co-dot:nth-child(2){background:#ffbd2e}
+.co-dot:nth-child(3){background:#28c840}
+.co-lbl{margin-left:auto;font-size:9px;color:#fff;font-family:var(--font-mono);letter-spacing:.14em;text-transform:uppercase;font-weight:700}
 .co-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
 .co-card{padding:16px;border-radius:16px;border:1px solid var(--border);background:linear-gradient(155deg,var(--bg3),rgba(20,26,40,.94));overflow:hidden;transition:border-color .25s,transform .4s cubic-bezier(.22,1,.36,1),box-shadow .4s cubic-bezier(.22,1,.36,1)}
 .co-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
@@ -369,6 +374,75 @@ h1.hero-title{
 .testi-nm{font-size:16px;font-weight:500;font-family:var(--font-display)}
 .testi-rl{font-size:10px;color:var(--text4);font-family:var(--font-mono)}
 
+/* ══ JOURNAL SCREENSHOT SECTION ══ */
+.screen-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:40px
+}
+.screen-card{
+  padding:26px;border-radius:24px;border:1px solid var(--border);
+  background:linear-gradient(150deg,rgba(8,12,24,.94),rgba(14,19,34,.96));
+  overflow:hidden;position:relative;transition:all .35s cubic-bezier(.22,1,.36,1)
+}
+.screen-card::before{
+  content:'';position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(153,93,255,.08),transparent 48%);opacity:0;transition:opacity .35s
+}
+.screen-card:hover{border-color:rgba(153,93,255,.18);transform:translateY(-4px) scale(1.005);box-shadow:0 50px 120px rgba(0,0,0,.6),inset 0 0 80px rgba(153,93,255,.06),0 0 0 1px rgba(153,93,255,.12)}
+.screen-card:hover::before{opacity:1}
+.screen-card-wide{grid-column:1/-1}
+.screen-bar{display:flex;align-items:center;gap:8px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:18px}
+.screen-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.18)}
+.screen-bar .screen-dot:nth-child(1){background:#ff7a7a}
+.screen-bar .screen-dot:nth-child(2){background:#ffd56c}
+.screen-bar .screen-dot:nth-child(3){background:#6ae286}
+.screen-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fff;font-family:var(--font-mono);margin-left:auto}
+.screen-body{display:flex;flex-direction:column;gap:14px}
+.screen-header{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;font-weight:700;color:#fff}
+.screen-pill{padding:6px 12px;border-radius:999px;background:rgba(153,93,255,.12);color:var(--purple);font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--font-mono)}
+.screen-copy{font-size:14px;line-height:1.75;color:var(--text);min-height:84px}
+.screen-row{display:flex;flex-wrap:wrap;gap:8px}
+.screen-chip{padding:8px 11px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--border);font-size:11px;color:var(--text4);font-family:var(--font-mono)}
+.screen-preview{margin-top:16px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);overflow:hidden}
+.screen-preview-inner{padding:16px}
+.screen-topline{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.screen-topline span{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.18)}
+.screen-preview-bg{display:grid;gap:10px}
+.screen-line{height:10px;border-radius:999px;background:rgba(255,255,255,.08)}
+.screen-line.short{width:45%}
+.screen-line.medium{width:70%}
+.screen-line.long{width:95%}
+.screen-graph{display:flex;align-items:flex-end;gap:6px;height:64px}
+.screen-graph span{flex:1;border-radius:8px;background:linear-gradient(180deg,rgba(153,93,255,.55),rgba(153,93,255,.18));min-height:14px}
+.screen-pnl-grid{display:grid;gap:10px}
+.pnl-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pnl-cell{padding:16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);display:flex;flex-direction:column;gap:8px}
+.pnl-cell strong{font-size:14px;color:#fff}
+.pnl-cell span{font-size:12px;color:var(--text)}
+.pnl-cell small{font-size:11px;color:var(--text4);letter-spacing:.02em}
+.pnl-win{background:rgba(66,187,127,.1);border-color:rgba(66,187,127,.2)}
+.pnl-loss{background:rgba(255,103,103,.1);border-color:rgba(255,103,103,.2)}
+.pnl-muted{background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.08);color:var(--text4)}
+.pnl-cell.wide{grid-column:span 3}
+.screen-hours-graph{display:flex;flex-direction:column;gap:12px}
+.hour-axis{display:grid;grid-template-columns:repeat(14,1fr);gap:6px;font-size:10px;color:var(--text4);letter-spacing:.04em}
+.hour-axis span{text-align:center;white-space:nowrap}
+.hour-bars{display:grid;grid-template-columns:repeat(14,1fr);gap:8px;min-height:160px;align-items:end}
+.hour-bar{border-radius:12px;background:linear-gradient(180deg,rgba(153,93,255,.5),rgba(153,93,255,.15));}
+.hour-win{background:linear-gradient(180deg,rgba(85,209,169,.85),rgba(66,187,127,.35))}
+.hour-loss{background:linear-gradient(180deg,rgba(255,129,129,.85),rgba(255,103,103,.25))}
+.screen-streaks{display:grid;gap:14px}
+.streak-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.streak-summary div{padding:14px 16px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.streak-summary span{font-size:11px;color:var(--text4);text-transform:uppercase;letter-spacing:.08em}
+.streak-summary strong{display:block;margin-top:6px;font-size:16px;color:#fff}
+.streak-line{display:flex;align-items:flex-end;gap:10px;height:72px;padding:0 4px}
+.streak-bar{flex:1;border-radius:999px}
+.streak-bar.win{background:linear-gradient(180deg,rgba(85,209,169,.85),rgba(66,187,127,.35))}
+.streak-bar.loss{background:linear-gradient(180deg,rgba(255,129,129,.85),rgba(255,103,103,.25))}
+.streak-tags{display:flex;flex-wrap:wrap;gap:10px}
+.streak-tag{padding:10px 14px;border-radius:999px;font-size:11px;font-family:var(--font-mono);border:1px solid rgba(255,255,255,.08)}
+.win-tag{background:rgba(85,209,169,.12);color:#9ff7d1;border-color:rgba(66,187,127,.3)}
+.loss-tag{background:rgba(255,129,129,.12);color:#ffb3b3;border-color:rgba(255,103,103,.3)}
+
 /* ══ STATS ROW ══ */
 .stats-row{
   display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
@@ -387,7 +461,7 @@ h1.hero-title{
 .cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative}
 
 /* ══ FOOTER ══ */
-.ftr{padding:22px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;background:rgba(2,2,8,.5)}
+.ftr{position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;width:100vw;max-width:100vw;box-sizing:border-box;padding:22px 36px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;background:rgba(2,2,8,.5)}
 .ftr-copy{font-size:11px;color:var(--text4);font-family:var(--font-mono)}
 .ftr-links{display:flex;gap:22px}
 .ftr-links a{font-size:11px;color:var(--text4);font-family:var(--font-mono);transition:color .2s}
@@ -399,7 +473,7 @@ h1.hero-title{
 /* ══ RESPONSIVE ══ */
 @media(max-width:1000px){
   .hero-inner,.split,.split.flip{grid-template-columns:1fr}
-  .feat-strip,.out-grid{grid-template-columns:1fr 1fr}
+  .feat-strip,.out-grid,.screen-grid{grid-template-columns:1fr 1fr}
   .co-grid{grid-template-columns:1fr}
   .stats-row{grid-template-columns:repeat(2,1fr)}
   .dash-row{grid-template-columns:1fr}
@@ -420,7 +494,7 @@ h1.hero-title{
 </style>
 </head>
 <body>
-<a href="journal.html" style="
+<a href="journal.html" target="_blank" rel="noopener noreferrer" style="
   position: fixed;
   top: 20px;
   right: 20px;
@@ -448,11 +522,11 @@ h1.hero-title{
   <div class="nav-center">
     <a href="#platform">Platform</a>
     <a href="#outcomes">Outcomes</a>
-    <a href="#reviews">Reviews</a>
+    <a href="#screenshots">Journal</a>
   </div>
   <div class="nav-end">
-    <button class="nav-ghost" onclick="window.location.href='journal.html?auth=signin'">Sign In</button>
-    <button class="nav-cta" onclick="window.location.href='journal.html?auth=signup'">Start Free →</button>
+    <button class="nav-ghost" onclick="window.open('journal.html?auth=signin', '_blank')">Sign In</button>
+    <button class="nav-cta" onclick="window.open('journal.html?auth=signup', '_blank')">Start Free →</button>
   </div>
 </nav>
 
@@ -463,7 +537,7 @@ h1.hero-title{
       <h1 class="hero-title">Trade  journaling  that  reveals  your  <span class="hero-accent"> real  edge </span>.</h1>
       <p class="hero-desc">Equity Trace pulls your imports, account rules, setups, and execution data into one review system — so you can see what makes money, what leaks capital, and what needs to stop.</p>
       <div class="hero-btns">
-        <button class="btn-p" onclick="window.location.href='journal.html?auth=signup'">
+        <button class="btn-p" onclick="window.open('journal.html?auth=signup', '_blank')">
           <svg viewBox="0 0 16 16" fill="none"><path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           Create Free Account
         </button>
@@ -499,7 +573,7 @@ h1.hero-title{
             </div>
             <div class="dash-card">
               <div class="dc-label">Best Model</div>
-              <div class="dc-big" style="font-size:22px">VWAP Reclaim</div>
+              <div class="dc-big" style="font-size:22px">Support Breakout</div>
               <div class="dc-sub">19 trades · +2.6R avg · 73% win</div>
             </div>
           </div>
@@ -614,7 +688,7 @@ h1.hero-title{
         <li><div class="chk">✓</div>Edge breakdown by symbol, session, playbook, and time period</li>
         <li><div class="chk">✓</div>Dedicated reports page for exporting and sharing progress</li>
       </ul>
-      <a class="btn-p ft-cta" href="journal.html?auth=signup">Open the journal →</a>
+      <a class="btn-p ft-cta" href="journal.html?auth=signup" target="_blank" rel="noopener noreferrer">Open the journal →</a>
     </div>
   </div>
 </div>
@@ -661,33 +735,96 @@ h1.hero-title{
   </div>
 </div>
 
-<!-- TESTIMONIALS -->
-<div class="sec" id="reviews">
+<!-- JOURNAL SCREENSHOTS -->
+<div class="sec" id="screenshots">
   <div class="rv">
-    <div class="sec-kicker">What traders say</div>
-    <div class="sec-hd">Built by traders, for traders.</div>
-    <div class="sec-sub">Real feedback from the trading community.</div>
+    <div class="sec-kicker">Journal In Action</div>
+    <div class="sec-hd">Screenshot previews of the journal working with live trades.</div>
+    <div class="sec-sub">See trade review, calendar heatmap, and screenshot attachment workflows from inside the app.</div>
   </div>
-  <div class="testi-grid stg">
-    <div class="testi" data-hover-glow>
-      <div class="testi-qt">"Finally a journal that doesn't feel like homework. The playbook tracking changed how I approach setups."</div>
-      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#6b1fd4,#995dff)">JK</div><div><div class="testi-nm">Anthony Gunner</div><div class="testi-rl">Futures Trader</div></div></div>
-    </div>
-    <div class="testi" data-hover-glow>
-      <div class="testi-qt">"The calendar heatmap alone saved my month. I could see exactly when I was overtrading and bleeding."</div>
-      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#1a9e62,#2ecc8a)">MR</div><div><div class="testi-nm">Jake conners</div><div class="testi-rl">Forex · Prop Trader</div></div></div>
-    </div>
-    <div class="testi" data-hover-glow>
-      <div class="testi-qt">"Beautiful design, fast import, and the public profile is perfect for funding applications."</div>
-      <div class="testi-who"><div class="testi-av" style="background:linear-gradient(135deg,#2d6fd4,#4d8ef0)">AP</div><div><div class="testi-nm">Pritheesh G</div><div class="testi-rl">Index Scalper</div></div></div>
-    </div>
-  </div>
+  <div class="screen-grid stg">
+    <article class="screen-card" data-hover-glow>
+      <div class="screen-bar"><span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-label">P&amp;L by day</span></div>
+      <div class="screen-body">
+        <div class="screen-header"><span>P&amp;L by day</span><span class="screen-pill">Overall</span></div>
+        <div class="screen-copy">Track net daily performance and trade count by weekday so you can see which days are driving your edge.</div>
+        <div class="screen-preview screen-pnl-grid">
+          <div class="pnl-row">
+            <div class="pnl-cell pnl-win"><strong>MON</strong><span>+ $70.84</span><small>6 trades</small></div>
+            <div class="pnl-cell pnl-win"><strong>TUE</strong><span>+ $5.42</span><small>6 trades</small></div>
+            <div class="pnl-cell pnl-win"><strong>WED</strong><span>+ $190.64</span><small>14 trades</small></div>
+          </div>
+          <div class="pnl-row">
+            <div class="pnl-cell pnl-loss"><strong>THU</strong><span>- $168.31</span><small>3 trades</small></div>
+            <div class="pnl-cell pnl-muted"><strong>FRI</strong><span>—</span><small>0 trades</small></div>
+            <div class="pnl-cell pnl-muted"><strong>SAT</strong><span>—</span><small>0 trades</small></div>
+          </div>
+          <div class="pnl-row">
+            <div class="pnl-cell pnl-win wide"><strong>SUN</strong><span>+ $135.97</span><small>4 trades</small></div>
+          </div>
+        </div>
+      </div>
+    </article>
 
-  <div class="stats-row rv">
-    <div class="stat-box"><div class="stat-num ln" data-target="8" data-suffix="M+" style="color:var(--purple)">0</div><div class="stat-lbl">Trade events reviewed</div></div>
-    <div class="stat-box"><div class="stat-num ln" data-target="2400" data-suffix="+" style="color:var(--green)">0</div><div class="stat-lbl">Active traders</div></div>
-    <div class="stat-box"><div class="stat-num ln" data-target="5" data-suffix=" min" style="color:var(--blue)">0</div><div class="stat-lbl">Avg review cycle</div></div>
-    <div class="stat-box"><div class="stat-num ln" data-target="99.9" data-decimals="1" data-suffix="%" style="color:var(--text)">0%</div><div class="stat-lbl">Uptime</div></div>
+    <article class="screen-card" data-hover-glow>
+      <div class="screen-bar"><span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-label">Best trading hours</span></div>
+      <div class="screen-body">
+        <div class="screen-header"><span>Best trading hours</span><span class="screen-pill">11 active hours</span></div>
+        <div class="screen-copy">Compare your best session hours with weighted P&amp;L bars to find peak trading time and risk windows.</div>
+        <div class="screen-preview screen-hours-graph">
+          <div class="hour-axis">
+            <span>1am</span><span>2am</span><span>3am</span><span>4am</span><span>5am</span><span>6am</span><span>7am</span><span>8am</span><span>9am</span><span>10am</span><span>11am</span><span>7pm</span><span>8pm</span><span>9pm</span>
+          </div>
+          <div class="hour-bars">
+            <div class="hour-bar hour-win" style="height:110px"></div>
+            <div class="hour-bar hour-win" style="height:38px"></div>
+            <div class="hour-bar hour-loss" style="height:40px"></div>
+            <div class="hour-bar hour-loss" style="height:45px"></div>
+            <div class="hour-bar hour-loss" style="height:32px"></div>
+            <div class="hour-bar hour-loss" style="height:28px"></div>
+            <div class="hour-bar hour-loss" style="height:44px"></div>
+            <div class="hour-bar hour-loss" style="height:24px"></div>
+            <div class="hour-bar hour-win" style="height:120px"></div>
+            <div class="hour-bar hour-loss" style="height:26px"></div>
+            <div class="hour-bar hour-loss" style="height:18px"></div>
+            <div class="hour-bar hour-win" style="height:68px"></div>
+            <div class="hour-bar hour-win" style="height:150px"></div>
+            <div class="hour-bar hour-loss" style="height:32px"></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="screen-card" data-hover-glow>
+      <div class="screen-bar"><span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-label">Win / loss streaks</span></div>
+      <div class="screen-body">
+        <div class="screen-header"><span>Win / loss streaks</span><span class="screen-pill">Best W 3</span></div>
+        <div class="screen-copy">Track your current momentum, best and worst streaks, and the timeline of recent trade runs.</div>
+        <div class="screen-preview screen-streaks">
+          <div class="streak-summary">
+            <div><span>Best win streak</span><strong>3 trades</strong></div>
+            <div><span>Current streak</span><strong>1 W</strong></div>
+            <div><span>Worst loss streak</span><strong>5 trades</strong></div>
+            <div><span>Avg streak length</span><strong>2.1</strong></div>
+          </div>
+          <div class="streak-line">
+            <span class="streak-bar win" style="height:24px"></span>
+            <span class="streak-bar loss" style="height:18px"></span>
+            <span class="streak-bar win" style="height:28px"></span>
+            <span class="streak-bar loss" style="height:22px"></span>
+            <span class="streak-bar win" style="height:30px"></span>
+            <span class="streak-bar loss" style="height:20px"></span>
+            <span class="streak-bar win" style="height:34px"></span>
+          </div>
+          <div class="streak-tags">
+            <div class="streak-tag win-tag">1W +$109.20</div>
+            <div class="streak-tag loss-tag">3L -$107.76</div>
+            <div class="streak-tag win-tag">1W +$104.84</div>
+            <div class="streak-tag loss-tag">2L -$52.41</div>
+          </div>
+        </div>
+      </div>
+    </article>
   </div>
 </div>
 
@@ -697,7 +834,7 @@ h1.hero-title{
   <div class="rv" style="transition-delay:.1s"><p>Enter through the homepage. Work inside the journal. Keep both experiences clean.</p></div>
   <div class="rv" style="transition-delay:.18s">
     <div class="cta-btns">
-      <button class="btn-p" style="font-size:15px;padding:15px 32px" onclick="window.location.href='journal.html?auth=signup'">Start Free</button>
+      <button class="btn-p" style="font-size:15px;padding:15px 32px" onclick="window.open('journal.html?auth=signup', '_blank')">Start Free</button>
       <button class="btn-g" style="font-size:14px;padding:14px 28px" onclick="window.location.href='mailto:hello@equitytrace.com'">Contact Us</button>
     </div>
   </div>
@@ -709,7 +846,8 @@ h1.hero-title{
   <div class="ftr-links">
     <a href="#platform">Platform</a>
     <a href="#outcomes">Outcomes</a>
-    <a href="journal.html?auth=signin">Journal</a>
+    <a href="journal.html?auth=signin" target="_blank" rel="noopener noreferrer">Journal</a>
+    <a href="help.html">Help</a>
   </div>
 </footer>
 
@@ -926,86 +1064,6 @@ function resetNum(el){
   });
 })();
 
-// ══ PWA INSTALL PROMPT ══
-(function(){
-  let deferredPrompt;
-  let installPromptShown = false;
-  
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
-                       window.navigator.standalone === true ||
-                       localStorage.getItem('pwa-dismissed') === 'true';
-    
-    if (!installPromptShown && !isInstalled) {
-      setTimeout(() => {
-        showInstallPrompt();
-        installPromptShown = true;
-      }, 5000);
-    }
-  });
-  
-  function showInstallPrompt() {
-    const promptHtml = `
-      <div id="pwa-install-prompt" style="position:fixed;bottom:20px;right:20px;max-width:360px;background:linear-gradient(135deg,#995dff 0%,#7d48d9 100%);border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(153,93,255,0.4);z-index:10000;animation:slideIn 0.3s ease-out">
-        <div style="display:flex;align-items:start;gap:12px">
-          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-          </div>
-          <div style="flex:1">
-            <h3 style="color:#fff;font-size:16px;font-weight:600;margin-bottom:4px">Install Equity Trace</h3>
-            <p style="color:rgba(255,255,255,0.9);font-size:14px;line-height:1.4;margin-bottom:12px">Access your trading journal anytime, even offline. Install for the best experience.</p>
-            <div style="display:flex;gap:8px">
-              <button id="pwa-install-btn" style="background:#fff;color:#995dff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s">Install</button>
-              <button id="pwa-dismiss-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s">Not now</button>
-            </div>
-          </div>
-          <button id="pwa-close-btn" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:4px;margin:-4px;line-height:1">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', promptHtml);
-    const style = document.createElement('style');
-    style.textContent = '@keyframes slideIn{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes slideOut{from{transform:translateY(0);opacity:1}to{transform:translateY(100px);opacity:0}}#pwa-install-btn:hover{background:#f5f5f5;transform:translateY(-1px)}#pwa-dismiss-btn:hover{background:rgba(255,255,255,0.3)}';
-    document.head.appendChild(style);
-    
-    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`Install: ${outcome}`);
-      deferredPrompt = null;
-      removePrompt();
-    });
-    
-    const dismissPrompt = () => {
-      localStorage.setItem('pwa-dismissed', 'true');
-      removePrompt();
-    };
-    
-    const removePrompt = () => {
-      const p = document.getElementById('pwa-install-prompt');
-      if (p) {
-        p.style.animation = 'slideOut 0.3s ease-in';
-        setTimeout(() => p.remove(), 300);
-      }
-    };
-    
-    document.getElementById('pwa-dismiss-btn').addEventListener('click', dismissPrompt);
-    document.getElementById('pwa-close-btn').addEventListener('click', dismissPrompt);
-  }
-  
-  window.addEventListener('appinstalled', () => {
-    console.log('PWA installed');
-    const p = document.getElementById('pwa-install-prompt');
-    if (p) p.remove();
-  });
-})();
-
 // ══ PWA SERVICE WORKER REGISTRATION ══
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -1024,19 +1082,10 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-// ══ PWA INSTALL PROMPT ══
-let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
-  deferredPrompt = e;
-  // You can show your custom install button here
-  console.log('PWA install prompt available');
 });
 
-window.addEventListener('appinstalled', () => {
-  console.log('PWA installed successfully');
-  deferredPrompt = null;
-});
 </script>
 </body>
 </html>

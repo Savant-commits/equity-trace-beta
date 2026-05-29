@@ -2910,365 +2910,7 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
       </div>
 
-      <!-- == FAQ SECTION == -->
-      <div style="display:flex;flex-direction:column;gap:0;margin-top:8px">
-        <div style="font-family:var(--font-body);font-weight:600;font-size:22px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px;margin-bottom:8px">FAQs</div>
-        <div style="font-family:var(--font-body);font-size:14px;color:var(--text2);line-height:1.7;max-width:760px;margin-left:6px;margin-bottom:18px">Updated answers for the latest journal, accounts, and settings changes. The current Data section focuses on local storage reset controls rather than direct import/export buttons.</div>
-
-        <style>
-          .faq-group{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px;background:var(--bg2)}
-          .faq-group-header{display:flex;align-items:center;gap:0;padding:14px 16px;cursor:pointer;user-select:none;transition:background .15s}
-          .faq-group-header:hover{background:var(--ac-06)}
-          .faq-group-icon{display:none}
-          .faq-group-title{font-family:var(--font-display);font-weight:500;font-size:14px;color:var(--text);flex:1}
-          .faq-group-count{font-size:9px;font-family:var(--font-mono);color:var(--text3);background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:2px 8px}
-          .faq-group-chevron{color:var(--text3);transition:transform .2s;font-size:0;display:flex;align-items:center;justify-content:center;width:12px}
-          .faq-group-chevron::before{content:'>';font-size:11px;line-height:1}
-          .faq-group-body{display:none;border-top:1px solid var(--border);padding:0}
-          .faq-item{padding:14px 18px;border-bottom:1px solid var(--border)}
-          .faq-item:last-child{border-bottom:none}
-          .faq-q{display:flex;align-items:flex-start;gap:10px;cursor:pointer;user-select:none}
-          .faq-q-text{font-family:var(--font-body);font-size:13px;font-weight:500;color:var(--text);flex:1;line-height:1.5}
-          .faq-q-arrow{color:var(--text3);font-size:0;transition:transform .2s;flex-shrink:0;margin-top:2px;width:10px;display:flex;align-items:center;justify-content:center}
-          .faq-q-arrow::before{content:'>';font-size:10px;line-height:1}
-          .faq-a{display:none;margin-top:10px;font-family:var(--font-body);font-size:13px;color:var(--text2);line-height:1.85;padding-left:20px}
-          .faq-a code{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-family:var(--font-mono);font-size:11px;color:var(--purple)!important}
-          .faq-a ul{padding-left:16px;margin-top:4px}
-          .faq-a ul li{margin-bottom:4px}
-          .faq-item.open .faq-q-arrow{transform:rotate(90deg)}
-          .faq-item.open .faq-a{display:block}
-        </style>
-
-        <!-- GROUP 1: Getting Started -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">🚀</div>
-            <div class="faq-group-title">Getting Started</div>
-            <div class="faq-group-count">5 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I add my first trade?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Click the <code>+ Add Trade</code> button in the top-right corner, or press <code>N</code> on your keyboard. Fill in the required fields - symbol, direction, entry/exit prices, date, time, and P&L. Optional fields like setup, session, and notes help build better analytics over time.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I add an account?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Go to <code>Settings -> Accounts</code> and click <code>+ Add Account</code>. Enter your prop firm name, phase, account size, and drawdown limits. Each account is tracked independently and can be selected from the account switcher in the header.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">Where is my data stored?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">All your data is stored <strong>locally in your browser</strong> using localStorage. Nothing is sent to any server. This means your data stays on your device, but clearing browser data or uninstalling the app will erase it. The Data section now focuses on local reset controls, so keep your browser profile intact for the most reliable storage.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I back up or transfer my data?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The app stores trades locally, and the current settings experience no longer exposes import/export controls in the Data section. If you need to keep your journal safe, avoid clearing browser storage and use the available report export tools elsewhere in the app for summaries and backups.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What does the version number mean?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The app is currently in a preview release with the journal, accounts, and analytics features available. It is stable for daily tracking but still being refined, so report any issues and your current workflow if you encounter one.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 2: Dashboard & Overview -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">📊</div>
-            <div class="faq-group-title">Dashboard & Overview</div>
-            <div class="faq-group-count">5 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What does "All Accounts" mode show?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">When <code>All Accounts</code> is selected, the dashboard aggregates data across all your accounts - total P&L, combined win rate, and portfolio overview. The Daily P&L chart switches to dollar values instead of percentages since each account has a different size.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">Why does the Profit Factor show infinity?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Profit Factor = Total Wins ÷ Total Losses. If you have no losing trades (or haven't entered any losses yet), the denominator is zero - which results in ∞. This is mathematically correct and means your trading has been 100% profitable so far.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What is the Setup Scorecard?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The Setup Scorecard ranks your trades by a composite score based on: win/loss result, risk management quality, kill zone alignment, instrument traded, and win streak multiplier. Higher scores indicate trades that were both profitable and well-executed. Hover over any row to see the score breakdown.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What are the Goals cards tracking?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The Goals section shows three key prop firm metrics: <ul><li><strong>Max Loss</strong> - total drawdown limit from starting balance</li><li><strong>Profit Target</strong> - amount needed to pass the evaluation</li><li><strong>Daily Loss</strong> - maximum loss allowed in a single day, with a reset timer</li></ul>These are configured per-account in Settings.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How does the Equity Curve work?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The equity curve plots your running account balance after each trade. The dashed reference lines show your Profit Target (green), Initial Balance (grey), Daily Loss limit (amber), and Max Loss limit (red). Click any data point to open that trade's detail. Use the All / Month / Week filters to zoom in on different periods.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 3: Trade Journal -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">📋</div>
-            <div class="faq-group-title">Trade Journal</div>
-            <div class="faq-group-count">5 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I edit a trade?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Click on any trade row in the Trade Journal to open the detail panel on the right. From there, click the <code>Edit</code> button (pencil icon) to open the trade in the edit modal. Make your changes and click <code>Save Trade</code>.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I add screenshots to a trade?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Open a trade's detail panel, scroll to the Screenshots section. You can drag and drop images directly onto the upload area, paste from clipboard (<code>Ctrl+V</code>), or click to browse files. Each image can be labeled with a timeframe (1M, 5M, 1H, etc.) for organized chart review.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What is the Rating (stars) for?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The star rating (1-5) is your personal quality assessment of how well you executed the trade - separate from whether it was profitable. A losing trade can still be 5-star if you followed your rules perfectly. Use this to track execution quality over time and identify patterns in well-rated vs poorly-rated trades.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I filter trades?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Use the filter bar at the top of the Trade Journal. You can filter by: <ul><li>Direction (Long / Short)</li><li>Result (Win / Loss / BE)</li><li>Symbol</li><li>Session (London, NY, Asia, etc.)</li><li>Date range</li><li>Account</li></ul>Multiple filters can be combined. Click <code>Clear</code> to reset all filters.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What is Bulk Edit?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Select multiple trades by clicking the checkboxes on the left of each row, then use the bulk action bar that appears at the bottom. You can bulk-update Account, Session, Setup, or Model fields across all selected trades at once - useful when importing trades that need categorization.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 4: Analytics -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">📈</div>
-            <div class="faq-group-title">Analytics & Charts</div>
-            <div class="faq-group-count">4 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What is the Heatmap showing?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The calendar heatmap shows your daily P&L at a glance - green cells are profitable days, red cells are losing days, and the intensity of the color reflects the magnitude. Click any day to jump to that date in the Trade Journal.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What does the Daily P&L chart show?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The horizontal bar chart shows your net P&L for each trading day of the selected week. Green bars extend right (profit), red bars extend left (loss). The X-axis shows percentages relative to your account size when a single account is selected, or dollar amounts when All Accounts is selected. Click a bar to filter the Trade Journal to that day.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What is the P&L by Session chart?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">This chart on the Advanced Analytics page breaks down your total P&L by trading session (London, New York, Asia, etc.). It helps you identify which sessions you perform best in and where you may be overtrading or underperforming.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How is R-Multiple calculated?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">R-Multiple (Reward-to-Risk) = Exit P&L ÷ Risk Amount. For example, if you risked $100 and made $150, your R-Multiple is 1.5R. To get accurate R values, enter your Stop Loss when logging trades. If no stop loss is entered, the app estimates based on average loss size.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 5: Keyboard Shortcuts -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">⌨️</div>
-            <div class="faq-group-title">Keyboard Shortcuts</div>
-            <div class="faq-group-count">1 topic</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What keyboard shortcuts are available?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">
-                <ul>
-                  <li><code>N</code> - Open Add Trade modal</li>
-                  <li><code>D</code> - Cycle themes (Midnight -> Dawn -> Aura)</li>
-                  <li><code>1</code> - Dashboard</li>
-                  <li><code>2</code> - Trade Journal</li>
-                  <li><code>3</code> - Analytics</li>
-                  <li><code>4</code> - Trend Report</li>
-                  <li><code>5</code> - Calendar</li>
-                  <li><code>6</code> - Entry Models (Playbook)</li>
-                  <li><code>7</code> - Accounts</li>
-                  <li><code>8</code> - Reports</li>
-                  <li><code>9</code> - User Profile</li>
-                  <li><code>0</code> - Settings</li>
-                  <li><code>Cmd+K</code> / <code>Ctrl+K</code> - Command palette</li>
-                  <li><code>Backspace</code> - Close detail panel / go back</li>
-                  <li><code>Ctrl+Enter</code> - Save trade (when form is open)</li>
-                  <li><code>Escape</code> - Close modal or panel</li>
-                  <li><code>,</code> / <code>.</code> - Navigate history back / forward</li>
-                  <li><code>/</code> - Show keyboard shortcuts help</li>
-                  <li><code>Ctrl+V</code> (in trade detail) - Paste screenshot</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 6: Themes & Appearance -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">🎨</div>
-            <div class="faq-group-title">Themes & Appearance</div>
-            <div class="faq-group-count">3 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What are the three themes?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a"><ul><li><strong>Midnight</strong> - Pure black background, minimal and focused. Best for low-light environments.</li><li><strong>Aura</strong> - Dark grey background with vivid accent-colored cards that glow. Best for a premium, vibrant look.</li><li><strong>Dawn</strong> - Light background with accent-filled cards. Best for bright environments or daytime use.</li></ul>Switch between them with the <code>D</code> key or from Settings.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">My theme resets every time I open the app</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Theme preferences are saved in your browser's localStorage. If your browser is set to clear site data on close, or you're using private/incognito mode, settings won't persist. To fix this, allow the site to store data, or avoid incognito mode.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 7: Prop Firm & Accounts -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">🏦</div>
-            <div class="faq-group-title">Prop Firm & Accounts</div>
-            <div class="faq-group-count">4 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How do I set up a prop firm account?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">In <code>Settings -> Accounts</code>, click <code>+ Add Account</code>. Fill in: Firm name, Phase (e.g. Phase 1 Eval, Funded), Account Size, Max Drawdown %, Daily Loss %, Profit Target %, and Drawdown Type (Trailing or Static). Once saved, it appears in the account switcher on the dashboard.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">What is the difference between Trailing and Static drawdown?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a"><ul><li><strong>Static</strong> - Drawdown is calculated from your initial starting balance. The limit never changes regardless of profits.</li><li><strong>Trailing</strong> - Drawdown limit follows your highest equity point. As you profit, the floor rises with you, making it progressively harder to breach.</li></ul>Most prop firms use trailing drawdown during evaluations and static on funded accounts.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">How does the Daily Loss timer reset work?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">The Daily Loss timer in the Goals card counts down to the next day reset - typically midnight in your local time or the prop firm's reset time (often 5 PM EST). Once reset, your daily P&L counter starts fresh. The timer shown is based on your local system clock.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">Can I track multiple accounts at once?</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Yes. Add as many accounts as you like in Settings. Select <code>All Accounts</code> in the header to see aggregated portfolio stats, or select any individual account to drill into its specific metrics, goals, and trade history. The Portfolio Overview section on the dashboard shows all accounts side by side.</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- GROUP 8: Troubleshooting -->
-        <div class="faq-group">
-          <div class="faq-group-header" onclick="faqToggleGroup(this)">
-            <div class="faq-group-icon">🔧</div>
-            <div class="faq-group-title">Troubleshooting</div>
-            <div class="faq-group-count">4 topics</div>
-            <div class="faq-group-chevron">▶</div>
-          </div>
-          <div class="faq-group-body">
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">My data disappeared after opening the app</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">This can happen if your browser cleared localStorage (e.g. after an update, in incognito mode, or due to browser settings). Always export your data regularly from <code>Settings -> Data -> Export</code> as a backup. If you have a backup, you can re-import it immediately.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">Charts are not displaying correctly</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Try refreshing the page. If charts still appear broken, it may be due to a browser extension blocking scripts (e.g. ad blockers). Try disabling extensions temporarily, or open the app in a private window. Make sure you're using a modern browser (Chrome, Edge, or Firefox recommended).</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">The app looks different on my phone</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Equity Trace is optimized for desktop use. On mobile, the layout may be condensed - the sidebar collapses, and some panels may require scrolling. For the best experience, use a laptop or desktop with a minimum screen width of 900px.</div>
-            </div>
-            <div class="faq-item">
-              <div class="faq-q" onclick="faqToggleItem(this.parentElement)">
-                <div class="faq-q-text">A keyboard shortcut is not working</div>
-                <div class="faq-q-arrow">▶</div>
-              </div>
-              <div class="faq-a">Shortcuts are disabled when you're typing in an input field. Click on an empty area of the page first to make sure no input is focused. Also check that no modal or dialog is open - most shortcuts are blocked when a modal is active to prevent accidental actions.</div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-      <!-- == END FAQ SECTION == -->
+      
 
 
     </div>
@@ -5477,9 +5119,100 @@ if ('serviceWorker' in navigator) {
     background: transparent !important;
   }
 </style>
+<script>
+(function(){
+  let deferredPrompt;
+  let installPromptShown = false;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+
+    const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
+                       window.navigator.standalone === true ||
+                       localStorage.getItem('pwa-dismissed') === 'true';
+
+    if (!installPromptShown && !isInstalled) {
+      setTimeout(showInstallPrompt, 5000);
+      installPromptShown = true;
+    }
+  });
+
+  function showInstallPrompt() {
+    const promptHtml = `
+      <div id="pwa-install-prompt" style="position:fixed;bottom:20px;right:20px;max-width:360px;background:linear-gradient(135deg,#995dff 0%,#7d48d9 100%);border-radius:16px;padding:20px;box-shadow:0 8px 32px rgba(153,93,255,0.4);z-index:10000;animation:slideIn 0.3s ease-out">
+        <div style="display:flex;align-items:start;gap:12px">
+          <div style="width:48px;height:48px;background:rgba(255,255,255,0.2);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </div>
+          <div style="flex:1">
+            <h3 style="color:#fff;font-size:16px;font-weight:600;margin-bottom:4px">Install Equity Trace</h3>
+            <p style="color:rgba(255,255,255,0.9);font-size:14px;line-height:1.4;margin-bottom:12px">Access your trading journal anytime, even offline. Install for the best experience.</p>
+            <div style="display:flex;gap:8px">
+              <button id="pwa-install-btn" style="background:#fff;color:#995dff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s">Install</button>
+              <button id="pwa-dismiss-btn" style="background:rgba(255,255,255,0.2);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;transition:all 0.2s">Not now</button>
+            </div>
+          </div>
+          <button id="pwa-close-btn" style="background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;padding:4px;margin:-4px;line-height:1">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          </button>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', promptHtml);
+    const style = document.createElement('style');
+    style.textContent = '@keyframes slideIn{from{transform:translateY(100px);opacity:0}to{transform:translateY(0);opacity:1}}@keyframes slideOut{from{transform:translateY(0);opacity:1}to{transform:translateY(100px);opacity:0}}#pwa-install-btn:hover{background:#f5f5f5;transform:translateY(-1px)}#pwa-dismiss-btn:hover{background:rgba(255,255,255,0.3)}';
+    document.head.appendChild(style);
+
+    let autoHideTimer;
+    const clearAutoHideTimer = () => {
+      if (autoHideTimer) {
+        clearTimeout(autoHideTimer);
+        autoHideTimer = null;
+      }
+    };
+
+    const removePrompt = () => {
+      const p = document.getElementById('pwa-install-prompt');
+      if (p) {
+        p.style.animation = 'slideOut 0.3s ease-in';
+        setTimeout(() => p.remove(), 300);
+      }
+    };
+
+    const dismissPrompt = () => {
+      localStorage.setItem('pwa-dismissed', 'true');
+      clearAutoHideTimer();
+      removePrompt();
+    };
+
+    document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+      if (!deferredPrompt) return;
+      clearAutoHideTimer();
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`Install: ${outcome}`);
+      deferredPrompt = null;
+      removePrompt();
+    });
+
+    autoHideTimer = setTimeout(removePrompt, 3000);
+
+    document.getElementById('pwa-dismiss-btn').addEventListener('click', dismissPrompt);
+    document.getElementById('pwa-close-btn').addEventListener('click', dismissPrompt);
+  }
+
+  window.addEventListener('appinstalled', () => {
+    console.log('PWA installed');
+    const p = document.getElementById('pwa-install-prompt');
+    if (p) p.remove();
+  });
+})();
+</script>
 
 </body>
 </html>
+
 
 
 
