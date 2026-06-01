@@ -5,5 +5,10 @@
 window.SUPABASE_URL = "https://your-project.supabase.co";
 window.SUPABASE_ANON = "your-anon-key-goes-here";
 
+// PostHog Analytics Configuration (optional but recommended)
+// Get these values from your PostHog dashboard at https://posthog.com
+// window.POSTHOG_KEY = "your-posthog-api-key";
+// window.POSTHOG_HOST = "https://your-posthog-instance.com"; // or https://us.posthog.com
+
 // Usage: include this BEFORE `supabase.js` in your HTML when running locally.
 // <script src="local-env.js"></script>

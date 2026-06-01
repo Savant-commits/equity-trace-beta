@@ -1,5 +1,8 @@
 // ═══ Core App — State, Trades, Dashboard, Charts ═══
 
+// ── POSTHOG ANALYTICS ──────────────────────────────────────
+import { initializePostHog } from './posthog-init.js';
+
 // ── DOM + STORAGE HELPERS (global) ──────────────────────────
 const $  = id  => document.getElementById(id);
 const $$ = sel => document.querySelectorAll(sel);
@@ -320,6 +323,17 @@ window.addEventListener('focus', () => {
 });
 
 window.addEventListener('load', () => {
+  // ── Initialize PostHog Analytics ──
+  try {
+    const posthog = initializePostHog();
+    if (posthog) {
+      window.posthog = posthog;
+      console.log('✓ PostHog analytics initialized successfully');
+    }
+  } catch (error) {
+    console.error('✗ Failed to initialize PostHog:', error);
+  }
+
   if (typeof updateFilterAccountVisibility === 'function') updateFilterAccountVisibility();
 });
 

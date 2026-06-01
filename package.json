@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "framer-motion": "^12.40.0",
+    "posthog-js": "^1.164.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   }
