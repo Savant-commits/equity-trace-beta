@@ -28,7 +28,21 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css"/>
 
 <!-- Local Supabase Configuration (for development) -->
-<script src="local-env.js"></script>
+<script>
+  window.localEnvLoaded = new Promise(function(resolve) {
+    var script = document.createElement('script');
+    script.src = 'local-env.js';
+    script.onload = function() {
+      console.log('local-env.js loaded');
+      resolve(true);
+    };
+    script.onerror = function() {
+      console.warn('local-env.js not found; continuing without local overrides.');
+      resolve(false);
+    };
+    document.head.appendChild(script);
+  });
+</script>
 
 <!-- Supabase SDK + Backend -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3952,6 +3966,10 @@ window.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- App Scripts (order matters) -->
+<!-- PostHog Analytics -->
+<script src="https://unpkg.com/posthog-js@latest/dist/posthog.umd.js"></script>
+<script src="posthog-init.js"></script>
+<!-- Main App Scripts -->
 <script defer src="app.js"></script>
 <script defer src="calendar.js"></script>
 <script defer src="reports.js"></script>

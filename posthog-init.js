@@ -1,95 +1,108 @@
 // ═══ PostHog Analytics Initialization ═══
 // Initialize PostHog for event tracking, session replay, and autocapture
+// Standalone global script - no ES modules, compatible with multi-script architecture
 
-import posthog from 'posthog-js';
+(async function() {
+  'use strict';
 
-/**
- * Initialize PostHog with Vite environment variables
- * Requires VITE_PUBLIC_POSTHOG_KEY and VITE_PUBLIC_POSTHOG_HOST in .env.local
- */
-export function initializePostHog() {
-  // Get PostHog credentials from environment variables
-  const apiKey = import.meta.env.VITE_PUBLIC_POSTHOG_KEY;
-  const apiHost = import.meta.env.VITE_PUBLIC_POSTHOG_HOST;
-
-  // Only initialize if credentials are provided
-  if (!apiKey || !apiHost) {
-    console.warn(
-      'PostHog: Missing VITE_PUBLIC_POSTHOG_KEY or VITE_PUBLIC_POSTHOG_HOST. ' +
-      'Analytics disabled. Add these to your .env.local file.'
-    );
-    return null;
+  if (window.localEnvLoaded && typeof window.localEnvLoaded.then === 'function') {
+    try {
+      await window.localEnvLoaded;
+    } catch (error) {
+      // Ignore failures loading local-env.js; continue with whatever values are available.
+    }
   }
 
-  try {
-    posthog.init(apiKey, {
-      api_host: apiHost,
-      
-      // ── SESSION REPLAY ──
-      session_recording: {
-        recordCrossOriginIframes: false,
-        // Mask sensitive input fields (passwords, tokens, etc.)
-        maskAllInputs: true,
-        // Mask text in elements with these classes
-        maskAllText: false,
-      },
+  // Poll for PostHog library to be loaded (from CDN script tag)
+  var maxRetries = 50; // ~5 seconds at 100ms intervals
+  var retryCount = 0;
 
-      // ── AUTOCAPTURE ──
-      autocapture: {
-        // Capture clicks, page views, form submissions, etc.
-        dom_event_handlers: ['click', 'change'],
-        url_ignored_components: [], // Ignore certain URL patterns if needed
-        element_allowlist: [], // Leave empty to capture all
-      },
-
-      // ── GENERAL CONFIG ──
-      // Capture page views automatically
-      capture_pageview: true,
-      // Capture navigation events
-      capture_pageleave: true,
-      // Load feature flags
-      loaded: (ph) => {
-        console.log('PostHog initialized:', {
-          apiKey: apiKey.substring(0, 8) + '...',
-          host: apiHost,
-        });
-      },
-    });
-
-    return posthog;
-  } catch (error) {
-    console.error('PostHog initialization failed:', error);
-    return null;
+  if (typeof window.posthog !== 'undefined') {
+    initPostHog();
+    return;
   }
-}
 
-/**
- * Track a custom event
- * @param {string} eventName - Name of the event
- * @param {Object} properties - Event properties
- */
-export function trackEvent(eventName, properties = {}) {
-  if (window.posthog) {
-    window.posthog.capture(eventName, properties);
-  }
-}
+  var retryInterval = setInterval(function() {
+    retryCount++;
+    
+    if (typeof window.posthog !== 'undefined') {
+      clearInterval(retryInterval);
+      initPostHog();
+      return;
+    }
+    
+    if (retryCount >= maxRetries) {
+      clearInterval(retryInterval);
+      console.warn('PostHog: CDN script did not load within 5 seconds.');
+    }
+  }, 100);
 
-/**
- * Set user properties for identification
- * @param {string} userId - Unique user identifier
- * @param {Object} properties - User properties
- */
-export function setUserProperties(userId, properties = {}) {
-  if (window.posthog) {
-    window.posthog.identify(userId, properties);
-  }
-}
+  function initPostHog() {
+    // Get credentials from window variables (set by local-env.js or Vite env injection)
+    var apiKey = window.POSTHOG_KEY || window.VITE_PUBLIC_POSTHOG_KEY;
+    var apiHost = window.POSTHOG_HOST || window.VITE_PUBLIC_POSTHOG_HOST;
 
-/**
- * Reset user session (e.g., on logout)
- */
-export function resetUserSession() {
-  if (window.posthog) {
-    window.posthog.reset();
+    // If Vite env vars are injected as strings via HTML, allow fallback to underscored names
+    if (!apiKey && window.VITE_PUBLIC_POSTHOG_KEY) {
+      apiKey = window.VITE_PUBLIC_POSTHOG_KEY;
+    }
+    if (!apiHost && window.VITE_PUBLIC_POSTHOG_HOST) {
+      apiHost = window.VITE_PUBLIC_POSTHOG_HOST;
+    }
+
+    if (!apiKey || !apiHost) {
+      console.warn(
+        'PostHog: Missing POSTHOG_KEY/POSTHOG_HOST or VITE_PUBLIC_POSTHOG_KEY/VITE_PUBLIC_POSTHOG_HOST. ' +
+        'Analytics disabled. Add to local-env.js or .env.local.'
+      );
+      return;
+    }
+
+    try {
+      window.posthog.init(apiKey, {
+        api_host: apiHost,
+        session_recording: {
+          recordCrossOriginIframes: false,
+          maskAllInputs: true,
+          maskAllText: false,
+        },
+        autocapture: {
+          dom_event_handlers: ['click', 'change'],
+          url_ignored_components: [],
+          element_allowlist: [],
+        },
+        capture_pageview: true,
+        capture_pageleave: true,
+        loaded: function(ph) {
+          console.log('PostHog initialized:', {
+            apiKey: apiKey.substring(0, 8) + '...',
+            host: apiHost,
+          });
+        },
+      });
+    } catch (error) {
+      console.error('PostHog initialization failed:', error);
+    }
   }
-}
+
+  // Expose global helper functions
+  window.trackEvent = function(eventName, properties) {
+    properties = properties || {};
+    if (window.posthog) {
+      window.posthog.capture(eventName, properties);
+    }
+  };
+
+  window.setUserProperties = function(userId, properties) {
+    properties = properties || {};
+    if (window.posthog) {
+      window.posthog.identify(userId, properties);
+    }
+  };
+
+  window.resetUserSession = function() {
+    if (window.posthog) {
+      window.posthog.reset();
+    }
+  };
+})();

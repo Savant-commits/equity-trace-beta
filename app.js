@@ -1,8 +1,5 @@
 // ═══ Core App — State, Trades, Dashboard, Charts ═══
 
-// ── POSTHOG ANALYTICS ──────────────────────────────────────
-import { initializePostHog } from './posthog-init.js';
-
 // ── DOM + STORAGE HELPERS (global) ──────────────────────────
 const $  = id  => document.getElementById(id);
 const $$ = sel => document.querySelectorAll(sel);
@@ -323,17 +320,6 @@ window.addEventListener('focus', () => {
 });
 
 window.addEventListener('load', () => {
-  // ── Initialize PostHog Analytics ──
-  try {
-    const posthog = initializePostHog();
-    if (posthog) {
-      window.posthog = posthog;
-      console.log('✓ PostHog analytics initialized successfully');
-    }
-  } catch (error) {
-    console.error('✗ Failed to initialize PostHog:', error);
-  }
-
   if (typeof updateFilterAccountVisibility === 'function') updateFilterAccountVisibility();
 });
 
@@ -356,14 +342,7 @@ function syncTopbarOffset() {
 
 function goToView(view) {
   var el = document.querySelector('[data-view="' + view + '"]');
-  if (el) return switchView(el);
-
-  var viewEl = document.getElementById('view-' + view);
-  if (viewEl) {
-    var fakeNav = document.createElement('div');
-    fakeNav.dataset.view = view;
-    return switchView(fakeNav);
-  }
+  if (el) switchView(el);
 }
 function goToSettings() {
   var el = document.querySelector('[data-view="settings"]');
@@ -387,15 +366,6 @@ function switchView(el) {
     console.log('  → Added active class to:', el.dataset?.view);
     const v = el.dataset.view;
     console.log('  → Switching to view:', v);
-
-    // Fullscreen summary mode: hide sidebar and topbar via body class
-    try {
-      if (v === 'summary') {
-        document.body.classList.add('summary-fullscreen');
-      } else {
-        document.body.classList.remove('summary-fullscreen');
-      }
-    } catch (e) { /* ignore */ }
 
     if (currentViewId === 'view-tradelog' && v !== 'tradelog' && window._tradeLogDrilldownActive) {
       clearTradeLogTransientFilters(true);
@@ -423,7 +393,6 @@ function switchView(el) {
     const authUserBadge = document.getElementById('auth-user-badge');
     const importBtn = $('import-trades-btn');
     const addTradeBtn = $('add-trade-btn-topbar');
-    const summaryBtn = $('summary-btn-dashboard');
     const showTopbarButtons = (v === 'dashboard' || v === 'tradelog' || v === 'accounts');
     const showTzSwitcher = (v === 'dashboard');
     const useTradeLogTopbarStyle = (v === 'tradelog' || v === 'analytics' || v === 'advanalytics' || v === 'calendar' || v === 'playbook' || v === 'accounts' || v === 'reports' || v === 'user-profile' || v === 'settings');
@@ -446,7 +415,6 @@ function switchView(el) {
     }
     if (importBtn) importBtn.style.display = showTopbarButtons ? '' : 'none';
     if (addTradeBtn) addTradeBtn.style.display = showTopbarButtons ? '' : 'none';
-    if (summaryBtn) summaryBtn.style.display = (v === 'dashboard') ? '' : 'none';
 
     // Initialize view-specific content
     try {
@@ -516,7 +484,6 @@ function switchView(el) {
 // ── RENDER TRADE TABLE ──
 // ── UPDATE TRADE LOG STAT CARDS FROM filteredTrades ──
 function updateTlCards(trades) {
-  const displayTz = getDisplayTimezone();
   const total  = trades.length;
   const wins   = trades.filter(t => getTradeResult(t) === 'win');
   const losses = trades.filter(t => getTradeResult(t) === 'loss');
@@ -528,28 +495,14 @@ function updateTlCards(trades) {
   const totalComm = trades.reduce((s, t) => s + (t.comm || 0), 0);
   const netPnl    = trades.reduce((s, t) => s + t.pnl, 0);
 
-  // Get today's date in display timezone
   const now = new Date();
-  const todayParts = _formatPartsInDisplayTz(now, displayTz);
-  const todayStr = `${todayParts.year}-${String(todayParts.month).padStart(2, '0')}-${String(todayParts.day).padStart(2, '0')}`;
-  
-  // Get week start in display timezone
-  const weekDayOfWeek = new Date(todayParts.year, todayParts.month - 1, todayParts.day).getDay();
-  const weekStart = new Date(todayParts.year, todayParts.month - 1, todayParts.day - (weekDayOfWeek === 0 ? 6 : weekDayOfWeek - 1));
-  
-  // Get month start in display timezone
-  const monthStart = new Date(todayParts.year, todayParts.month - 1, 1);
+  const todayStr  = now.toISOString().slice(0, 10);
+  const weekStart = new Date(now); weekStart.setDate(now.getDate() - now.getDay());
+  const monthStart= new Date(now.getFullYear(), now.getMonth(), 1);
 
-  const todayTrades = trades.filter(t => getTradeDisplayDate(t, displayTz) === todayStr).length;
-  const weekTrades  = trades.filter(t => {
-    const tDate = getTradeDisplayDate(t, displayTz);
-    return tDate >= `${weekStart.getFullYear()}-${String(weekStart.getMonth() + 1).padStart(2, '0')}-${String(weekStart.getDate()).padStart(2, '0')}`;
-  }).length;
-  const monthTrades = trades.filter(t => {
-    const tDate = getTradeDisplayDate(t, displayTz);
-    const tParts = tDate.match(/^(\d{4})-(\d{2})/);
-    return tParts && tParts[1] === String(todayParts.year) && tParts[2] === String(todayParts.month).padStart(2, '0');
-  }).length;
+  const todayTrades = trades.filter(t => t.date === todayStr).length;
+  const weekTrades  = trades.filter(t => new Date(t.date) >= weekStart).length;
+  const monthTrades = trades.filter(t => new Date(t.date) >= monthStart).length;
 
   // ── Card 1: Total Trades ticker ──
   const ttVal0 = $('tl-tt-val-0');
@@ -626,8 +579,7 @@ function updateTlCards(trades) {
   const tlDailyPnlMap = {};
   trades.forEach(t => {
     if (!t.date) return;
-    const tDisplayDate = getTradeDisplayDate(t, displayTz);
-    tlDailyPnlMap[tDisplayDate] = (tlDailyPnlMap[tDisplayDate] || 0) + (t.pnl || 0);
+    tlDailyPnlMap[t.date] = (tlDailyPnlMap[t.date] || 0) + (t.pnl || 0);
   });
   const tlDayPnls = Object.values(tlDailyPnlMap);
   const tlBestWinningDayProfit = tlDayPnls.length
@@ -2122,8 +2074,7 @@ function initEquityChart() {
 
   const profitTarget = acct ? Math.round(baseline*(1+(acct.profitTarget||8)/100)) : Math.round(baseline*1.08);
   const maxLoss      = acct ? Math.round(baseline*(1-(acct.maxDrawdown||8)/100))  : Math.round(baseline*0.92);
-  const currentEquity = running;
-  const dailyLoss    = acct ? Math.round(currentEquity*(1-(acct.dailyLoss||4)/100))    : Math.round(currentEquity*0.97);
+  const dailyLoss    = acct ? Math.round(baseline*(1-(acct.dailyLoss||4)/100))    : Math.round(baseline*0.97);
 
   const pad  = Math.round((profitTarget - maxLoss) * 0.05);
   const yMin = maxLoss - pad;
@@ -2346,34 +2297,26 @@ function initDailyPnlChart() {
     return;
   }
 
-  // Get display timezone for consistent date calculations
-  const displayTz = getDisplayTimezone();
-  
-  // Build current week Mon–Fri using display timezone
+  // Build current week Mon–Fri
   const now = new Date();
-  const displayNow = _formatPartsInDisplayTz(now, displayTz);
-  const displayDayOfWeek = new Date(displayNow.year, displayNow.month - 1, displayNow.day).getDay();
-  const monday = new Date(displayNow.year, displayNow.month - 1, displayNow.day - (displayDayOfWeek === 0 ? 6 : displayDayOfWeek - 1));
-  
+  const day = now.getDay(); // 0=Sun, 1=Mon...
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
   const dayNames = ['Mon','Tue','Wed','Thu','Fri'];
   const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   const weekDates = dayNames.map((d, i) => {
     const dt = new Date(monday);
     dt.setDate(monday.getDate() + i);
-    const dateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-    return { label: `${d} ${monthNames[dt.getMonth()]} ${dt.getDate()}`, dateStr: dateStr };
+    return { label: `${d} ${monthNames[dt.getMonth()]} ${dt.getDate()}`, dateStr: dt.toISOString().split('T')[0] };
   });
   const labels = weekDates.map(d => d.label);
   
   // Store week dates globally for click handling
   dailyPnlWeekDates = weekDates;
 
-  // Map account-filtered trades pnl to each weekday, using display timezone for date matching
+  // Map account-filtered trades pnl to each weekday
   const data = weekDates.map(d => {
-    const dayTrades = dashT.filter(t => {
-      const tradeDisplayDate = getTradeDisplayDate(t, displayTz);
-      return tradeDisplayDate === d.dateStr;
-    });
+    const dayTrades = dashT.filter(t => t.date === d.dateStr);
     return dayTrades.reduce((sum, t) => sum + t.pnl, 0);
   });
 
@@ -2642,24 +2585,19 @@ function pnlCalThisWeek() {
 
 function filterDailyPnlCustomDate(monday) {
   try {
-    const displayTz = getDisplayTimezone();
     const endDate = new Date(monday);
     endDate.setDate(monday.getDate() + 4);
     const dayNames   = ['Mon','Tue','Wed','Thu','Fri'];
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const weekDates  = dayNames.map((d, i) => {
       const dt = new Date(monday); dt.setDate(monday.getDate() + i);
-      const dateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-      return { label: `${d} ${monthNames[dt.getMonth()]} ${dt.getDate()}`, dateStr: dateStr };
+      return { label: `${d} ${monthNames[dt.getMonth()]} ${dt.getDate()}`, dateStr: dt.toISOString().split('T')[0] };
     });
     dailyPnlWeekDates = weekDates;
     dailyPnlActiveMode = 'custom';
     const labels = weekDates.map(d => d.label);
     const data   = weekDates.map(d => {
-      return getDashboardTrades().filter(t => {
-        const tradeDisplayDate = getTradeDisplayDate(t, displayTz);
-        return tradeDisplayDate === d.dateStr;
-      }).reduce((s,t) => s + t.pnl, 0);
+      return getDashboardTrades().filter(t => t.date === d.dateStr).reduce((s,t) => s + t.pnl, 0);
     });
     // Reset week buttons
     $('pnl-this-week').style.background = 'transparent'; $('pnl-this-week').style.color = 'var(--text2)';
@@ -2689,15 +2627,14 @@ function filterDailyPnl(mode) {
   try {
     dailyPnlActiveMode = mode; // Save current mode for theme switch restore
     const light = document.documentElement.classList.contains('light');
-    const displayTz = getDisplayTimezone();
     let startDate, endDate;
     const now = new Date();
     
     if (mode === 'this-week') {
-      // Get current week (Mon-Fri) in display timezone
-      const displayNow = _formatPartsInDisplayTz(now, displayTz);
-      const displayDayOfWeek = new Date(displayNow.year, displayNow.month - 1, displayNow.day).getDay();
-      const monday = new Date(displayNow.year, displayNow.month - 1, displayNow.day - (displayDayOfWeek === 0 ? 6 : displayDayOfWeek - 1));
+      // Get current week (Mon-Fri)
+      const day = now.getDay();
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1));
       startDate = monday;
       endDate = new Date(monday);
       endDate.setDate(monday.getDate() + 4); // Friday
@@ -2711,10 +2648,10 @@ function filterDailyPnl(mode) {
       $('pnl-prev-week').style.color = 'var(--text2)';
       
     } else if (mode === 'prev-week') {
-      // Get previous week (Mon-Fri) in display timezone
-      const displayNow = _formatPartsInDisplayTz(now, displayTz);
-      const displayDayOfWeek = new Date(displayNow.year, displayNow.month - 1, displayNow.day).getDay();
-      const monday = new Date(displayNow.year, displayNow.month - 1, displayNow.day - (displayDayOfWeek === 0 ? 6 : displayDayOfWeek - 1) - 7);
+      // Get previous week (Mon-Fri)
+      const day = now.getDay();
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - (day === 0 ? 6 : day - 1) - 7); // Previous Monday
       startDate = monday;
       endDate = new Date(monday);
       endDate.setDate(monday.getDate() + 4); // Friday
@@ -2759,18 +2696,15 @@ function filterDailyPnl(mode) {
     const weekDates = dayNames.map((d, i) => {
       const dt = new Date(startDate);
       dt.setDate(startDate.getDate() + i);
-      const dateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-      return { label: `${d} ${monthNames[dt.getMonth()]} ${dt.getDate()}`, dateStr: dateStr };
+      return { label: `${d} ${monthNames[dt.getMonth()]} ${dt.getDate()}`, dateStr: dt.toISOString().split('T')[0] };
     });
     
-    // Store week dates globally for click handling\n    dailyPnlWeekDates = weekDates;
+    // Store week dates globally for click handling
+    dailyPnlWeekDates = weekDates;
     
     const labels = weekDates.map(d => d.label);
     const data = weekDates.map(d => {
-      const dayTrades = getDashboardTrades().filter(t => {
-        const tradeDisplayDate = getTradeDisplayDate(t, displayTz);
-        return tradeDisplayDate === d.dateStr;
-      });
+      const dayTrades = getDashboardTrades().filter(t => t.date === d.dateStr);
       return dayTrades.reduce((sum, t) => sum + t.pnl, 0);
     });
     
@@ -3112,7 +3046,7 @@ function buildAnAccountBar() {
     let status = 'active';
     if (pnl <= -ml || Math.abs(wd) >= dl) status = 'breached';
     else if (a.profitTarget > 0 && pnl >= pt) status = 'passed';
-    return { a, i, status, selected: anCurrentAccount === an };
+    return { a, i, status, name: an, selected: anCurrentAccount === an };
   });
 
   const activeAccts = acctStatuses.filter(x => x.status === 'active');
@@ -5385,51 +5319,6 @@ function getDashboardTrades() {
   if (!a) return TRADES;
   const acctName = a.key || a.phase;
   return TRADES.filter(t => (t.account || '') === acctName);
-}
-
-// ══════════════════════════════════════════════
-//  TIMEZONE HELPERS FOR DISPLAY
-// ══════════════════════════════════════════════
-function getDisplayTimezone() {
-  try {
-    if (typeof loadSettings === 'function') {
-      const s = loadSettings();
-      if (s && s.displayTimezone) return s.displayTimezone;
-      if (s && s.timezone) return s.timezone;
-    }
-  } catch (_) {}
-  return 'UTC';
-}
-
-function _formatPartsInDisplayTz(dateObj, tz) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: tz,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  }).formatToParts(dateObj);
-  const pick = type => parts.find(p => p.type === type)?.value;
-  return {
-    year: parseInt(pick('year'), 10),
-    month: parseInt(pick('month'), 10),
-    day: parseInt(pick('day'), 10)
-  };
-}
-
-function getTradeDisplayDate(trade, displayTz) {
-  if (!trade || !trade.date) return '';
-  if (typeof convertTradeDateTimeBetweenZones !== 'function') return trade.date;
-  try {
-    const journalTz = (typeof getJournalTimezone === 'function')
-      ? getJournalTimezone()
-      : ((typeof loadSettings === 'function') ? (loadSettings().tradingTimezone || loadSettings().displayTimezone || loadSettings().timezone) : 'UTC');
-    if (journalTz === displayTz) return trade.date;
-    const timeStr = trade.time || '00:00';
-    const converted = convertTradeDateTimeBetweenZones(trade.date, timeStr, journalTz, displayTz);
-    return converted.date || trade.date;
-  } catch (_) {
-    return trade.date;
-  }
 }
 
 // ══════════════════════════════════════════════
