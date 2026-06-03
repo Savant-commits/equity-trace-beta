@@ -13,29 +13,37 @@
     }
   }
 
-  // Poll for PostHog library to be loaded (from CDN script tag)
-  var maxRetries = 50; // ~5 seconds at 100ms intervals
-  var retryCount = 0;
+  // Load the PostHog module if a global instance is not already available.
+  var posthogModuleUrl = 'https://cdn.jsdelivr.net/npm/posthog-js@latest/dist/module.js';
 
-  if (typeof window.posthog !== 'undefined') {
-    initPostHog();
-    return;
-  }
-
-  var retryInterval = setInterval(function() {
-    retryCount++;
-    
+  try {
     if (typeof window.posthog !== 'undefined') {
-      clearInterval(retryInterval);
       initPostHog();
       return;
     }
-    
-    if (retryCount >= maxRetries) {
-      clearInterval(retryInterval);
-      console.warn('PostHog: CDN script did not load within 5 seconds.');
-    }
-  }, 100);
+
+    var modulePromise = import(posthogModuleUrl)
+      .then(function(module) {
+        var ph = module.posthog || module.default || module.PostHog || module;
+        if (ph) {
+          window.posthog = ph;
+          console.log('PostHog module loaded:', posthogModuleUrl);
+          initPostHog();
+          return ph;
+        }
+        throw new Error('PostHog module did not expose a usable export.');
+      })
+      .catch(function(error) {
+        console.warn('PostHog dynamic import failed:', error);
+        console.warn('PostHog: CDN script did not load within 5 seconds.');
+      });
+
+    // If the browser does not support dynamic import, fall back to waiting for a global.
+    modulePromise.catch(function() {});
+  } catch (error) {
+    console.warn('PostHog: dynamic import is not supported in this browser.', error);
+    console.warn('PostHog: CDN script did not load within 5 seconds.');
+  }
 
   function initPostHog() {
     // Get credentials from window variables (set by local-env.js or Vite env injection)

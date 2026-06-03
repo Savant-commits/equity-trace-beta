@@ -4,9 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%236b1fd4'/%3E%3Cpolyline points='4,22 10,14 15,18 21,8 28,12' stroke='%232ecc8a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E">
-<link rel="icon" href="logo.png" type="image/png">
-<link rel="shortcut icon" href="logo.png" type="image/png">
-<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="/logo.png" type="image/png">
+<link rel="shortcut icon" href="/logo.png" type="image/png">
+<link rel="apple-touch-icon" href="/logo.png">
 <meta name="theme-color" content="#995dff">
 <!-- PWA Support -->
 <link rel="manifest" href="manifest.json">
@@ -29,19 +29,23 @@
 
 <!-- Local Supabase Configuration (for development) -->
 <script>
-  window.localEnvLoaded = new Promise(function(resolve) {
-    var script = document.createElement('script');
-    script.src = 'local-env.js';
-    script.onload = function() {
-      console.log('local-env.js loaded');
-      resolve(true);
-    };
-    script.onerror = function() {
-      console.warn('local-env.js not found; continuing without local overrides.');
-      resolve(false);
-    };
-    document.head.appendChild(script);
-  });
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    window.localEnvLoaded = new Promise(function(resolve) {
+      var script = document.createElement('script');
+      script.src = '/local-env.js';
+      script.onload = function() {
+        console.log('local-env.js loaded');
+        resolve(true);
+      };
+      script.onerror = function() {
+        console.warn('local-env.js not found; continuing without local overrides.');
+        resolve(false);
+      };
+      document.head.appendChild(script);
+    });
+  } else {
+    window.localEnvLoaded = Promise.resolve(false);
+  }
 </script>
 
 <!-- Supabase SDK + Backend -->
@@ -3967,8 +3971,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
 <!-- App Scripts (order matters) -->
 <!-- PostHog Analytics -->
-<script src="https://unpkg.com/posthog-js@latest/dist/posthog.umd.js"></script>
-<script src="posthog-init.js"></script>
+<script src="/posthog-init.js"></script>
 <!-- Main App Scripts -->
 <script defer src="app.js"></script>
 <script defer src="calendar.js"></script>
