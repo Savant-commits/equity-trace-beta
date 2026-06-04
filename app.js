@@ -10153,7 +10153,7 @@ async function fetchLatestVersion() {
 
 // Call this when the app initializes
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', fetchLatestVersion);
+  //document.addEventListener('DOMContentLoaded', fetchLatestVersion);
 } else {
-  fetchLatestVersion();
+  //fetchLatestVersion();
 }
