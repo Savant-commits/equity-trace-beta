@@ -769,10 +769,10 @@ window.SB = isSupabaseConfigured ? {
   // images
   loadTradeImages: sbLoadTradeImages,
   saveTradeImages: sbSaveTradeImages,
-  // public profiles
-  loadOwnPublicProfile: sbLoadOwnPublicProfile,
-  savePublicProfile: sbSavePublicProfile,
-  getPublicTraderStats: sbGetPublicTraderStats,
+  // public profiles (disabled)
+  loadOwnPublicProfile: async () => null,
+  savePublicProfile: async () => null,
+  getPublicTraderStats: async () => null,
   // settings
   getSetting: sbGetSetting,
   setSetting: sbSetSetting,

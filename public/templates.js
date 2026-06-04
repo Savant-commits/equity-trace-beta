@@ -42,39 +42,21 @@ function getAppBaseUrl() {
 }
 
 function buildPublicProfileUrl(username) {
-  const normalized = normalizePublicUsernameInput(username);
-  if (!normalized) return '';
-  return getAppBaseUrl().replace(/\/$/, '') + '/trader/' + normalized;
+  // Public profile URL generation disabled.
+  return '';
 }
 
 function getPublicTraderRouteUsername() {
-  try {
-    const params = new URLSearchParams(window.location.search || '');
-    const queryTrader = normalizePublicUsernameInput(params.get('trader') || '');
-    if (queryTrader) return queryTrader;
-  } catch (e) {}
-
-  const parts = (window.location.pathname || '')
-    .split('/')
-    .filter(Boolean);
-  const traderIndex = parts.findIndex(part => part.toLowerCase() === 'trader');
-  if (traderIndex === -1) return '';
-  return normalizePublicUsernameInput(parts[traderIndex + 1] || '');
+  // Public trader route detection disabled.
+  return '';
 }
 
 window.isPublicTraderRoute = function() {
-  return !!getPublicTraderRouteUsername();
+  return false;
 };
 
 function parsePublicDateValue(trade) {
-  const raw = String(trade?.date || '').trim();
-  if (!raw) return null;
-  const direct = new Date(raw);
-  if (!Number.isNaN(direct.getTime())) return direct;
-  const slash = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (slash) return new Date(Number(slash[3]), Number(slash[2]) - 1, Number(slash[1]));
-  const dash = raw.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if (dash) return new Date(Number(dash[1]), Number(dash[2]) - 1, Number(dash[3]));
+  // Public trader date parsing disabled.
   return null;
 }
 
@@ -279,54 +261,14 @@ function updatePublicShareUI(profile) {
 }
 
 function mergeRemotePublicProfileIntoLocal(remoteProfile) {
-  if (!remoteProfile) return loadProfile();
-  const current = loadProfile();
-  const merged = {
-    ...current,
-    publicUsername: remoteProfile.publicUsername || current.publicUsername || normalizePublicUsernameInput(current.handle || ''),
-    bio: typeof remoteProfile.bio === 'string' ? remoteProfile.bio : (current.bio || ''),
-    isPublic: typeof remoteProfile.isPublic === 'boolean' ? remoteProfile.isPublic : !!current.isPublic,
-  };
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(merged));
-  return merged;
+  // Public profile merge disabled.
+  return loadProfile();
 }
 
 window.mergeRemotePublicProfileIntoLocal = mergeRemotePublicProfileIntoLocal;
 
 function schedulePublicProfileSync(profile) {
-  clearTimeout(_publicProfileSyncTimer);
-  _publicProfileSyncTimer = setTimeout(async () => {
-    if (!window.SB || typeof window.SB.savePublicProfile !== 'function') return;
-    try {
-      const user = await window.SB.getUser();
-      if (!user) return;
-      await window.SB.savePublicProfile(profile);
-    } catch (error) {
-      console.warn('Public profile sync failed:', error);
-      if (typeof showToast === 'function' && error?.message) {
-        showToast(error.message, 'error', '', 2200);
-      }
-    }
-  }, 500);
-}
-
-function copyTextToClipboard(text, successMessage) {
-  if (!text) return;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      if (typeof showToast === 'function' && successMessage) showToast(successMessage, 'success', '', 1800);
-    }).catch(() => {
-      if (typeof showToast === 'function') showToast('Copy failed', 'error', '', 1800);
-    });
-    return;
-  }
-  const temp = document.createElement('textarea');
-  temp.value = text;
-  document.body.appendChild(temp);
-  temp.select();
-  document.execCommand('copy');
-  document.body.removeChild(temp);
-  if (typeof showToast === 'function' && successMessage) showToast(successMessage, 'success', '', 1800);
+  // Public profile sync disabled.
 }
 
 function togglePublicProfileSetting(event) {
@@ -334,106 +276,35 @@ function togglePublicProfileSetting(event) {
     event.preventDefault();
     event.stopPropagation();
   }
-  const toggle = $('prof-public-toggle');
-  if (!toggle) return;
-  const nextValue = toggle.getAttribute('data-on') !== 'true';
-  toggle.setAttribute('data-on', nextValue ? 'true' : 'false');
-  saveProfile();
+  // Public profile toggle disabled.
 }
 
 function copyPublicProfileLink() {
-  const profile = loadProfile();
-  const url = buildPublicProfileUrl(profile.publicUsername || profile.handle || '');
-  if (!url) {
-    if (typeof showToast === 'function') showToast('Set a public username first', 'error', '', 1800);
-    return;
-  }
-  copyTextToClipboard(url, 'Public profile link copied');
+  // Public profile link copying disabled.
 }
 
 function openPublicProfilePage() {
-  const profile = loadProfile();
-  const url = buildPublicProfileUrl(profile.publicUsername || profile.handle || '');
-  if (!url) {
-    if (typeof showToast === 'function') showToast('Set a public username first', 'error', '', 1800);
-    return;
-  }
-  window.open(url, '_blank', 'noopener');
+  // Public profile page opening disabled.
 }
 
 async function renderPublicShareCardBlob() {
-  const card = $('public-share-card-preview');
-  if (!card) throw new Error('Trader card not found.');
-  if (typeof html2canvas === 'undefined') throw new Error('Image renderer not loaded.');
-
-  const canvas = await html2canvas(card, {
-    scale: Math.max(2, window.devicePixelRatio || 1),
-    backgroundColor: null,
-    useCORS: true,
-    logging: false,
-  });
-
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-  if (!blob) throw new Error('Could not generate card image.');
-  return blob;
+  throw new Error('Public profile share card generation disabled.');
 }
 
 async function copyPublicShareCard() {
-  try {
-    const blob = await renderPublicShareCardBlob();
-    if (navigator.clipboard && window.ClipboardItem) {
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      if (typeof showToast === 'function') showToast('Card image copied', 'success', '', 1800);
-      return;
-    }
-    await downloadPublicShareCard();
-    if (typeof showToast === 'function') showToast('Clipboard image unsupported. Downloaded instead.', 'info', '', 2200);
-  } catch (e) {
-    if (typeof showToast === 'function') showToast(e.message || 'Could not copy card image', 'error', '', 2200);
-  }
+  // Public share card copying disabled.
 }
 
 async function downloadPublicShareCard() {
-  try {
-    const blob = await renderPublicShareCardBlob();
-    const url = URL.createObjectURL(blob);
-    const username = normalizePublicUsernameInput(loadProfile().publicUsername || loadProfile().handle || 'trader');
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `equitytrace-trader-card-${username || 'trader'}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    if (typeof showToast === 'function') showToast('Card downloaded', 'success', '', 1800);
-  } catch (e) {
-    if (typeof showToast === 'function') showToast(e.message || 'Could not download card image', 'error', '', 2200);
-  }
+  // Public share card download disabled.
 }
 
 async function sharePublicShareCard() {
-  const profile = loadProfile();
-  const url = buildPublicProfileUrl(profile.publicUsername || profile.handle || '');
-  try {
-    const blob = await renderPublicShareCardBlob();
-    const file = new File([blob], 'equitytrace-trader-card.png', { type: 'image/png' });
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        title: (profile.name || 'Trader') + ' · Trader Card',
-        text: url ? ('Tracked on EquityTrace\n' + url) : 'Tracked on EquityTrace',
-        files: [file],
-      });
-      return;
-    }
-    await downloadPublicShareCard();
-    if (typeof showToast === 'function') showToast('Native share unavailable. Downloaded card image.', 'info', '', 2200);
-  } catch (e) {
-    if (typeof showToast === 'function') showToast(e.message || 'Could not share card image', 'error', '', 2200);
-  }
+  // Public share card sharing disabled.
 }
 
 function sharePublicProfile() {
-  return sharePublicShareCard();
+  // Public profile sharing disabled.
 }
 
 function formatPublicCurrency(value) {
@@ -442,176 +313,31 @@ function formatPublicCurrency(value) {
 }
 
 function renderPublicTraderChart(points) {
-  const canvas = $('public-trader-chart');
-  if (!canvas || typeof Chart === 'undefined') return;
-  if (_publicTraderChart) {
-    _publicTraderChart.destroy();
-    _publicTraderChart = null;
-  }
-
-  _publicTraderChart = new Chart(canvas.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: points.map(point => point.date),
-      datasets: [{
-        data: points.map(point => Number(point.value) || 0),
-        borderColor: '#995dff',
-        backgroundColor: 'rgba(153,93,255,0.18)',
-        borderWidth: 2.5,
-        tension: 0.3,
-        fill: true,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-      },
-      scales: {
-        x: {
-          ticks: { color: '#8d97b6', maxTicksLimit: 6 },
-          grid: { color: 'rgba(255,255,255,0.04)' },
-        },
-        y: {
-          ticks: {
-            color: '#8d97b6',
-            callback: value => '$' + Number(value).toFixed(0),
-          },
-          grid: { color: 'rgba(255,255,255,0.05)' },
-        }
-      }
-    }
-  });
+  // Public trader chart rendering disabled.
 }
 
 function renderPublicTraderPage(payload) {
-  const profile = payload?.profile || {};
-  const summary = payload?.summary || {};
-  const bestModel = summary.best_model?.name || 'No models yet';
-  const displayName = profile.display_name || profile.username || 'Trader';
-  const username = profile.username || getPublicTraderRouteUsername();
-  const shareTextProfile = { name: displayName };
-  const shareStats = {
-    winRate: Number(summary.win_rate || 0).toFixed(1),
-    totalTrades: Number(summary.total_trades || 0),
-    bestModel,
-  };
-  const shareUrl = buildPublicProfileUrl(username);
-
-  if ($('public-trader-route-label')) $('public-trader-route-label').textContent = '/trader/' + username;
-  if ($('public-trader-name')) $('public-trader-name').textContent = displayName;
-  if ($('public-trader-handle')) $('public-trader-handle').textContent = '@' + username;
-  if ($('public-trader-bio')) $('public-trader-bio').textContent = profile.bio || 'No bio yet.';
-  if ($('public-trader-winrate')) $('public-trader-winrate').textContent = Number(summary.win_rate || 0).toFixed(1) + '%';
-  if ($('public-trader-trades')) $('public-trader-trades').textContent = Number(summary.total_trades || 0);
-  if ($('public-trader-netpnl')) $('public-trader-netpnl').textContent = formatPublicCurrency(summary.net_pnl || 0);
-  if ($('public-trader-best-model')) $('public-trader-best-model').textContent = bestModel;
-
-  if ($('public-trader-card-name')) $('public-trader-card-name').textContent = displayName;
-  if ($('public-trader-card-winrate')) $('public-trader-card-winrate').textContent = 'Winrate: ' + shareStats.winRate + '%';
-  if ($('public-trader-card-trades')) $('public-trader-card-trades').textContent = 'Trades: ' + shareStats.totalTrades;
-  if ($('public-trader-card-best-model')) $('public-trader-card-best-model').textContent = 'Best model: ' + bestModel;
-
-  if ($('public-trader-models')) {
-    const models = Array.isArray(payload.models) ? payload.models : [];
-    $('public-trader-models').innerHTML = models.length
-      ? models.map(model => `
-          <div class="public-trader-list-item">
-            <div class="public-trader-list-head">
-              <div class="public-trader-list-title">${escapePublicHtml(model.name)}</div>
-              <div class="public-trader-pill">${Number(model.win_rate || 0).toFixed(1)}% WR</div>
-            </div>
-            <div class="public-trader-list-meta">${Number(model.trades || 0)} trades · ${formatPublicCurrency(model.net_pnl || 0)}</div>
-          </div>
-        `).join('')
-      : '<div class="public-trader-list-item"><div class="public-trader-list-title">No models shared yet</div></div>';
-  }
-
-  if ($('public-trader-trades-list')) {
-    const trades = Array.isArray(payload.recent_trades) ? payload.recent_trades : [];
-    $('public-trader-trades-list').innerHTML = trades.length
-      ? trades.map(trade => `
-          <div class="public-trader-list-item">
-            <div class="public-trader-list-head">
-              <div class="public-trader-list-title">${escapePublicHtml(trade.symbol || 'Unknown')}</div>
-              <div class="public-trader-pill">${escapePublicHtml(String(trade.dir || '').toUpperCase() || 'N/A')}</div>
-            </div>
-            <div class="public-trader-list-meta">${escapePublicHtml(trade.date || '')} · ${escapePublicHtml(trade.model || 'Unlabeled')} · ${formatPublicCurrency(trade.pnl || 0)}</div>
-          </div>
-        `).join('')
-      : '<div class="public-trader-list-item"><div class="public-trader-list-title">No recent trades shared yet</div></div>';
-  }
-
-  renderPublicTraderChart(Array.isArray(payload.equity_curve) ? payload.equity_curve : []);
-
-  const activePage = $('public-trader-page');
-  if (activePage) activePage.dataset.shareText = buildPublicShareCardText(shareTextProfile, shareStats, shareUrl);
+  // Public trader page rendering disabled.
 }
 
 function setPublicTraderView(mode, message) {
-  if ($('public-trader-loading')) $('public-trader-loading').style.display = mode === 'loading' ? '' : 'none';
-  if ($('public-trader-empty')) {
-    $('public-trader-empty').style.display = mode === 'empty' ? '' : 'none';
-    if (message) $('public-trader-empty').textContent = message;
-  }
-  if ($('public-trader-content')) $('public-trader-content').style.display = mode === 'ready' ? '' : 'none';
+  // Public trader view updates disabled.
 }
 
 function preparePublicTraderShell() {
-  const page = $('public-trader-page');
-  if (page) page.style.display = 'block';
-  const landing = $('landing-screen');
-  if (landing) landing.style.display = 'none';
-  const auth = $('auth-overlay');
-  if (auth) auth.style.display = 'none';
-  const authBadge = $('auth-user-badge');
-  if (authBadge) authBadge.style.display = 'none';
-  const sidebar = document.querySelector('nav.sidebar');
-  const main = document.querySelector('main.main');
-  if (sidebar) sidebar.style.display = 'none';
-  if (main) main.style.display = 'none';
+  // Public trader shell disabled.
 }
 
 async function initPublicTraderRoute() {
-  const username = getPublicTraderRouteUsername();
-  if (!username) return;
-
-  preparePublicTraderShell();
-  setPublicTraderView('loading', 'Loading trader page...');
-
-  if (!window.SB || typeof window.SB.getPublicTraderStats !== 'function') {
-    setPublicTraderView('empty', 'Public trader pages need a live Supabase backend.');
-    return;
-  }
-
-  try {
-    const payload = await window.SB.getPublicTraderStats(username);
-    if (!payload || !payload.profile) {
-      setPublicTraderView('empty', 'Trader page not found or still private.');
-      return;
-    }
-    renderPublicTraderPage(payload);
-    setPublicTraderView('ready');
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  } catch (error) {
-    console.error('Public trader route error:', error);
-    setPublicTraderView('empty', 'Unable to load this trader page right now.');
-  }
+  // Public trader route initialization disabled.
 }
 
 function copyActivePublicTraderLink() {
-  if (window.isPublicTraderRoute && window.isPublicTraderRoute()) {
-    copyTextToClipboard(window.location.href, 'Public link copied');
-    return;
-  }
-  copyPublicProfileLink();
+  // Public trader link copying disabled.
 }
 
 function goToPublicHome() {
-  window.location.href = 'index.html';
+  // Public trader home navigation disabled.
 }
 
 function loadProfile() {
@@ -3346,7 +3072,7 @@ window.switchView = function(el) {
 // Init on load if these views are somehow active
 document.addEventListener('DOMContentLoaded', () => {
   initProfileUI();
-  initPublicTraderRoute();
+  // Public trader route initialization disabled.
   const s = loadSettings();
   // Apply saved accent — always apply (default to purple if none saved)
   applyAccentColor(s.accentColor || '#995dff');

@@ -11,10 +11,11 @@ if (typeof $ === 'undefined') {
 // ── USER PROFILE ──────────────────────────────────────────
 const PROFILE_KEY = 'et-user-profile';
 const SETTINGS_KEY = 'et-settings';
-const PUBLIC_USERNAME_PATTERN = /^[a-z0-9_]{3,24}$/;
 
 let _publicProfileSyncTimer = null;
 let _publicTraderChart = null;
+
+// Public profile support disabled. See future implementation notes.
 
 const AVATAR_EMOJIS = ['🦅','🦁','🐉','🔥','⚡','🎯','💎','🚀','🦊','🐺','🦋','🌊','🗡️','🛡️','🎪','🌟','🏹','🎭','🦄','🐻','🦈','🐅','🦅','⚔️','🧠','🎲','🃏','👑'];
 
@@ -63,7 +64,7 @@ function getPublicTraderRouteUsername() {
 }
 
 window.isPublicTraderRoute = function() {
-  return !!getPublicTraderRouteUsername();
+  return false;
 };
 
 function parsePublicDateValue(trade) {
@@ -116,325 +117,7 @@ function buildPublicSparklinePath(values, width, height, pad) {
   }).join(' ');
 }
 
-function getPublicShareStats(trades) {
-  const rows = Array.isArray(trades) ? trades.filter(Boolean) : [];
-  const totalTrades = rows.length;
-  const wins = rows.filter(t => Number(t.pnl) > 0).length;
-  const losses = rows.filter(t => Number(t.pnl) < 0).length;
-  const winRate = totalTrades ? ((wins / totalTrades) * 100).toFixed(1) : '0.0';
-  const bestModelMap = new Map();
-  const winPnls = [];
-  const lossPnls = [];
-  let bestTrade = -Infinity;
-
-  const now = new Date();
-  const monthRows = rows.filter(trade => {
-    const d = parsePublicDateValue(trade);
-    return d && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
-  });
-
-  const sortedRows = [...rows].sort((a, b) => {
-    const da = parsePublicDateValue(a)?.getTime() || 0;
-    const db = parsePublicDateValue(b)?.getTime() || 0;
-    if (da !== db) return da - db;
-    return String(a.time || '').localeCompare(String(b.time || ''));
-  });
-
-  let streak = 0;
-  let maxStreak = 0;
-  const equityCurve = [];
-  let running = 0;
-
-  rows.forEach(trade => {
-    const pnl = Number(trade.pnl) || 0;
-    const name = String(trade.model || '').trim() || 'Unlabeled';
-    const current = bestModelMap.get(name) || { name, trades: 0, wins: 0, pnl: 0 };
-    current.trades += 1;
-    if (pnl > 0) {
-      current.wins += 1;
-      winPnls.push(pnl);
-    }
-    if (pnl < 0) lossPnls.push(Math.abs(pnl));
-    if (pnl > bestTrade) bestTrade = pnl;
-    current.pnl += pnl;
-    bestModelMap.set(name, current);
-  });
-
-  sortedRows.forEach(trade => {
-    const pnl = Number(trade.pnl) || 0;
-    if (pnl > 0) {
-      streak += 1;
-      maxStreak = Math.max(maxStreak, streak);
-    } else if (pnl < 0) {
-      streak = 0;
-    }
-    running += pnl;
-    equityCurve.push(running);
-  });
-
-  const bestModel = Array.from(bestModelMap.values())
-    .sort((left, right) => (right.pnl - left.pnl) || (right.trades - left.trades) || left.name.localeCompare(right.name))[0] || null;
-
-  const avgWin = winPnls.length ? winPnls.reduce((sum, value) => sum + value, 0) / winPnls.length : 0;
-  const avgLoss = lossPnls.length ? lossPnls.reduce((sum, value) => sum + value, 0) / lossPnls.length : 0;
-  const avgRR = avgLoss > 0 ? (avgWin / avgLoss) : 0;
-  const monthlyPnl = monthRows.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0);
-  const estimatedCapital = getEstimatedCapital();
-  const monthlyReturn = estimatedCapital > 0 ? (monthlyPnl / estimatedCapital) * 100 : 0;
-  const netPnl = rows.reduce((sum, trade) => sum + (Number(trade.pnl) || 0), 0);
-  const netReturn = estimatedCapital > 0 ? (netPnl / estimatedCapital) * 100 : 0;
-
-  let badge = 'Building Edge';
-  if (maxStreak >= 5) badge = `🔥 ${maxStreak} Day Win Streak`;
-  else if (totalTrades >= 25 && Number(winRate) >= 65) badge = '💎 Top 10% Trader';
-  else if (monthlyReturn >= 8) badge = `⚡ +${monthlyReturn.toFixed(1)}% Month`;
-  else if (totalTrades >= 10 && Number(winRate) >= 60) badge = '🎯 Consistent Execution';
-
-  return {
-    totalTrades,
-    winRate,
-    losses,
-    bestModel: bestModel ? bestModel.name : 'No models yet',
-    netPnl,
-    netReturn,
-    monthlyPnl,
-    monthlyReturn,
-    estimatedCapital,
-    avgRR,
-    bestTrade: Number.isFinite(bestTrade) ? bestTrade : 0,
-    maxStreak,
-    badge,
-    equityCurve,
-  };
-}
-
-function buildPublicShareCardText(profile, stats, url) {
-  const displayName = (profile?.name || 'Trader').trim() || 'Trader';
-  return [
-    displayName,
-    'Monthly Return: ' + (stats.estimatedCapital > 0 ? ((stats.monthlyReturn >= 0 ? '+' : '') + stats.monthlyReturn.toFixed(1) + '%') : formatPublicCurrency(stats.monthlyPnl || 0)),
-    'Winrate: ' + stats.winRate + '%',
-    'Trades: ' + stats.totalTrades,
-    'Avg RR: ' + (stats.avgRR || 0).toFixed(2),
-    'Best Trade: ' + formatPublicCurrency(stats.bestTrade || 0),
-    'Net Return: ' + (stats.estimatedCapital > 0 ? ((stats.netReturn >= 0 ? '+' : '') + stats.netReturn.toFixed(1) + '%') : 'N/A'),
-    'Badge: ' + (stats.badge || 'Building Edge'),
-    url || ''
-  ].filter(Boolean).join('\n');
-}
-
-function updatePublicShareUI(profile) {
-  const currentProfile = profile || loadProfile();
-  const username = normalizePublicUsernameInput(currentProfile.handle || currentProfile.publicUsername || '');
-  const stats = getPublicShareStats(window.TRADES || []);
-  const publicUrl = buildPublicProfileUrl(username);
-  const isPublic = !!currentProfile.isPublic;
-  const hasValidUsername = PUBLIC_USERNAME_PATTERN.test(username);
-
-  if ($('public-url-inline')) $('public-url-inline').textContent = hasValidUsername ? '/trader/' + username : '/trader/username';
-  if ($('public-profile-url')) $('public-profile-url').textContent = hasValidUsername ? publicUrl : 'Set a public username to create a share link';
-  if ($('public-share-name')) $('public-share-name').textContent = currentProfile.name || 'Trader';
-  if ($('public-share-handle')) $('public-share-handle').textContent = hasValidUsername ? ('@' + username) : (currentProfile.handle ? ('@' + String(currentProfile.handle).replace(/^@+/, '')) : '@username');
-  if ($('public-share-badge')) $('public-share-badge').textContent = stats.badge || 'Building Edge';
-
-  const heroEl = $('public-share-hero');
-  const heroLabelEl = $('public-share-hero-label');
-  if (heroEl && heroLabelEl) {
-    if (stats.estimatedCapital > 0) {
-      const val = Number(stats.monthlyReturn) || 0;
-      heroEl.textContent = `${val >= 0 ? '+' : ''}${val.toFixed(1)}%`;
-      heroLabelEl.textContent = 'Monthly Return';
-    } else {
-      heroEl.textContent = formatPublicCurrency(stats.monthlyPnl || stats.netPnl || 0);
-      heroLabelEl.textContent = 'Monthly P&L';
-    }
-  }
-
-  if ($('public-share-winrate')) $('public-share-winrate').textContent = stats.winRate + '%';
-  if ($('public-share-trades')) $('public-share-trades').textContent = String(stats.totalTrades);
-  if ($('public-share-rr')) $('public-share-rr').textContent = (stats.avgRR || 0).toFixed(2);
-  if ($('public-share-best-trade')) $('public-share-best-trade').textContent = formatPublicCurrency(stats.bestTrade || 0);
-  if ($('public-share-netreturn')) {
-    $('public-share-netreturn').textContent = stats.estimatedCapital > 0
-      ? `${stats.netReturn >= 0 ? '+' : ''}${stats.netReturn.toFixed(1)}%`
-      : 'N/A';
-  }
-
-  const card = $('public-share-card-preview');
-  if (card) {
-    const isLoss = stats.estimatedCapital > 0 ? stats.netReturn < 0 : (stats.monthlyPnl || stats.netPnl) < 0;
-    card.classList.toggle('loss-theme', isLoss);
-  }
-
-  const toggle = $('prof-public-toggle');
-  if (toggle) toggle.setAttribute('data-on', isPublic ? 'true' : 'false');
-
-  const status = $('public-share-status');
-  if (status) {
-    if (!username) status.textContent = 'Add a handle to activate sharing';
-    else if (!hasValidUsername) status.textContent = 'Username must be 3-24 chars: a-z, 0-9, _';
-    else status.textContent = isPublic ? 'Public and ready to share' : 'Private until you turn sharing on';
-    status.style.color = isPublic && hasValidUsername ? 'var(--green)' : 'var(--text3)';
-  }
-}
-
-function mergeRemotePublicProfileIntoLocal(remoteProfile) {
-  if (!remoteProfile) return loadProfile();
-  const current = loadProfile();
-  const merged = {
-    ...current,
-    publicUsername: remoteProfile.publicUsername || current.publicUsername || normalizePublicUsernameInput(current.handle || ''),
-    bio: typeof remoteProfile.bio === 'string' ? remoteProfile.bio : (current.bio || ''),
-    isPublic: typeof remoteProfile.isPublic === 'boolean' ? remoteProfile.isPublic : !!current.isPublic,
-  };
-  localStorage.setItem(PROFILE_KEY, JSON.stringify(merged));
-  return merged;
-}
-
-window.mergeRemotePublicProfileIntoLocal = mergeRemotePublicProfileIntoLocal;
-
-function schedulePublicProfileSync(profile) {
-  clearTimeout(_publicProfileSyncTimer);
-  _publicProfileSyncTimer = setTimeout(async () => {
-    if (!window.SB || typeof window.SB.savePublicProfile !== 'function') return;
-    try {
-      const user = await window.SB.getUser();
-      if (!user) return;
-      await window.SB.savePublicProfile(profile);
-    } catch (error) {
-      console.warn('Public profile sync failed:', error);
-      if (typeof showToast === 'function' && error?.message) {
-        showToast(error.message, 'error', '', 2200);
-      }
-    }
-  }, 500);
-}
-
-function copyTextToClipboard(text, successMessage) {
-  if (!text) return;
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      if (typeof showToast === 'function' && successMessage) showToast(successMessage, 'success', '', 1800);
-    }).catch(() => {
-      if (typeof showToast === 'function') showToast('Copy failed', 'error', '', 1800);
-    });
-    return;
-  }
-  const temp = document.createElement('textarea');
-  temp.value = text;
-  document.body.appendChild(temp);
-  temp.select();
-  document.execCommand('copy');
-  document.body.removeChild(temp);
-  if (typeof showToast === 'function' && successMessage) showToast(successMessage, 'success', '', 1800);
-}
-
-function togglePublicProfileSetting(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  const toggle = $('prof-public-toggle');
-  if (!toggle) return;
-  const nextValue = toggle.getAttribute('data-on') !== 'true';
-  toggle.setAttribute('data-on', nextValue ? 'true' : 'false');
-  saveProfile();
-}
-
-function copyPublicProfileLink() {
-  const profile = loadProfile();
-  const url = buildPublicProfileUrl(profile.publicUsername || profile.handle || '');
-  if (!url) {
-    if (typeof showToast === 'function') showToast('Set a public username first', 'error', '', 1800);
-    return;
-  }
-  copyTextToClipboard(url, 'Public profile link copied');
-}
-
-function openPublicProfilePage() {
-  const profile = loadProfile();
-  const url = buildPublicProfileUrl(profile.publicUsername || profile.handle || '');
-  if (!url) {
-    if (typeof showToast === 'function') showToast('Set a public username first', 'error', '', 1800);
-    return;
-  }
-  window.open(url, '_blank', 'noopener');
-}
-
-async function renderPublicShareCardBlob() {
-  const card = $('public-share-card-preview');
-  if (!card) throw new Error('Trader card not found.');
-  if (typeof html2canvas === 'undefined') throw new Error('Image renderer not loaded.');
-
-  const canvas = await html2canvas(card, {
-    scale: Math.max(2, window.devicePixelRatio || 1),
-    backgroundColor: null,
-    useCORS: true,
-    logging: false,
-  });
-
-  const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-  if (!blob) throw new Error('Could not generate card image.');
-  return blob;
-}
-
-async function copyPublicShareCard() {
-  try {
-    const blob = await renderPublicShareCardBlob();
-    if (navigator.clipboard && window.ClipboardItem) {
-      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-      if (typeof showToast === 'function') showToast('Card image copied', 'success', '', 1800);
-      return;
-    }
-    await downloadPublicShareCard();
-    if (typeof showToast === 'function') showToast('Clipboard image unsupported. Downloaded instead.', 'info', '', 2200);
-  } catch (e) {
-    if (typeof showToast === 'function') showToast(e.message || 'Could not copy card image', 'error', '', 2200);
-  }
-}
-
-async function downloadPublicShareCard() {
-  try {
-    const blob = await renderPublicShareCardBlob();
-    const url = URL.createObjectURL(blob);
-    const username = normalizePublicUsernameInput(loadProfile().publicUsername || loadProfile().handle || 'trader');
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `equitytrace-trader-card-${username || 'trader'}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    if (typeof showToast === 'function') showToast('Card downloaded', 'success', '', 1800);
-  } catch (e) {
-    if (typeof showToast === 'function') showToast(e.message || 'Could not download card image', 'error', '', 2200);
-  }
-}
-
-async function sharePublicShareCard() {
-  const profile = loadProfile();
-  const url = buildPublicProfileUrl(profile.publicUsername || profile.handle || '');
-  try {
-    const blob = await renderPublicShareCardBlob();
-    const file = new File([blob], 'equitytrace-trader-card.png', { type: 'image/png' });
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({
-        title: (profile.name || 'Trader') + ' · Trader Card',
-        text: url ? ('Tracked on EquityTrace\n' + url) : 'Tracked on EquityTrace',
-        files: [file],
-      });
-      return;
-    }
-    await downloadPublicShareCard();
-    if (typeof showToast === 'function') showToast('Native share unavailable. Downloaded card image.', 'info', '', 2200);
-  } catch (e) {
-    if (typeof showToast === 'function') showToast(e.message || 'Could not share card image', 'error', '', 2200);
-  }
-}
-
-function sharePublicProfile() {
-  return sharePublicShareCard();
-}
+// Public profile features disabled.
 
 function formatPublicCurrency(value) {
   const amount = Number(value) || 0;
@@ -487,131 +170,29 @@ function renderPublicTraderChart(points) {
   });
 }
 
+// Public trader route features disabled.
 function renderPublicTraderPage(payload) {
-  const profile = payload?.profile || {};
-  const summary = payload?.summary || {};
-  const bestModel = summary.best_model?.name || 'No models yet';
-  const displayName = profile.display_name || profile.username || 'Trader';
-  const username = profile.username || getPublicTraderRouteUsername();
-  const shareTextProfile = { name: displayName };
-  const shareStats = {
-    winRate: Number(summary.win_rate || 0).toFixed(1),
-    totalTrades: Number(summary.total_trades || 0),
-    bestModel,
-  };
-  const shareUrl = buildPublicProfileUrl(username);
-
-  if ($('public-trader-route-label')) $('public-trader-route-label').textContent = '/trader/' + username;
-  if ($('public-trader-name')) $('public-trader-name').textContent = displayName;
-  if ($('public-trader-handle')) $('public-trader-handle').textContent = '@' + username;
-  if ($('public-trader-bio')) $('public-trader-bio').textContent = profile.bio || 'No bio yet.';
-  if ($('public-trader-winrate')) $('public-trader-winrate').textContent = Number(summary.win_rate || 0).toFixed(1) + '%';
-  if ($('public-trader-trades')) $('public-trader-trades').textContent = Number(summary.total_trades || 0);
-  if ($('public-trader-netpnl')) $('public-trader-netpnl').textContent = formatPublicCurrency(summary.net_pnl || 0);
-  if ($('public-trader-best-model')) $('public-trader-best-model').textContent = bestModel;
-
-  if ($('public-trader-card-name')) $('public-trader-card-name').textContent = displayName;
-  if ($('public-trader-card-winrate')) $('public-trader-card-winrate').textContent = 'Winrate: ' + shareStats.winRate + '%';
-  if ($('public-trader-card-trades')) $('public-trader-card-trades').textContent = 'Trades: ' + shareStats.totalTrades;
-  if ($('public-trader-card-best-model')) $('public-trader-card-best-model').textContent = 'Best model: ' + bestModel;
-
-  if ($('public-trader-models')) {
-    const models = Array.isArray(payload.models) ? payload.models : [];
-    $('public-trader-models').innerHTML = models.length
-      ? models.map(model => `
-          <div class="public-trader-list-item">
-            <div class="public-trader-list-head">
-              <div class="public-trader-list-title">${escapePublicHtml(model.name)}</div>
-              <div class="public-trader-pill">${Number(model.win_rate || 0).toFixed(1)}% WR</div>
-            </div>
-            <div class="public-trader-list-meta">${Number(model.trades || 0)} trades · ${formatPublicCurrency(model.net_pnl || 0)}</div>
-          </div>
-        `).join('')
-      : '<div class="public-trader-list-item"><div class="public-trader-list-title">No models shared yet</div></div>';
-  }
-
-  if ($('public-trader-trades-list')) {
-    const trades = Array.isArray(payload.recent_trades) ? payload.recent_trades : [];
-    $('public-trader-trades-list').innerHTML = trades.length
-      ? trades.map(trade => `
-          <div class="public-trader-list-item">
-            <div class="public-trader-list-head">
-              <div class="public-trader-list-title">${escapePublicHtml(trade.symbol || 'Unknown')}</div>
-              <div class="public-trader-pill">${escapePublicHtml(String(trade.dir || '').toUpperCase() || 'N/A')}</div>
-            </div>
-            <div class="public-trader-list-meta">${escapePublicHtml(trade.date || '')} · ${escapePublicHtml(trade.model || 'Unlabeled')} · ${formatPublicCurrency(trade.pnl || 0)}</div>
-          </div>
-        `).join('')
-      : '<div class="public-trader-list-item"><div class="public-trader-list-title">No recent trades shared yet</div></div>';
-  }
-
-  renderPublicTraderChart(Array.isArray(payload.equity_curve) ? payload.equity_curve : []);
-
-  const activePage = $('public-trader-page');
-  if (activePage) activePage.dataset.shareText = buildPublicShareCardText(shareTextProfile, shareStats, shareUrl);
+  // Public trader page support is disabled for now.
 }
 
 function setPublicTraderView(mode, message) {
-  if ($('public-trader-loading')) $('public-trader-loading').style.display = mode === 'loading' ? '' : 'none';
-  if ($('public-trader-empty')) {
-    $('public-trader-empty').style.display = mode === 'empty' ? '' : 'none';
-    if (message) $('public-trader-empty').textContent = message;
-  }
-  if ($('public-trader-content')) $('public-trader-content').style.display = mode === 'ready' ? '' : 'none';
+  // Public trader page support is disabled.
 }
 
 function preparePublicTraderShell() {
-  const page = $('public-trader-page');
-  if (page) page.style.display = 'block';
-  const landing = $('landing-screen');
-  if (landing) landing.style.display = 'none';
-  const auth = $('auth-overlay');
-  if (auth) auth.style.display = 'none';
-  const authBadge = $('auth-user-badge');
-  if (authBadge) authBadge.style.display = 'none';
-  const sidebar = document.querySelector('nav.sidebar');
-  const main = document.querySelector('main.main');
-  if (sidebar) sidebar.style.display = 'none';
-  if (main) main.style.display = 'none';
+  // Public trader page support is disabled.
 }
 
 async function initPublicTraderRoute() {
-  const username = getPublicTraderRouteUsername();
-  if (!username) return;
-
-  preparePublicTraderShell();
-  setPublicTraderView('loading', 'Loading trader page...');
-
-  if (!window.SB || typeof window.SB.getPublicTraderStats !== 'function') {
-    setPublicTraderView('empty', 'Public trader pages need a live Supabase backend.');
-    return;
-  }
-
-  try {
-    const payload = await window.SB.getPublicTraderStats(username);
-    if (!payload || !payload.profile) {
-      setPublicTraderView('empty', 'Trader page not found or still private.');
-      return;
-    }
-    renderPublicTraderPage(payload);
-    setPublicTraderView('ready');
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  } catch (error) {
-    console.error('Public trader route error:', error);
-    setPublicTraderView('empty', 'Unable to load this trader page right now.');
-  }
+  // Public trader route initialization disabled.
 }
 
 function copyActivePublicTraderLink() {
-  if (window.isPublicTraderRoute && window.isPublicTraderRoute()) {
-    copyTextToClipboard(window.location.href, 'Public link copied');
-    return;
-  }
-  copyPublicProfileLink();
+  // Public trader route support disabled.
 }
 
 function goToPublicHome() {
-  window.location.href = 'index.html';
+  // Public trader route support disabled.
 }
 
 function loadProfile() {
@@ -1338,8 +919,9 @@ function saveProfile() {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
   updateProfilePreview(p);
   updateSidebarProfile(p);
-  updatePublicShareUI(p);
-  schedulePublicProfileSync(p);
+  // Public profile sync disabled
+  // updatePublicShareUI(p);
+  // schedulePublicProfileSync(p);
 }
 function setProfileAuthEmail(email) {
   const value = email && String(email).trim() ? String(email).trim() : 'Yet to sign in';
@@ -1461,7 +1043,8 @@ function initProfileUI() {
   if ($('prof-style'))  $('prof-style').value  = p.style  || '';
   if ($('prof-exp'))    $('prof-exp').value    = p.exp    || '';
   if ($('prof-bio'))    $('prof-bio').value    = p.bio    || '';
-  if ($('prof-public-toggle')) $('prof-public-toggle').setAttribute('data-on', p.isPublic ? 'true' : 'false');
+  // Public profile toggle UI disabled
+  // if ($('prof-public-toggle')) $('prof-public-toggle').setAttribute('data-on', p.isPublic ? 'true' : 'false');
   const avatar = p.avatar || '';
   const em = $('profile-avatar-emoji');
   if (em) em.textContent = avatar;
@@ -1475,7 +1058,8 @@ function initProfileUI() {
   }, 0);
   updateProfilePreview(p);
   updateSidebarProfile(p);
-  updatePublicShareUI(p);
+  // Public profile UI update disabled
+  // updatePublicShareUI(p);
   syncSettingsTimezoneDropdown('prof-style');
   syncSettingsTimezoneDropdown('prof-exp');
   syncProfileAuthEmail();
@@ -3347,7 +2931,8 @@ window.switchView = function(el) {
 // Init on load if these views are somehow active
 document.addEventListener('DOMContentLoaded', () => {
   initProfileUI();
-  initPublicTraderRoute();
+  // Public trader route initialization disabled.
+  // initPublicTraderRoute();
   const s = loadSettings();
   // Apply saved accent — always apply (default to purple if none saved)
   applyAccentColor(s.accentColor || '#995dff');
