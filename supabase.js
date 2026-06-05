@@ -205,7 +205,26 @@ async function sbLoadOwnPublicProfile() {
   if (error) {
     if (isMissingPublicProfileInfra(error)) {
       markPublicProfileInfraUnavailable(error);
-      return null;
+      try {
+        // Fallback: read basic info from `profiles` table when `public_profiles` doesn't exist
+        const { data: pData, error: pErr } = await requireClient()
+          .from('profiles')
+          .select('display_name')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (pErr) {
+          console.error('sbLoadOwnPublicProfile fallback (profiles) failed:', pErr);
+          return null;
+        }
+        return dbToPublicProfile({
+          username: pData?.display_name || '',
+          bio: '',
+          is_public: false,
+        });
+      } catch (e) {
+        console.error('sbLoadOwnPublicProfile fallback error:', e);
+        return null;
+      }
     }
     console.error('sbLoadOwnPublicProfile:', error);
     return null;
