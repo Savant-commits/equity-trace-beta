@@ -22,18 +22,11 @@ const SUPABASE_ANON = (_env?.VITE_SUPABASE_ANON || _env?.SUPABASE_ANON || window
 // (already injected via index.html <script> tag — see setup guide)
 
 let _supabase = null;
-let _publicProfileInfraAvailable = true;
-
-if (!SUPABASE_URL || !SUPABASE_ANON) {
-  console.info('Supabase backend not configured. Running in local-only mode. To enable syncing, set SUPABASE_URL/SUPABASE_ANON in local-env.js or VITE_SUPABASE_URL/VITE_SUPABASE_ANON in .env.');
-  _publicProfileInfraAvailable = false;
-}
 
 function getSupabase() {
   if (!_supabase) {
     if (!SUPABASE_URL || !SUPABASE_ANON) {
       console.error('Supabase not configured; SUPABASE_URL or SUPABASE_ANON missing.');
-      _publicProfileInfraAvailable = false;
       return null;
     }
     if (typeof supabase === 'undefined' || !supabase.createClient) {
@@ -60,28 +53,9 @@ function normalizePublicUsername(value) {
     .slice(0, 24);
 }
 
-function isMissingPublicProfileInfra(error) {
-  const message = String(error?.message || '').toLowerCase();
-  const code = String(error?.code || '').toUpperCase();
-  return (
-    code === 'PGRST205' ||
-    message.includes("could not find the table") ||
-    message.includes('public_profiles') && message.includes('schema cache') ||
-    message.includes('relation "public.public_profiles" does not exist') ||
-    message.includes('function public.get_public_trader_stats')
-  );
-}
-
-function markPublicProfileInfraUnavailable(error) {
-  if (!_publicProfileInfraAvailable) return;
-  _publicProfileInfraAvailable = false;
-  console.warn('Public profile infra unavailable in Supabase. Falling back to local-only mode.', error);
-}
-
 const isSupabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON);
 if (!isSupabaseConfigured) {
   console.info('Supabase backend not configured; running in local-only mode. Add local-env.js with SUPABASE_URL and SUPABASE_ANON or use a Vite env file.');
-  _publicProfileInfraAvailable = false;
 }
 
 function createSupabaseStub() {
@@ -192,108 +166,15 @@ function dbToPublicProfile(row) {
 }
 
 async function sbLoadOwnPublicProfile() {
-  if (!_publicProfileInfraAvailable) return null;
-  const user = await sbGetUser();
-  if (!user) return null;
-
-  const { data, error } = await requireClient()
-    .from('public_profiles')
-    .select('username, bio, is_public')
-    .eq('user_id', user.id)
-    .maybeSingle();
-
-  if (error) {
-    if (isMissingPublicProfileInfra(error)) {
-      markPublicProfileInfraUnavailable(error);
-      try {
-        // Fallback: read basic info from `profiles` table when `public_profiles` doesn't exist
-        const { data: pData, error: pErr } = await requireClient()
-          .from('profiles')
-          .select('display_name')
-          .eq('id', user.id)
-          .maybeSingle();
-        if (pErr) {
-          console.error('sbLoadOwnPublicProfile fallback (profiles) failed:', pErr);
-          return null;
-        }
-        return dbToPublicProfile({
-          username: pData?.display_name || '',
-          bio: '',
-          is_public: false,
-        });
-      } catch (e) {
-        console.error('sbLoadOwnPublicProfile fallback error:', e);
-        return null;
-      }
-    }
-    console.error('sbLoadOwnPublicProfile:', error);
-    return null;
-  }
-  return dbToPublicProfile(data || {});
+  return null;
 }
 
 async function sbSavePublicProfile(profile) {
-  if (!_publicProfileInfraAvailable) return dbToPublicProfile({
-    username: profile?.publicUsername || profile?.handle || '',
-    bio: profile?.bio || '',
-    is_public: !!profile?.isPublic,
-  });
-
-  const user = await sbGetUser();
-  if (!user) throw new Error('Not authenticated');
-
-  const username = normalizePublicUsername(profile?.publicUsername || profile?.handle || '');
-
-  // Best effort update only; avoid insert/upsert on profiles to prevent RLS insert violations.
-  await requireClient()
-    .from('profiles')
-    .update({
-      display_name: profile?.name || null,
-    })
-    .eq('id', user.id);
-
-  const { data, error } = await requireClient()
-    .from('public_profiles')
-    .upsert({
-      user_id: user.id,
-      username: username || null,
-      bio: profile?.bio || null,
-      is_public: !!profile?.isPublic,
-    }, { onConflict: 'user_id' })
-    .select('username, bio, is_public')
-    .single();
-
-  if (error) {
-    if (isMissingPublicProfileInfra(error)) {
-      markPublicProfileInfraUnavailable(error);
-      return dbToPublicProfile({
-        username: profile?.publicUsername || profile?.handle || '',
-        bio: profile?.bio || '',
-        is_public: !!profile?.isPublic,
-      });
-    }
-    throw error;
-  }
-  return dbToPublicProfile(data);
+  return true;
 }
 
 async function sbGetPublicTraderStats(username) {
-  if (!_publicProfileInfraAvailable) return null;
-  const normalized = normalizePublicUsername(username);
-  if (!normalized) return null;
-
-  const { data, error } = await requireClient()
-    .rpc('get_public_trader_stats', { profile_username: normalized });
-
-  if (error) {
-    if (isMissingPublicProfileInfra(error)) {
-      markPublicProfileInfraUnavailable(error);
-      return null;
-    }
-    console.error('sbGetPublicTraderStats:', error);
-    return null;
-  }
-  return data || null;
+  return null;
 }
 
 
@@ -741,14 +622,15 @@ async function migrateLocalStorageToSupabase() {
     const rawProfile = localStorage.getItem('et-user-profile');
     if (rawProfile) {
       const profile = JSON.parse(rawProfile);
-      await sbSavePublicProfile({
-        name: profile.name || '',
-        handle: profile.handle || '',
-        publicUsername: profile.publicUsername || profile.handle || '',
-        bio: profile.bio || '',
-        isPublic: !!profile.isPublic,
-      });
-      console.log('  ✓ Migrated public profile');
+      // Public profile migration to Supabase is disabled to avoid public_profiles table errors.
+      // await sbSavePublicProfile({
+      //   name: profile.name || '',
+      //   handle: profile.handle || '',
+      //   publicUsername: profile.publicUsername || profile.handle || '',
+      //   bio: profile.bio || '',
+      //   isPublic: !!profile.isPublic,
+      // });
+      // console.log('  ✓ Migrated public profile');
     }
   } catch(e) { errors.push('public profile: ' + e.message); }
   if (errors.length > 0) {
@@ -789,9 +671,9 @@ window.SB = isSupabaseConfigured ? {
   loadTradeImages: sbLoadTradeImages,
   saveTradeImages: sbSaveTradeImages,
   // public profiles (disabled)
-  loadOwnPublicProfile: async () => null,
-  savePublicProfile: async () => null,
-  getPublicTraderStats: async () => null,
+  loadOwnPublicProfile: sbLoadOwnPublicProfile,
+  savePublicProfile: sbSavePublicProfile,
+  getPublicTraderStats: sbGetPublicTraderStats,
   // settings
   getSetting: sbGetSetting,
   setSetting: sbSetSetting,
