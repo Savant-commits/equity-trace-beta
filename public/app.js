@@ -10132,7 +10132,7 @@ function updateHiddenCount() {
 }
 
 // ── VERSION FETCHING FROM GITHUB ──
-async function fetchLatestVersion() {
+/*async function fetchLatestVersion() {
   try {
     // Replace with your actual GitHub repo: 'owner/repo'
     const repo = 'equitytrace/equity-trace'; // Update this when repo is public
@@ -10156,4 +10156,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', fetchLatestVersion);
 } else {
   fetchLatestVersion();
-}
+}*/
