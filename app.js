@@ -341,8 +341,18 @@ function syncTopbarOffset() {
 }
 
 function goToView(view) {
-  var el = document.querySelector('[data-view="' + view + '"]');
-  if (el) switchView(el);
+  var el = document.querySelector('.nav-item[data-view="' + view + '"]');
+  if (el) {
+    switchView(el);
+    return;
+  }
+  var viewEl = document.getElementById('view-' + view);
+  if (viewEl) {
+    const fakeNav = document.createElement('div');
+    fakeNav.className = 'nav-item';
+    fakeNav.dataset.view = view;
+    switchView(fakeNav);
+  }
 }
 function goToSettings() {
   var el = document.querySelector('[data-view="settings"]');
