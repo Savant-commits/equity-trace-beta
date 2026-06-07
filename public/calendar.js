@@ -1036,16 +1036,25 @@ function initDrawdownChart(period) {
 // ── ADVANCED ANALYTICS — 03 MONTHLY P&L ──
 // ══════════════════════════════════════════════
 let mpChartInst = null;
-let _mpSelectedMonths = new Set(); // empty = show all
+let _mpSelectedMonths = new Set();
+let _mpShowAllMonths = false;
+let _mpMonthChipsExpanded = false;
+const MP_DEFAULT_MONTHS = 3;
 
 function mpClearFilter() {
   _mpSelectedMonths.clear();
-  $('mp-clear-btn').style.display = 'none';
-  $$('.mp-chip').forEach(c => {
-    c.style.background = 'var(--bg4)';
-    c.style.color = 'var(--text2)';
-    c.style.borderColor = 'var(--border)';
-  });
+  _mpShowAllMonths = false;
+  _mpMonthChipsExpanded = false;
+  const clearBtn = $('mp-clear-btn');
+  if (clearBtn) clearBtn.style.display = 'none';
+  initMonthlyPnL();
+}
+
+function mpToggleShowAll() {
+  _mpShowAllMonths = !_mpShowAllMonths;
+  if (_mpShowAllMonths) {
+    _mpSelectedMonths.clear();
+  }
   initMonthlyPnL();
 }
 
@@ -1069,14 +1078,14 @@ function initMonthlyPnL() {
   });
   const allMonthKeys = Object.keys(allMonthMap).sort();
   const MONTH_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const defaultMonthKeys = allMonthKeys.slice(-MP_DEFAULT_MONTHS);
 
-  // Build filter chips (only once or when account changes)
+  // Build filter chips (rebuild each time so default/selected state stays in sync)
   const chipsEl = $('mp-month-chips');
   const MP_VISIBLE = 3;
-  if (chipsEl && chipsEl.dataset.built !== allMonthKeys.join(',')) {
-    chipsEl.dataset.built = allMonthKeys.join(',');
+  if (chipsEl) {
     chipsEl.innerHTML = '';
-    let mpExpanded = false;
+    let mpExpanded = _mpMonthChipsExpanded;
 
     function buildChip(key) {
       const [y, mo] = key.split('-');
@@ -1085,20 +1094,15 @@ function initMonthlyPnL() {
       chip.className = 'mp-chip';
       chip.dataset.key = key;
       chip.textContent = lbl;
-      const isActive = _mpSelectedMonths.has(key);
+      const isActive = _mpShowAllMonths ? false : (_mpSelectedMonths.size > 0 ? _mpSelectedMonths.has(key) : defaultMonthKeys.includes(key));
       chip.style.cssText = `font-size:9.5px;font-family:var(--font-mono);padding:2px 9px;border-radius:5px;cursor:pointer;border:1px solid;transition:all .15s;background:${isActive?'var(--ac-18)':'var(--bg4)'};color:${isActive?'#c0a0ff':'var(--text2)'};border-color:${isActive?'var(--ac-50)':'var(--border)'}`;
       chip.onclick = () => {
         if (_mpSelectedMonths.has(key)) {
           _mpSelectedMonths.delete(key);
-          chip.style.background = 'var(--bg4)';
-          chip.style.color = 'var(--text2)';
-          chip.style.borderColor = 'var(--border)';
         } else {
           _mpSelectedMonths.add(key);
-          chip.style.background = 'var(--ac-18)';
-          chip.style.color = '#c0a0ff';
-          chip.style.borderColor = 'var(--ac-50)';
         }
+        _mpShowAllMonths = false;
         const clearBtn = $('mp-clear-btn');
         if (clearBtn) clearBtn.style.display = _mpSelectedMonths.size > 0 ? '' : 'none';
         initMonthlyPnL();
@@ -1118,7 +1122,7 @@ function initMonthlyPnL() {
         expandBtn.textContent = mpExpanded ? '↑ Less' : `+${remaining} more`;
         expandBtn.onmouseenter = () => { expandBtn.style.color='var(--text)'; expandBtn.style.borderColor='var(--border2)'; };
         expandBtn.onmouseleave = () => { expandBtn.style.color='var(--text3)'; expandBtn.style.borderColor='var(--border)'; };
-        expandBtn.onclick = () => { mpExpanded = !mpExpanded; renderChips(); };
+        expandBtn.onclick = () => { mpExpanded = !mpExpanded; _mpMonthChipsExpanded = mpExpanded; renderChips(); };
         chipsEl.appendChild(expandBtn);
       }
     }
@@ -1127,8 +1131,19 @@ function initMonthlyPnL() {
   }
 
   // Apply filter
-  const activeKeys = _mpSelectedMonths.size > 0 ? [..._mpSelectedMonths] : allMonthKeys;
+  const activeKeys = _mpShowAllMonths ? allMonthKeys : (_mpSelectedMonths.size > 0 ? [..._mpSelectedMonths].sort() : defaultMonthKeys);
   const trades = allTrades.filter(t => activeKeys.includes(t.date.slice(0,7)));
+
+  const showAllBtn = $('mp-show-all-btn');
+  if (showAllBtn) {
+    showAllBtn.textContent = _mpShowAllMonths ? `Show last ${MP_DEFAULT_MONTHS} months` : 'Show all months';
+    showAllBtn.style.background = _mpShowAllMonths ? 'var(--ac-18)' : 'var(--bg4)';
+    showAllBtn.style.color = _mpShowAllMonths ? '#c0a0ff' : 'var(--text3)';
+    showAllBtn.style.borderColor = _mpShowAllMonths ? 'var(--ac-50)' : 'var(--border)';
+  }
+
+  const clearBtn = $('mp-clear-btn');
+  if (clearBtn) clearBtn.style.display = _mpSelectedMonths.size > 0 ? '' : 'none';
 
   if (!trades.length) {
     if (mpChartInst) { mpChartInst.destroy(); mpChartInst = null; }
