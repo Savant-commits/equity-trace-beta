@@ -1216,8 +1216,8 @@ function initMonthlyPnL() {
 
   const isDark  = !document.documentElement.classList.contains('light');
   const isMed0  = document.documentElement.classList.contains('medium');
-  const gridCol = isDark ? (isMed0?'rgba(255,255,255,0.10)':'rgba(255,255,255,0.05)') : 'rgba(0,0,0,0.10)';
-  const tickCol = isDark ? (isMed0?'#c0c8de':'rgba(255,255,255,0.3)') : 'rgba(0,0,0,0.6)';
+  const gridCol = isDark ? (isMed0?'rgba(255,255,255,0.12)':'rgba(255,255,255,0.08)') : 'rgba(0,0,0,0.12)';
+  const tickCol = isDark ? (isMed0?'#f3f4ff':'rgba(255,255,255,0.78)') : 'rgba(0,0,0,0.78)';
 
   // Format month labels nicely: "Mar 26"
   const labels = months.map(m => {
@@ -1243,10 +1243,32 @@ function initMonthlyPnL() {
       c.stroke();
       c.setLineDash([]);
       c.font = '8px "JetBrains Mono",monospace';
-      c.fillStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)';
+      c.fillStyle = isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.55)';
       c.textAlign = 'left';
       c.textBaseline = 'bottom';
       c.fillText('$0', left + 4, zeroY - 3);
+      c.restore();
+    }
+  };
+
+  const mpMonthDividers = {
+    id: 'mpMonthDividers',
+    afterDraw(chart) {
+      if (months.length <= 4) return;
+      const { ctx: c, chartArea: { top, bottom }, scales: { x } } = chart;
+      c.save();
+      c.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)';
+      c.lineWidth = 1;
+      c.setLineDash([2, 4]);
+      for (let i = 0; i < months.length - 1; i++) {
+        const xPos = x.getPixelForValue(i + 0.5);
+        if (xPos >= x.left && xPos <= x.right) {
+          c.beginPath();
+          c.moveTo(xPos, top);
+          c.lineTo(xPos, bottom);
+          c.stroke();
+        }
+      }
       c.restore();
     }
   };
@@ -1366,7 +1388,7 @@ function initMonthlyPnL() {
         }
       }
     },
-    plugins: [mpZeroLine]
+    plugins: [mpZeroLine, mpMonthDividers]
   });
 
   // Click a bar → jump to Trade Log filtered to that month + account
