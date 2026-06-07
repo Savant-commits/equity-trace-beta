@@ -2362,7 +2362,7 @@ function initStreaks() {
   const stBeLegend = $('st-be-legend');
   if (stBeLegend) stBeLegend.style.display = hasBeTrades ? 'flex' : 'none';
 
-  timeline.innerHTML = trades.map((t, i) => {
+  timeline.innerHTML = trades.slice().reverse().map((t, i) => {
     const result = getTradeResult(t);
     const isWin  = result === 'win';
     const isLoss = result === 'loss';
@@ -2375,7 +2375,8 @@ function initStreaks() {
   }).join('');
 
   // --- Streak badges ---
-  streakList.innerHTML = streaks.map((s, i) => {
+  const reversedStreaks = streaks.slice().reverse();
+  streakList.innerHTML = reversedStreaks.map((s, i) => {
     const isW    = s.type === 'W';
     const net    = s.units.reduce((sum, u) => sum + u.pnl, 0);
     const netStr = (net >= 0 ? '+' : '') + '$' + net.toFixed(2);
@@ -2383,7 +2384,7 @@ function initStreaks() {
     const color  = isW ? 'var(--green)'  : 'var(--red)';
     const border = isW ? 'rgba(46,204,138,.25)' : 'rgba(232,80,74,.25)';
     const icon   = isW ? '▲' : '▼';
-    const isCur  = i === streaks.length - 1;
+    const isCur  = s === curStreak;
     // Collect all individual trade IDs from this streak's units
     const ids    = s.units.flatMap(u => u.trades.map(t => t.id)).join(',');
     return `<div title="View these ${s.units.length} combined trade${s.units.length!==1?'s':''} (${s.units.reduce((tot,u)=>tot+u.trades.length,0)} individual trades) in Trade Log" style="display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;background:${bg};border:1px solid ${border};cursor:pointer;transition:opacity .15s" onmouseenter="this.style.opacity='.8'" onmouseleave="this.style.opacity='1'" onclick="(function(ids){const idArr=ids.split(',');window._streakIdFilter=idArr;window._symbolQuickFilter=null;_detailOriginView='advanalytics';document.querySelector('[data-view=\\'tradelog\\']').click();setTimeout(()=>{applyFilters();const firstId=idArr[0];const row=document.querySelector('.trade-table tbody tr[data-id=\\''+firstId+'\\']');const trade=TRADES.find(t=>String(t.id)===String(firstId));if(trade)showDetail(trade,row||document.createElement('tr'));if(row){row.scrollIntoView({behavior:'smooth',block:'center'});row.classList.add('selected-row');}},80);}('${ids}'))">

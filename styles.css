@@ -2250,6 +2250,25 @@ h1,h2,h3{letter-spacing:-.02em}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:4px}
 
+#st-timeline::-webkit-scrollbar,
+#st-streaks::-webkit-scrollbar {
+  height:10px;
+}
+#st-timeline::-webkit-scrollbar-track,
+#st-streaks::-webkit-scrollbar-track {
+  background:transparent;
+}
+#st-timeline::-webkit-scrollbar-thumb,
+#st-streaks::-webkit-scrollbar-thumb {
+  background:var(--bg5);
+  border-radius:6px;
+}
+#st-timeline,
+#st-streaks {
+  scrollbar-width:auto;
+  scrollbar-color:var(--bg5) transparent;
+}
+
 /* ─── SIDEBAR ─── */
 .sidebar{width:var(--sidebar-collapsed);min-width:var(--sidebar-collapsed);background:linear-gradient(180deg,rgba(72,26,170,0.97) 0%,rgba(82,30,182,0.97) 100%);border-right:none;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100000;transition:width .25s cubic-bezier(.4,0,.2,1);overflow:hidden;backdrop-filter:blur(12px);box-shadow:2px 0 24px rgba(0,0,0,.28)}
 
