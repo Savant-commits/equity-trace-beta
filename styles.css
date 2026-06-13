@@ -3704,8 +3704,95 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 /* ─── EXTRA SMALL (≤ 480px) ─── */
 @media (max-width: 480px) {
 
-  /* Single column stat cards on very small phones */
-  .stat-row { grid-template-columns: 1fr; }
+  /* Carousel view for overview cards on mobile */
+  .stat-row {
+    display: flex !important;
+    grid-template-columns: unset !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    /* Hide scrollbar but keep scrolling functional */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .stat-row::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .stat-row .stat-card {
+    flex: 0 0 calc(48vw - 24px) !important;
+    min-width: calc(48vw - 24px) !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    padding-bottom: 10px !important;
+    padding-top: 10px !important;
+  }
+  
+  /* Carousel view for account cards on mobile */
+  #all-accounts-cards {
+    display: flex !important;
+    grid-template-columns: unset !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    gap: 16px;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 8px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  #all-accounts-cards::-webkit-scrollbar {
+    display: none;
+  }
+  
+  #all-accounts-cards .stat-card {
+    flex: 0 0 calc(90vw - 40px) !important;
+    min-width: calc(90vw - 40px) !important;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    min-height: 420px !important;
+    padding: 16px 18px !important;
+  }
+  
+  #all-accounts-cards .stat-card > div:nth-child(2) {
+    margin-top: 14px !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+  
+  #all-accounts-cards .stat-card .acct-rule-bars {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Portfolio summary cards - 2x2 grid on mobile */
+  #portfolio-strip {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: auto auto !important;
+    gap: 8px !important;
+  }
+  
+  #portfolio-strip .stat-card {
+    overflow: visible !important;
+    min-height: auto !important;
+    padding: 12px 10px !important;
+  }
+  
+  #portfolio-strip #port-total-cap,
+  #portfolio-strip #port-combined-pnl,
+  #portfolio-strip #port-health,
+  #portfolio-strip #port-total-accounts {
+    font-size: 24px !important;
+  }
+
+  /* Hide analytics section on mobile */
+  #dashboard-analytics-heading { display: none !important; }
+  #dashboard-analytics-grid { display: none !important; }
+  
   .metrics-row { grid-template-columns: 1fr; }
   #tl-stat-grid { grid-template-columns: 1fr !important; }
 
