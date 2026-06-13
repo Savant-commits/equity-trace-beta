@@ -3148,10 +3148,6 @@ window.addEventListener('DOMContentLoaded', function() {
           <div class="form-label">Exit Price</div>
           <input class="form-input" id="f-exit" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" type="number" step="0.00001" placeholder="0.00"/>
         </div>
-        <div class="form-group">
-          <div class="form-label">Lot Size</div>
-          <input class="form-input" id="f-size" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" type="number" step="0.01" min="0" placeholder="e.g. 0.5"/>
-        </div>
       </div>
 
       <div class="form-row">
@@ -3166,6 +3162,10 @@ window.addEventListener('DOMContentLoaded', function() {
         <div class="form-group">
           <div class="form-label">Commission</div>
           <input class="form-input" id="f-comm" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" type="number" step="0.01" placeholder="0.00"/>
+        </div>
+        <div class="form-group">
+          <div class="form-label">Lot Size</div>
+          <input class="form-input" id="f-size" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur();}" type="number" step="0.01" min="0" placeholder="e.g. 0.5"/>
         </div>
       </div>
 
@@ -4613,7 +4613,6 @@ document.addEventListener('DOMContentLoaded', function() {
     <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
       <div>
         <div style="font-family:var(--font-display);font-weight:500;font-size:28px;color:var(--text)">Import Trades</div>
-        <div style="font-size:14px;font-weight:500;color:var(--text3);font-family:var(--font-mono);margin-top:3px">Support CSV, HTML & JSON from trading accounts</div>
       </div>
       <button onclick="closeImportModal()" style="width:28px;height:28px;border-radius:8px;background:var(--bg4);border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text3);transition:all .15s" onmouseenter="this.style.color='var(--text)';this.style.borderColor='var(--ac-40)'" onmouseleave="this.style.color='var(--text3)';this.style.borderColor='var(--border)'">
         <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
@@ -4664,7 +4663,6 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <div id="import-timezone-list" style="max-height:240px;overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0"></div>
         </div>
-        <div style="font-size:11px;font-weight:500;color:var(--text3);font-family:var(--font-mono);margin-top:6px">Session tagging uses EST windows. Pick the timezone used in the broker export file.</div>
       </div>
 
       <!-- Parse options -->

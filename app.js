@@ -4653,6 +4653,8 @@ function openAddTradeModal() { openModal(); }
 function openModal() {
   editTradeId = null;
   $('modal-overlay').classList.add('open');
+  const topbar = document.querySelector('.topbar');
+  if (topbar) topbar.classList.add('modal-blur');
   document.querySelector('#modal-overlay .modal-title').innerHTML = '<span style="display:flex;align-items:center;gap:7px"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="7" y1="1" x2="7" y2="13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="1" y1="7" x2="13" y2="7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Add New Trade</span>';
   $('f-symbol').value = '';
   $('f-entry').value = '';
@@ -4751,6 +4753,8 @@ function openEditTradeModal() {
 
 function closeModal() {
   $('modal-overlay').classList.remove('open');
+  const topbar = document.querySelector('.topbar');
+  if (topbar) topbar.classList.remove('modal-blur');
   // Discard any staged screenshots if modal was cancelled
   if (typeof resetModalImgs === 'function') resetModalImgs();
 }

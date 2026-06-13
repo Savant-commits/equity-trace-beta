@@ -13,6 +13,8 @@ let _brokerPollTimers = {};
 // ── Open/Close Import Modal ──
 function openImportModal() {
   $('import-modal-overlay').style.display = 'flex';
+  const topbar = document.querySelector('.topbar');
+  if (topbar) topbar.classList.add('modal-blur');
 
   // Only do a full reset if there's no previously loaded file
   const hasExistingData = _importFile !== null && _importedTrades.length > 0;
@@ -72,6 +74,8 @@ function openImportModal() {
 
 function closeImportModal() {
   $('import-modal-overlay').style.display = 'none';
+  const topbar = document.querySelector('.topbar');
+  if (topbar) topbar.classList.remove('modal-blur');
   // NOTE: intentionally keep _importedTrades and _importFile so that
   // if the user closes and re-opens the modal (e.g. to add an account first)
   // their uploaded file and parsed trades are still available.
