@@ -5553,65 +5553,65 @@ function renderAllAccountsSection() {
     const pnlColor = netPnl >= 0 ? 'var(--green)' : 'var(--red)';
     const pnlSign = netPnl >= 0 ? '+' : '-';
     const statusLabel = breachReason ? `BREACHED` : sm.label.toUpperCase();
+    const statusColor = computedStatus === 'passed'
+      ? 'var(--green)'
+      : computedStatus === 'breached'
+        ? 'var(--red)'
+        : (challengeType.includes('funded') || challengeType.includes('instant') ? 'var(--green)' : 'var(--purple)');
+    const statusBg = computedStatus === 'passed'
+      ? 'rgba(46,204,138,.12)'
+      : computedStatus === 'breached'
+        ? 'rgba(232,80,74,.12)'
+        : 'rgba(169,125,232,.12)';
+    const statusBorder = computedStatus === 'passed'
+      ? 'rgba(46,204,138,.25)'
+      : computedStatus === 'breached'
+        ? 'rgba(232,80,74,.25)'
+        : 'rgba(169,125,232,.25)';
     const statusTitle = breachReason || sm.label;
 
     return `
     <div class="stat-card status-${computedStatus}" style="position:relative;min-height:240px">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-        <!-- Three-dot menu -->
-        <div style="position:absolute;top:12px;right:4px;z-index:10">
-          <button onclick="toggleAcctCardMenu(event,${a.id},'acct-card-menu-${a.id}')" style="background:transparent;border:none;cursor:pointer;color:var(--text2);width:24px;height:24px;border-radius:5px;display:flex;align-items:center;justify-content:center;transition:all .15s" onmouseenter="this.style.background='var(--bg4)';this.style.color='var(--text)'" onmouseleave="this.style.background='transparent';this.style.color='var(--text2)'">
-            <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="2" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="8" cy="14" r="1.5"/></svg>
-          </button>
-          <div id="acct-card-menu-${a.id}" style="display:none;position:absolute;top:28px;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:5px;min-width:150px;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.5)">
-            <button onclick="openEditAccountModal(${a.id})" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;background:transparent;border:none;color:var(--text);font-size:12.5px;font-family:var(--font-body);cursor:pointer;transition:background .12s;text-align:left" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background='transparent'">
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
-              Edit Account
-            </button>
-            <div style="height:1px;background:var(--border);margin:3px 5px"></div>
-            <button onclick="confirmDeleteAccount(${a.id})" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:7px;background:transparent;border:none;color:var(--red);font-size:12.5px;font-family:var(--font-body);cursor:pointer;transition:background .12s;text-align:left" onmouseenter="this.style.background='rgba(232,80,74,.08)'" onmouseleave="this.style.background='transparent'">
-              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg>
-              Delete Account
-            </button>
-          </div>
-        </div>
-        <!-- Left: identity -->
-        <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;position:relative">
+        <div style="display:flex;align-items:center;gap:12px;min-width:0">
           <div style="flex-shrink:0">${accountNumberHTML(i + 1, 42, 10)}</div>
-          <div style="display:flex;align-items:center;gap:8px;min-width:0">
-            <div style="font-family:var(--font-display);font-size:19px;font-weight:500;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.firm}</div>
-            <span style="background:var(--ac-12);color:#a97de8;border:1px solid var(--ac-30);padding:4px 12px;border-radius:5px;font-size:12px;font-family:var(--font-mono);font-weight:500">${formatAccountPhase(a)}</span>
+          <div style="display:flex;flex-direction:column;min-width:0">
+            <div style="font-family:var(--font-display);font-size:19px;font-weight:500;font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0">${a.firm}</div>
           </div>
         </div>
-        <!-- Right: P&L -->
-        <div style="text-align:right;flex-shrink:0;margin-right:8px;transform:translateX(-15px)">
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:12px">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span style="background:var(--ac-12);color:#a97de8;border:1px solid var(--ac-30);padding:4px 12px;border-radius:5px;font-size:12px;font-family:var(--font-mono);font-weight:500">${formatAccountPhase(a)}</span>
+          <span style="background:${statusBg};color:${statusColor};border:1px solid ${statusBorder};padding:3px 10px;border-radius:5px;font-size:10px;font-family:var(--font-mono);font-weight:700;text-transform:uppercase;letter-spacing:.08em;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap">${statusLabel}</span>
+        </div>
+        <div style="text-align:right">
           <div style="font-family:var(--font-display);font-weight:550;font-size:30px;color:${pnlColor}!important;line-height:1">${pnlSign}${fmt(Math.abs(netPnl))}</div>
           <div style="font-family:var(--font-mono);font-size:10px;color:${pnlColor}!important;margin-top:2px;opacity:.8">${pnlSign}${Math.abs(pnlPct)}%</div>
         </div>
       </div>
 
-      <!-- Stats row -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
         <div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Equity</div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Equity</div>
           <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1">${fmtK(equity)}</div>
         </div>
         <div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Trades</div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Trades</div>
           <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1">${acctTrades.length}</div>
         </div>
         <div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Win Rate</div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Win Rate</div>
           <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1;color:${wr>=55?'var(--green)':wr>=50?'var(--amber)':'var(--red)'}!important">${wr}%</div>
         </div>
         <div>
-          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px">Size</div>
+          <div style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px">Size</div>
           <div style="font-family:var(--font-display);font-weight:500;font-size:16px;line-height:1.1">${fmtK(a.startBal)}</div>
         </div>
       </div>
 
-      <!-- Rule bars -->
-      <div style="display:grid;grid-template-columns:${hideProfitTarget ? '1fr' : '1fr 1fr'};gap:10px;margin-top:22px">
+      <div class="acct-rule-bars" style="display:grid;grid-template-columns:${hideProfitTarget ? '1fr' : '1fr 1fr'};gap:10px;margin-top:22px">
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
             <span style="font-size:9px;color:var(--text3);font-family:var(--font-mono);letter-spacing:.05em;text-transform:uppercase">Max Drawdown</span>
@@ -5671,13 +5671,22 @@ function renderAllAccountsSection() {
   const pnlColor = combinedPnl >= 0 ? 'var(--green)' : 'var(--red)';
   const pnlSign  = combinedPnl >= 0 ? '+' : '-';
 
-  const capEl = $('port-total-cap');
+  const fundedCapEl = $('port-funded-cap');
+  const challengeCapEl = $('port-challenge-cap');
+  const fundedCapSub = $('port-funded-cap-sub');
+  const challengeCapSub = $('port-challenge-cap-sub');
   const pnlEl = $('port-combined-pnl');
   const hlthEl = $('port-health');
-  if (capEl)  { capEl.textContent = '$' + totalCap.toFixed(2); capEl.style.setProperty('color', 'var(--text)', 'important'); }
-  // Reset toggle to funded view on re-render
-  window._capView = window._capView || 'funded';
-  switchCapView(window._capView);
+  if (fundedCapEl) { fundedCapEl.textContent = '$' + fundedCap.toFixed(1); fundedCapEl.style.setProperty('color', 'var(--green)', 'important'); }
+  if (challengeCapEl) { challengeCapEl.textContent = '$' + challengeCap.toFixed(1); challengeCapEl.style.setProperty('color', 'var(--purple)', 'important'); }
+  if (fundedCapSub) {
+    const acctWord = fundedCount !== 1 ? 'accounts' : 'account';
+    fundedCapSub.textContent = `across ${fundedCount} funded ${acctWord}`;
+  }
+  if (challengeCapSub) {
+    const acctWord = challengeCount !== 1 ? 'accounts' : 'account';
+    challengeCapSub.textContent = `across ${challengeCount} challenge ${acctWord}`;
+  }
   if (pnlEl)  { pnlEl.textContent = pnlSign + '$' + Math.abs(combinedPnl).toFixed(2); pnlEl.style.setProperty('color', pnlColor, 'important'); }
   if (hlthEl) { hlthEl.textContent = `${active} · ${passed} · ${breached}`; hlthEl.style.setProperty('color', 'var(--purple)', 'important'); }
 }

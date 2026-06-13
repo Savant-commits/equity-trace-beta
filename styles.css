@@ -53,6 +53,8 @@
   --ac-85:rgba(153, 93, 255, 0.85);
   --ac-90:rgba(153, 93, 255, 0.90);
 }
+/* Default spacing between overview cards and the following section */
+#stat-row { margin-bottom: 28px; }
 :root.light{
   --bg:#d8dae8;--bg2:#d0d2e2;--bg3:#c8cad8;--bg4:#bcc0d2;--bg5:#b0b4c8;
   --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);--border3:rgba(0,0,0,0.2);
@@ -3768,6 +3770,39 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
     grid-template-columns: 1fr !important;
   }
   
+  /* Mobile: stack account identity and P&L so P&L sits below name
+     and above the equity/trades stats row */
+  #all-accounts-cards .stat-card > div:first-child {
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:8px !important;
+  }
+
+  /* Ensure identity block uses full width */
+  #all-accounts-cards .stat-card > div:first-child > div:nth-child(2) {
+    width:100% !important;
+    min-width:0 !important;
+  }
+
+  /* Make the P&L block a full-width row and align its content right */
+  #all-accounts-cards .stat-card > div:first-child > div:nth-child(3) {
+    width:100% !important;
+    text-align:right !important;
+    transform:none !important;
+    margin-right:0 !important;
+    margin-top:0 !important;
+  }
+
+  /* Position phase badge to the left of the P&L row (mobile) */
+  #all-accounts-cards .stat-card { position:relative !important; }
+  #all-accounts-cards .stat-card > div:first-child > div:nth-child(1) > div:nth-child(2) > span {
+    position:absolute !important;
+    left:18px !important;
+    top:48px !important;
+    z-index:20 !important;
+    transform:none !important;
+  }
   /* Portfolio summary cards - 2x2 grid on mobile */
   #portfolio-strip {
     display: grid !important;
@@ -3779,14 +3814,23 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   #portfolio-strip .stat-card {
     overflow: visible !important;
     min-height: auto !important;
-    padding: 12px 10px !important;
+    padding: 10px 10px !important;
   }
   
-  #portfolio-strip #port-total-cap,
+  #portfolio-strip #port-funded-cap,
+  #portfolio-strip #port-challenge-cap,
   #portfolio-strip #port-combined-pnl,
   #portfolio-strip #port-health,
   #portfolio-strip #port-total-accounts {
-    font-size: 24px !important;
+    font-size: 18px !important;
+  }
+  
+  #portfolio-strip #port-funded-cap-sub,
+  #portfolio-strip #port-challenge-cap-sub,
+  #portfolio-strip #port-total-cap-sub,
+  #portfolio-strip #port-combined-pnl-sub,
+  #portfolio-strip #port-health-sub {
+    display: none !important;
   }
 
   /* Hide analytics section on mobile */
@@ -3798,6 +3842,17 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   /* Hide the import button to save topbar space */
   #import-trades-btn { display: none !important; }
+  /* Hide the summary button on dashboard in mobile view */
+  #summary-btn-dashboard { display: none !important; }
+
+  /* Increase spacing between overview cards and next section on mobile */
+  #stat-row { margin-bottom: 24px !important; }
+
+/* Add extra vertical spacing after section headings (Overview, Portfolio Overview, Goals, etc.) */
+[style*="border-left:3px solid var(--purple)"] {
+  margin-bottom: 18px !important;
+  display: block;
+}
 
   /* Simplify add-trade button */
   .add-trade-btn span[style*="font-size:9px"] { display: none; }

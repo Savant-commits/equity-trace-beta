@@ -1062,34 +1062,34 @@ window.addEventListener('DOMContentLoaded', function() {
         <div id="all-accounts-cards" style="display:grid;grid-template-columns:repeat(2,1fr);gap:16px"></div>
 
         <!-- Portfolio summary strip -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="portfolio-strip">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px" id="portfolio-strip">
           <div class="stat-card" style="padding:24px 18px;position:relative;overflow:hidden;min-height:70px!important">
-            <div id="port-cap-bar" style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green);opacity:.7;border-radius:0"></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-              <div id="port-cap-label" style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Funded Capital</div>
-              <div style="display:flex;align-items:center;background:var(--bg4);border:1px solid var(--border2);border-radius:6px;overflow:hidden">
-                <button id="port-cap-btn-funded" onclick="switchCapView('funded')" style="padding:2px 7px;font-size:8.5px;font-family:var(--font-mono);font-weight:600;border:none;cursor:pointer;transition:all .15s;background:var(--green);color:#000;letter-spacing:.04em">Funded</button>
-                <button id="port-cap-btn-challenge" onclick="switchCapView('challenge')" style="padding:2px 7px;font-size:8.5px;font-family:var(--font-mono);font-weight:600;border:none;cursor:pointer;transition:all .15s;background:transparent;color:var(--text3);letter-spacing:.04em">Challenge</button>
-              </div>
-            </div>
-            <div id="port-total-cap" style="font-family:var(--font-display);font-weight:450!important;font-size:34px!important;line-height:1;color:var(--text)">-</div>
-            <div id="port-total-cap-sub" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:6px">across funded accounts</div>
+            <div id="port-funded-cap-bar" style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green);opacity:.7;border-radius:0"></div>
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Funded Capital</div>
+            <div id="port-funded-cap" style="font-family:var(--font-display);font-weight:450!important;font-size:30px!important;line-height:1;color:var(--green)">-</div>
+            <div id="port-funded-cap-sub" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:6px">across funded accounts</div>
+          </div>
+          <div class="stat-card" style="padding:24px 18px;position:relative;overflow:hidden;min-height:70px!important">
+            <div id="port-challenge-cap-bar" style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);opacity:.7;border-radius:0"></div>
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Challenge Capital</div>
+            <div id="port-challenge-cap" style="font-family:var(--font-display);font-weight:450!important;font-size:30px!important;line-height:1;color:var(--purple)">-</div>
+            <div id="port-challenge-cap-sub" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:6px">across challenge accounts</div>
           </div>
           <div class="stat-card" style="padding:24px 18px;position:relative;overflow:hidden;min-height:70px!important">
             <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);opacity:.7;border-radius:0"></div>
             <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Combined P&L</div>
-            <div id="port-combined-pnl" style="font-family:var(--font-display);font-weight:450!important;font-size:34px!important;line-height:1;color:var(--text)">-</div>
+            <div id="port-combined-pnl" style="font-family:var(--font-display);font-weight:450!important;font-size:30px!important;line-height:1;color:var(--text)">-</div>
             <div id="port-combined-pnl-sub" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:6px">net across all accounts</div>
           </div>
           <div class="stat-card" style="padding:24px 18px;position:relative;overflow:hidden;min-height:70px!important">
             <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);opacity:.7;border-radius:0"></div>
             <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);margin-bottom:10px">Accounts Health</div>
-            <div id="port-health" style="font-family:var(--font-display);font-weight:450!important;font-size:34px!important;line-height:1;color:var(--purple)">-</div>
+            <div id="port-health" style="font-family:var(--font-display);font-weight:450!important;font-size:30px!important;line-height:1;color:var(--purple)">-</div>
             <div id="port-health-sub" style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:6px">active  -  passed  -  breached</div>
           </div>
         </div>
       </div><!-- end all-accounts-section -->
-      <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px">Analytics</div>
+      <div id="dashboard-analytics-heading" style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;margin-left:6px">Analytics</div>
       <div style="display:grid;grid-template-columns:1fr;gap:12px" id="dashboard-analytics-grid">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%" id="dashboard-right-panels">
           <div class="panel">
