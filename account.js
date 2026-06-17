@@ -275,20 +275,20 @@ function initAccountCalendarModule() {
 
         const dateNumColor = isToday ? 'var(--purple)' : isWeekend ? 'rgba(160,168,190,.35)' : 'rgba(160,168,190,.5)';
 
-        return `<div ${click} ${hover} style="${cursor}padding:10px 10px 10px;border:1px solid ${borderColor};border-radius:8px;margin:4px;background:${bgColor};display:flex;flex-direction:column;justify-content:space-between;min-height:96px;transition:background .15s,transform .15s${todayGlow}">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+        return `<div class="cal-day-cell" ${click} ${hover} style="${cursor}padding:10px 10px 10px;border:1px solid ${borderColor};border-radius:8px;margin:4px;background:${bgColor};display:flex;flex-direction:column;justify-content:space-between;min-height:96px;transition:background .15s,transform .15s${todayGlow}">
+          <div class="cal-day-dow" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
             <span style="font-family:var(--font-mono);font-size:8.5px;letter-spacing:.1em;font-weight:700;color:${isWeekend ? 'rgba(232,80,74,.4)' : (isToday ? 'var(--purple)' : 'var(--text3)')}">${dow}</span>
-            ${isToday ? `<span style="width:5px;height:5px;border-radius:50%;background:var(--purple);box-shadow:0 0 5px var(--ac-80);display:inline-block"></span>` : ''}
+            ${isToday ? `<span class="cal-day-today-dot" style="width:5px;height:5px;border-radius:50%;background:var(--purple);box-shadow:0 0 5px var(--ac-80);display:inline-block"></span>` : ''}
           </div>
-          <div style="text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
+          <div class="cal-day-value" style="text-align:center;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px">
             ${data
               ? `<div style="font-family:var(--font-display);font-weight:700;font-size:15px;color:${pnlColor};line-height:1">${fmt(data.pnl)}</div>`
               : `<div style="font-family:var(--font-mono);font-size:13px;color:var(--text4)">—</div>`
             }
           </div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+          <div class="cal-day-footer" style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">
             <span style="font-family:var(--font-mono);font-size:9px;color:var(--text3)">${data ? data.trades + ' trade' + (data.trades !== 1 ? 's' : '') : '0 trades'}</span>
-            <span style="font-family:var(--font-mono);font-size:10px;color:${dateNumColor};font-weight:600">${d}</span>
+            <span class="cal-day-date" style="font-family:var(--font-mono);font-size:10px;color:${dateNumColor};font-weight:600">${d}</span>
           </div>
         </div>`;
       }).join('');

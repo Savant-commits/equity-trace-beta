@@ -3711,6 +3711,11 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   #cmdk-box { width: 95vw; }
 
+  /* === TIME HEATMAP: hide empty cells on mobile === */
+  #time-heatmap .trade-cell[title*="no trades"] {
+    color: transparent !important;
+  }
+
   /* === TLOG FILTERS: smaller pills on mobile === */
   .tlog-filters { padding: 8px 10px; gap: 4px; }
   .fpill { font-size: 10px; padding: 3px 9px; }
@@ -3859,12 +3864,219 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   /* Hide the summary button on dashboard in mobile view */
   #summary-btn-dashboard { display: none !important; }
 
-  /* Move the dashboard action buttons up slightly on mobile */
-  #view-dashboard #topbar-acct-wrap,
-  #view-dashboard #import-trades-btn-dashboard,
-  #view-dashboard #add-trade-btn-dashboard {
-    transform: translateY(-4px) !important;
+  /* Mobile calendar header: remove top Today button and keep account/timezone controls visible */
+  #view-calendar #cal-today-btn { display: none !important; }
+  #view-calendar #cal-tz-btn,
+  #view-calendar #cal-acct-bar { display: inline-flex !important; }
+  #view-calendar .content > div:first-child > div[style*='display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:space-between;width:100%'] {
+    width: auto !important;
+    justify-content: flex-end !important;
   }
+
+  /* Mobile-only compact performance calendar */
+  #view-calendar #cal-grid-body {
+    overflow-x: hidden !important;
+  }
+
+  #view-calendar #cal-grid-body > div {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  }
+
+  #view-calendar #cal-grid-body .cal-day-cell {
+    min-height: 48px !important;
+    padding: 6px !important;
+    margin: 2px !important;
+    border-radius: 8px !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  #view-calendar #cal-grid-body .cal-day-dow,
+  #view-calendar #cal-grid-body .cal-day-value,
+  #view-calendar #cal-grid-body .cal-day-footer span:first-child,
+  #view-calendar #cal-grid-body .cal-day-today-dot {
+    display: none !important;
+  }
+
+  #view-calendar #cal-grid-body .cal-day-footer {
+    justify-content: center !important;
+    margin-top: 0 !important;
+  }
+
+  #view-calendar #cal-grid-body .cal-day-date {
+    font-size: 14px !important;
+    color: var(--text) !important;
+    font-weight: 700 !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div:last-child {
+    display: none !important;
+  }
+
+  /* Hide the week total column on mobile so the calendar fits the screen */
+  #view-calendar #cal-grid-body > div {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  }
+
+  #view-calendar > .content > div[style*='display:grid;grid-template-columns:repeat(7,1fr) 110px;border-bottom:1px solid var(--border)'] > div:last-child {
+    display: none !important;
+  }
+
+  /* Move the calendar headings closer together */
+  #view-calendar > .content > div[style*='display:grid;grid-template-columns:repeat(6,1fr);gap:10px'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  /* Move header buttons into a tighter layout */
+  #view-calendar .content > div:first-child > div[style*='display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px'] {
+    gap: 8px !important;
+  }
+
+  /* Compact calendar header button width */
+  #view-calendar button[onclick^="calNav"],
+  #view-calendar #cal-today-btn,
+  #view-calendar #cal-tz-btn {
+    width: auto !important;
+    min-width: 32px !important;
+    padding: 6px 10px !important;
+  }
+
+  #view-calendar #cal-month-label {
+    min-width: 120px !important;
+    font-size: 14px !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div {
+    overflow: hidden !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div[style*='padding:6px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg2);opacity:.3'] {
+    min-height: 48px !important;
+  }
+
+  #view-calendar #cal-grid-body > div {
+    gap: 4px !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell {
+    min-height: 44px !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell .cal-day-date {
+    line-height: 1 !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell {
+    background-clip: padding-box !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell[onclick] {
+    cursor: pointer !important;
+  }
+
+  /* Preserve row height compactness */
+  #view-calendar #cal-grid-body > div {
+    align-items: stretch !important;
+  }
+
+  /* Avoid extra gap from nested grid row */
+  #view-calendar #cal-grid-body {
+    padding: 0 !important;
+  }
+
+  /* Hide the calendar week label on mobile if needed */
+  #view-calendar #cal-grid-body > div > div[style*='font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;margin-bottom:2px'] {
+    display: none !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell {
+    line-height: 1 !important;
+  }
+
+  /* Shrink calendar header and stats spacing on mobile */
+  #view-calendar .content { gap: 8px !important; }
+  #view-calendar #cal-stats-bar { gap: 6px !important; }
+
+  /* Make calendar body fit better on narrow screens */
+  #view-calendar #cal-grid-body > div {
+    grid-template-columns: repeat(7, 1fr) !important;
+  }
+
+  /* Ensure calendar rows do not overflow horizontally unnecessarily */
+  #view-calendar #cal-grid-body { width: 100% !important; }
+
+  /* Force the calendar container to shrink on mobile */
+  #view-calendar > .content > div[style*='background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);overflow:hidden;box-shadow:inset 0 0 60px var(--ac-07)'] {
+    overflow-x: hidden !important;
+  }
+
+  /* Compact the day header labels */
+  #view-calendar > .content > div[style*='background:var(--bg3);border:1px solid var(--ac-15);border-radius:var(--radius);overflow:hidden;box-shadow:inset 0 0 60px var(--ac-07)'] > div[style*='display:grid;grid-template-columns:repeat(7,1fr) 110px;border-bottom:1px solid var(--border)'] {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+  }
+
+  /* Hide the Week P&L header label on mobile */
+  #view-calendar .content > div:nth-child(3) > div:first-child > div:last-child {
+    display: none !important;
+  }
+
+  /* Reduce padding on day header labels */
+  #view-calendar > .content > div[style*='display:grid;grid-template-columns:repeat(7,1fr) 110px;border-bottom:1px solid var(--border)'] > div {
+    padding: 6px 4px !important;
+    font-size: 8px !important;
+  }
+
+  #view-calendar #cal-grid-body > div > div.cal-day-cell .cal-day-date {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: var(--text2) !important;
+  }
+
+  /* Hide extra visual decoration on mobile calendar */
+  #view-calendar #cal-grid-body > div > div.cal-day-cell { box-shadow: none !important; }
+
+  /* Lower margins in the calendar grid for compact layout */
+  #view-calendar #cal-grid-body > div > div.cal-day-cell { margin: 1px !important; }
+
+  /* Keep the calendar actionable element sizes small */
+  #view-calendar button { min-height: 32px !important; }
+
+  /* Reduce the line-height of the calendar heading text */
+  #view-calendar #cal-month-label { line-height: 1.1 !important; }
+
+  /* Make sure empty filler cells remain compact */
+  #view-calendar #cal-grid-body > div > div[style*='background:var(--bg2);opacity:.3'] { min-height: 42px !important; }
+
+  /* Remove week total cell padding to save width */
+  #view-calendar #cal-grid-body > div > div:last-child { padding: 0 !important; }
+
+  /* Hide the week total row on mobile */
+  #view-calendar #cal-grid-body > div > div:last-child { display: none !important; }
+
+  /* Ensure the calendar grid body fills the viewport width on mobile */
+  #view-calendar #cal-grid-body { width: 100% !important; }
+
+  /* Prevent mobile layout from being too tall with large cards */
+  #view-calendar #cal-grid-body .cal-day-cell { min-height: 42px !important; }
+
+  /* Force only the date text to remain visible in day cells */
+  #view-calendar #cal-grid-body .cal-day-footer .cal-day-date { display: block !important; }
+
+  /* Hide unwanted elements in cells on mobile */
+  #view-calendar #cal-grid-body .cal-day-dow,
+  #view-calendar #cal-grid-body .cal-day-value,
+  #view-calendar #cal-grid-body .cal-day-footer span:first-child,
+  #view-calendar #cal-grid-body .cal-day-today-dot { display: none !important; }
+
+  #view-calendar #cal-grid-body .cal-day-cell { justify-content: center !important; }
+
+  /* Align the remaining date text centrally */
+  #view-calendar #cal-grid-body .cal-day-date { display: inline-block !important; margin: 0 auto !important; }
 
   /* Keep the Overview heading aligned with the right-side actions on mobile */
   #view-dashboard .content > div:first-child {
@@ -3914,16 +4126,19 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   .banner { padding: 10px; }
   /* Mobile bottom navigation */
   #mobile-bottom-nav {
-    position: fixed;
+    position: fixed !important;
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100vw;
+    max-width: 100vw;
+    box-sizing: border-box;
     height: 58px;
     display: flex !important;
     align-items: center;
     justify-content: space-around;
     gap: 8px;
-    padding: 6px 8px;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0)) 8px;
     background: linear-gradient(180deg, var(--bg2), var(--bg3));
     border-top: 1px solid var(--border);
     box-shadow: 0 -8px 20px rgba(0,0,0,0.5);
