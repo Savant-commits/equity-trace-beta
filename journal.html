@@ -1261,30 +1261,14 @@ window.addEventListener('DOMContentLoaded', function() {
               <div id="tl-net-hover" class="stat-val c-green" style="font-size:32px;line-height:1">+$0.00</div>
             </div>
             <div style="height:1px;background:var(--border);margin-bottom:10px"></div>
-            <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:center">
+            <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="text-align:left">
                 <div style="font-size:9px;letter-spacing:.1em;color:var(--text);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:5px">Gross P&L</div>
                 <div id="tl-gross" style="font-family:var(--font-display);font-weight:700;font-size:18px">$487.20</div>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:3px;opacity:0.25">
-                <div style="width:1px;height:10px;background:var(--border2)"></div>
-                <div style="font-size:10px;color:var(--text3)">−</div>
-                <div style="width:1px;height:10px;background:var(--border2)"></div>
-              </div>
-              <div style="text-align:right">
+              <div style="text-align:left">
                 <div style="font-size:9px;letter-spacing:.1em;color:var(--text);font-family:var(--font-mono);text-transform:uppercase;margin-bottom:5px">Commissions</div>
                 <div id="tl-comm" style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--red)">-$267.19</div>
-              </div>
-            </div>
-            <div style="margin-top:10px">
-              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
-                <span id="tl-wl-loss" style="font-size:10px;font-family:var(--font-mono);color:var(--text3);letter-spacing:.06em">13L</span>
-                <span style="font-size:9px;font-family:var(--font-mono);color:var(--text);letter-spacing:.08em;text-transform:uppercase">loss · win</span>
-                <span id="tl-wl-win" style="font-size:10px;font-family:var(--font-mono);color:var(--green);letter-spacing:.06em">15W</span>
-              </div>
-              <div style="height:4px;background:var(--bg5);border-radius:2px;overflow:hidden;display:flex;gap:1px">
-                <div id="tl-wl-bar-loss" style="height:100%;flex:1;background:linear-gradient(90deg,#b53030,#e8504a);border-radius:2px 0 0 2px;box-shadow:0 0 6px rgba(232,80,74,.25)"></div>
-                <div id="tl-wl-bar-win" style="height:100%;width:53.6%;background:linear-gradient(90deg,#1e9e68,#2ecc8a);border-radius:0 2px 2px 0;box-shadow:0 0 6px rgba(46,204,138,.35)"></div>
               </div>
             </div>
           </div>
@@ -4556,6 +4540,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <button id="auth-tab-signup" class="auth-tab-btn" onclick="authShowTab('signup')">Sign Up</button>
         </div>
 
+        <div id="auth-tagline">Sign in to sync your trades across devices</div>
         <div id="auth-error" class="auth-alert"></div>
         <div id="auth-success" class="auth-alert"></div>
 
@@ -4835,39 +4820,44 @@ function authShowTab(mode) {
   const btn = document.getElementById('auth-submit-btn');
   const tagline = document.getElementById('auth-tagline');
   const confirmWrapper = document.getElementById('auth-confirm-wrapper');
+  const passwordConfirm = document.getElementById('auth-password-confirm');
+  const password = document.getElementById('auth-password');
+  const authError = document.getElementById('auth-error');
+  const authSuccess = document.getElementById('auth-success');
 
-  if (!si || !su || !title || !btn || !tagline || !confirmWrapper) {
-    console.warn('Auth UI not available yet, skipping auth tab render.', { si, su, title, btn, tagline, confirmWrapper });
+  if (!si && !su && !title && !btn && !tagline && !confirmWrapper && !authError && !authSuccess) {
+    console.warn('Auth UI not available yet, skipping auth tab render.');
     return;
   }
-  
+
   if (mode === 'signin') {
-    si.classList.add('active');
-    su.classList.remove('active');
-    title.textContent = 'Welcome Back';
-    btn.textContent = 'Sign In';
-    tagline.textContent = 'Sign in to sync your trades across devices';
-    confirmWrapper.style.display = 'none';
-    document.getElementById('auth-password-confirm').value = '';
+    si?.classList.add('active');
+    su?.classList.remove('active');
+    if (title) title.textContent = 'Welcome Back';
+    if (btn) btn.textContent = 'Sign In';
+    if (tagline) tagline.textContent = 'Sign in to sync your trades across devices';
+    if (confirmWrapper) confirmWrapper.style.display = 'none';
+    if (passwordConfirm) passwordConfirm.value = '';
   } else if (mode === 'signup') {
-    si.classList.remove('active');
-    su.classList.add('active');
+    si?.classList.remove('active');
+    su?.classList.add('active');
     if (title) title.textContent = 'Welcome to your growth';
-    btn.textContent = 'Create Account';
-    tagline.textContent = 'Create an account to save trades and sync across devices';
-    confirmWrapper.style.display = 'block';
+    if (btn) btn.textContent = 'Create Account';
+    if (tagline) tagline.textContent = 'Create an account to save trades and sync across devices';
+    if (confirmWrapper) confirmWrapper.style.display = 'block';
   } else {
-    si.classList.remove('active');
-    su.classList.remove('active');
+    si?.classList.remove('active');
+    su?.classList.remove('active');
     if (title) title.textContent = 'Reset Password';
-    btn.textContent = 'Update Password';
-    tagline.textContent = 'Create a new password for your account';
-    confirmWrapper.style.display = 'block';
-    document.getElementById('auth-password').value = '';
-    document.getElementById('auth-password-confirm').value = '';
+    if (btn) btn.textContent = 'Update Password';
+    if (tagline) tagline.textContent = 'Create a new password for your account';
+    if (confirmWrapper) confirmWrapper.style.display = 'block';
+    if (password) password.value = '';
+    if (passwordConfirm) passwordConfirm.value = '';
   }
-  document.getElementById('auth-error').style.display = 'none';
-  document.getElementById('auth-success').style.display = 'none';
+
+  if (authError) authError.style.display = 'none';
+  if (authSuccess) authSuccess.style.display = 'none';
 }
 
 function authShowError(msg) {

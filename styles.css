@@ -236,8 +236,13 @@ h1,h2,h3{letter-spacing:-.02em}
 #view-tradelog #tl-best-label,
 #view-tradelog #tl-worst-label{font-weight:500!important}
 
+#view-tradelog #tl-gross,
+#view-tradelog #tl-comm {font-size:16px!important;}
+
 /* Trade Log: Win Rate value size */
 #view-tradelog #tl-winrate{font-size:32px!important}
+
+#tl-pnl-card #tl-net-hover {font-size:28px !important;}
 /* ═══════════════════════════════════════════════ */
 
 
@@ -3620,6 +3625,44 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   /* === TRADE LOG STAT CARDS === */
   #tl-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  #view-tradelog #tl-tt-card,
+  #view-tradelog #tl-pnl-card,
+  #view-tradelog #tl-wr-card,
+  #view-tradelog #tl-pf-card,
+  #view-tradelog #tl-consistency-card {
+    min-height: 180px !important;
+    height: auto !important;
+    padding: 18px 16px !important;
+  }
+  #view-tradelog #tl-wr-stack {
+    gap: 10px !important;
+  }
+  #view-tradelog #tl-consistency-card {
+    min-height: 200px !important;
+  }
+
+  #view-tradelog #tl-wl-loss,
+  #view-tradelog #tl-wl-win,
+  #view-tradelog #tl-wl-bar-loss,
+  #view-tradelog #tl-wl-bar-win {
+    display: none !important;
+  }
+
+  /* Center Gross P&L and Commissions on mobile and hide leading '-' for negative Net */
+  #view-tradelog #tl-pnl-card #tl-pnl-hover > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  #view-tradelog #tl-pnl-card #tl-pnl-hover > div > div { text-align: center !important; }
+
+  /* Hide leading minus for negative Net P&L only on mobile (class set by JS: c-red) */
+  #view-tradelog #tl-pnl-card #tl-net.c-red::first-letter,
+  #view-tradelog #tl-pnl-card #tl-net-hover.c-red::first-letter {
+    visibility: hidden;
+  }
 
   /* === CHART ROW: single column === */
   .chart-row { grid-template-columns: 1fr; }
@@ -3857,7 +3900,19 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   #dashboard-analytics-grid { display: none !important; }
   
   .metrics-row { grid-template-columns: 1fr; }
-  #tl-stat-grid { grid-template-columns: 1fr !important; }
+  #tl-stat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  #view-tradelog #tl-tt-card,
+  #view-tradelog #tl-pnl-card,
+  #view-tradelog #tl-wr-card,
+  #view-tradelog #tl-pf-card,
+  #view-tradelog #tl-consistency-card {
+    min-height: 170px !important;
+    height: auto !important;
+    padding: 16px 14px !important;
+  }
+  #view-tradelog #tl-consistency-card {
+    min-height: 190px !important;
+  }
 
   /* Hide the import button to save topbar space */
   #import-trades-btn { display: none !important; }

@@ -608,7 +608,11 @@ function updateTlCards(trades) {
   const tlConsistencySubEl = $('tl-consistency-sub');
 
   if (tlConsistencyValueEl) {
-    tlConsistencyValueEl.textContent = tlHasConsistencyData ? `${tlRoundedConsistencyPct.toFixed(2)}%` : '0.00%';
+    const mobile = (typeof window !== 'undefined' && window.innerWidth <= 768);
+    const pctStr = tlHasConsistencyData
+      ? (mobile ? `${tlRoundedConsistencyPct.toFixed(1)}%` : `${tlRoundedConsistencyPct.toFixed(2)}%`)
+      : (mobile ? '0.0%' : '0.00%');
+    tlConsistencyValueEl.textContent = pctStr;
     tlConsistencyValueEl.style.color = tlHasConsistencyData ? 'var(--purple)' : 'var(--text3)';
   }
 
