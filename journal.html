@@ -2392,7 +2392,7 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="width:32px;height:32px;border-radius:9px;background:var(--ac-15);border:1px solid var(--ac-25);display:flex;align-items:center;justify-content:center;font-size:15px; color:var(--purple);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="8" y1="1.5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><polyline points="5,4.5 8,1.5 11,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg></div>
           <div><div style="font-family:var(--font-display);font-weight:700;font-size:14px">Export Trade Data</div><div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Download your trades in multiple formats</div></div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
+        <div class="rpt-fmt-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px">
           <div onclick="exportReport('csv')" class="rpt-fmt-card" style="background:var(--bg4);border:1px solid var(--border);border-radius:10px;padding:18px 14px;cursor:pointer;transition:all .2s;text-align:center">
             <div style="font-size:30px;margin-bottom:8px; color:var(--purple);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="9" width="3" height="6" rx="1" fill="currentColor"/><rect x="6" y="5" width="3" height="10" rx="1" fill="currentColor"/><rect x="11" y="1" width="3" height="14" rx="1" fill="currentColor"/></svg></div>
             <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--green)">CSV</div>
@@ -2429,32 +2429,32 @@ window.addEventListener('DOMContentLoaded', function() {
 
           <!-- Custom date range picker (hidden by default) -->
           <div id="exp-date-range" style="display:none;flex-direction:column;gap:10px" class="exp-sub-panel">
-            <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
-              <!-- FROM -->
-              <div style="flex:0 1 132px;min-width:132px;width:132px">
-                <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">From</div>
-                <div id="exp-cal-from-display" onclick="toggleExpCal('from')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--text2);display:flex;align-items:center;gap:8px;transition:border-color .15s;user-select:none" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
-                  <span style="font-size:14px; color:var(--text2);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></span>
-                  <span id="exp-from-label">Select date</span>
+            <div style="position:relative">
+              <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:nowrap;overflow-x:auto">
+                <!-- FROM -->
+                <div style="flex:0 1 132px;min-width:132px;width:132px">
+                  <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">From</div>
+                  <div id="exp-cal-from-display" onclick="toggleExpCal('from')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--text2);display:flex;align-items:center;gap:8px;transition:border-color .15s;user-select:none" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
+                    <span style="font-size:14px; color:var(--text2);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></span>
+                    <span id="exp-from-label">Select date</span>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;padding-top:22px;color:var(--text3);font-size:12px;font-family:var(--font-mono)">-></div>
+                <!-- TO -->
+                <div style="flex:0 1 132px;min-width:132px;width:132px">
+                  <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">To</div>
+                  <div id="exp-cal-to-display" onclick="toggleExpCal('to')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--text2);display:flex;align-items:center;gap:8px;transition:border-color .15s;user-select:none" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
+                    <span style="font-size:14px; color:var(--text2);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></span>
+                    <span id="exp-to-label">Select date</span>
+                  </div>
                 </div>
               </div>
-              <div style="display:flex;align-items:center;padding-top:22px;color:var(--text3);font-size:12px;font-family:var(--font-mono)">-></div>
-              <!-- TO -->
-              <div style="flex:0 1 132px;min-width:132px;width:132px">
-                <div style="font-size:9px;color:var(--text2);font-family:var(--font-mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">To</div>
-                <div id="exp-cal-to-display" onclick="toggleExpCal('to')" style="background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-family:var(--font-mono);color:var(--text2);display:flex;align-items:center;gap:8px;transition:border-color .15s;user-select:none" onmouseenter="this.style.borderColor='var(--ac-50)'" onmouseleave="this.style.borderColor='var(--border2)'">
-                  <span style="font-size:14px; color:var(--text2);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="1.5" stroke="currentColor" stroke-width="1.5" fill="none"/><line x1="5" y1="1.5" x2="5" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="11" y1="1.5" x2="11" y2="4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="1.5" y1="7" x2="14.5" y2="7" stroke="currentColor" stroke-width="1.5"/></svg></span>
-                  <span id="exp-to-label">Select date</span>
-                </div>
-              </div>
-              <!-- Range summary -->
-              <div id="exp-range-summary" style="display:none;flex:1;min-width:120px;padding-top:22px">
-                <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);font-weight:600;margin-bottom:2px">Trades in range</div>
-                <div id="exp-range-count" style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--purple)">0</div>
-              </div>
+              <div id="exp-calendar-popup" style="display:none;position:absolute;bottom:calc(100% + 10px);left:0;background:var(--bg2);border:1px solid var(--ac-25);border-radius:12px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,.5);width:280px;z-index:1000"></div>
             </div>
-            <!-- Inline calendar popup -->
-            <div id="exp-calendar-popup" style="display:none;background:var(--bg2);border:1px solid var(--ac-25);border-radius:12px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,.5);width:280px"></div>
+            <div id="exp-range-summary" style="display:none;flex:1;min-width:120px;padding-top:0">
+              <div style="font-size:10px;color:var(--text2);font-family:var(--font-mono);font-weight:600;margin-bottom:2px">Trades in range</div>
+              <div id="exp-range-count" style="font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--purple)">0</div>
+            </div>
           </div>
         </div>
         <!-- hidden inputs kept for getExportTrades() compat -->
