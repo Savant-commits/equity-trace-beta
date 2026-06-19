@@ -3677,7 +3677,36 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   /* === TRADE TABLE: contained scroll === */
   #tlog-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .trade-table { min-width: 620px; }
+  .trade-table { min-width: auto; }
+  #view-tradelog .trade-table th,
+  #view-tradelog .trade-table td {
+    padding: 8px 10px;
+  }
+  #view-tradelog .trade-table th {
+    font-size: 8.8px;
+  }
+  #view-tradelog .sym-badge {
+    margin-left: 4px;
+  }
+
+  #view-tradelog #trade-table thead th[data-col="account"],
+  #view-tradelog #trade-table thead th[data-col="model"],
+  #view-tradelog #trade-table thead th[data-col="session"],
+  #view-tradelog #trade-table thead th[data-col="dir"],
+  #view-tradelog #trade-table thead th[data-col="entry"],
+  #view-tradelog #trade-table thead th[data-col="exit"],
+  #view-tradelog #trade-table thead th[data-col="size"] {
+    display: none !important;
+  }
+  #view-tradelog #trade-table tbody td.account-col,
+  #view-tradelog #trade-table tbody td.model-col,
+  #view-tradelog #trade-table tbody td.session-col,
+  #view-tradelog #trade-table tbody td.direction-col,
+  #view-tradelog #trade-table tbody td.entry-col,
+  #view-tradelog #trade-table tbody td.exit-col,
+  #view-tradelog #trade-table tbody td.size-col {
+    display: none !important;
+  }
 
   /* === MODAL: bottom sheet === */
   .overlay { padding: 12px 0 0; align-items: flex-end; }
@@ -3694,22 +3723,45 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   /* === FORM ROWS: 2 columns === */
   .form-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
-  /* === DETAIL PANEL: full screen slide-up === */
+  /* === DETAIL PANEL: card modal === */
   .detail-panel {
-    top: auto;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    width: 100vw !important;
-    max-width: 100vw !important;
-    height: 92vh;
-    border-left: none;
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) scale(0.98) !important;
+    width: 90vw !important;
+    max-width: 420px !important;
+    height: auto !important;
+    max-height: calc(100vh - 120px) !important;
+    border-left: 1px solid var(--border);
     border-top: 1px solid var(--border);
-    border-radius: 16px 16px 0 0;
-    transform: translateY(100%);
+    border-radius: 24px !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6) !important;
+    transition: opacity .22s, transform .22s;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10002 !important;
   }
-  .detail-panel.open { transform: translateY(0); }
-  .detail-panel.open { transform: translateY(0); }
+  .detail-panel.open { 
+    transform: translate(-50%, -50%) scale(1) !important; 
+    opacity: 1;
+    pointer-events: auto;
+  }
+  
+  /* === BLUR PAGE CONTENT WHEN DETAIL PANEL IS OPEN === */
+  body:has(.detail-panel.open) #view-tradelog,
+  body:has(.detail-panel.open) #topbar,
+  body:has(.detail-panel.open) #sidebar,
+  body:has(.detail-panel.open) #nav-bottom {
+    filter: blur(5px) !important;
+  }
+  
+  /* === LOCK SCROLL WHEN DETAIL PANEL IS OPEN === */
+  body:has(.detail-panel.open) {
+    overflow: hidden !important;
+  }
 
   /* === BACK TO TOP === */
   #back-to-top { bottom: 14px; right: 14px; width: 34px; height: 34px; font-size: 14px; }

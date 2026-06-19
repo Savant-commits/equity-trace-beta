@@ -855,9 +855,9 @@ function renderTrades(trades) {
     }
 
     tr.innerHTML = checkboxCell + `
-      <td><span style="font-family:var(--font-mono);font-size:10px;background:var(--bg5);padding:3px 8px;border-radius:5px;white-space:nowrap">${t.account || '—'}</span></td>
-      <td><span style="font-family:var(--font-mono);font-size:11.5px">${t.date}</span><br><span style="font-size:10px;color:var(--text3)">${typeof formatTradeTime === 'function' ? formatTradeTime(t.time) : t.time}</span></td>
-      <td>
+      <td class="account-col"><span style="font-family:var(--font-mono);font-size:10px;background:var(--bg5);padding:3px 8px;border-radius:5px;white-space:nowrap">${t.account || '—'}</span></td>
+      <td class="date-col"><span style="font-family:var(--font-mono);font-size:11.5px">${t.date}</span><br><span style="font-size:10px;color:var(--text3)">${typeof formatTradeTime === 'function' ? formatTradeTime(t.time) : t.time}</span></td>
+      <td class="symbol-col">
         <div class="sym-cell">
           <div class="sym-name">
             <span class="sym-code">${t.symbol}</span>
@@ -865,14 +865,14 @@ function renderTrades(trades) {
           </div>
         </div>
       </td>
-      <td>${t.model ? `<span style="font-family:var(--font-mono);font-size:10px;background:var(--ac-15);border:1px solid var(--ac-25);color:#a97de8;padding:3px 8px;border-radius:5px;white-space:nowrap">${t.model}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
-      <td>${t.session ? `<span style="font-family:var(--font-mono);font-size:10px;background:rgba(99,179,237,.1);border:1px solid rgba(99,179,237,.25);color:#63b3ed;padding:3px 8px;border-radius:5px;white-space:nowrap">${t.session}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
-      <td><span class="dir-badge ${t.dir==='long'?'dir-long':'dir-short'}">${t.dir==='long'?'▲ LONG':'▼ SHORT'}</span></td>
-      <td style="font-family:var(--font-mono);font-size:12px">${formatPrice(t.symbol, t.entry)}</td>
-      <td style="font-family:var(--font-mono);font-size:12px">${exitDisplay}</td>
-      <td style="font-family:var(--font-mono);font-size:12px">${t.size}</td>
-      <td><span class="${isBE?'pnl-be':isPos?'pnl-pos':'pnl-neg'}">${t.pnl>0?'+':''}\$${Math.abs(t.pnl).toFixed(2)}</span></td>
-      <td><span class="${tradeRes==='win'?'result-win':tradeRes==='be'?'result-be':'result-loss'}">${tradeRes==='win'?'● WIN':tradeRes==='be'?'● BE':'● LOSS'}</span></td>
+      <td class="model-col">${t.model ? `<span style="font-family:var(--font-mono);font-size:10px;background:var(--ac-15);border:1px solid var(--ac-25);color:#a97de8;padding:3px 8px;border-radius:5px;white-space:nowrap">${t.model}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+      <td class="session-col">${t.session ? `<span style="font-family:var(--font-mono);font-size:10px;background:rgba(99,179,237,.1);border:1px solid rgba(99,179,237,.25);color:#63b3ed;padding:3px 8px;border-radius:5px;white-space:nowrap">${t.session}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+      <td class="direction-col"><span class="dir-badge ${t.dir==='long'?'dir-long':'dir-short'}">${t.dir==='long'?'▲ LONG':'▼ SHORT'}</span></td>
+      <td class="entry-col" style="font-family:var(--font-mono);font-size:12px">${formatPrice(t.symbol, t.entry)}</td>
+      <td class="exit-col" style="font-family:var(--font-mono);font-size:12px">${exitDisplay}</td>
+      <td class="size-col" style="font-family:var(--font-mono);font-size:12px">${t.size}</td>
+      <td class="pnl-col"><span class="${isBE?'pnl-be':isPos?'pnl-pos':'pnl-neg'}">${t.pnl>0?'+':''}\$${Math.abs(t.pnl).toFixed(2)}</span></td>
+      <td class="result-col"><span class="${tradeRes==='win'?'result-win':tradeRes==='be'?'result-be':'result-loss'}">${tradeRes==='win'?'● WIN':tradeRes==='be'?'● BE':'● LOSS'}</span></td>
     `;
     tr.addEventListener('click', () => {
       if (selectModeActive) toggleSelectRow(t.id, {stopPropagation:()=>{}});
