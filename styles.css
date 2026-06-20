@@ -429,6 +429,70 @@ h1,h2,h3{letter-spacing:-.02em}
   margin: 0 auto !important;
 }
 
+#view-user-profile .settings-user-profile-card > div:nth-child(2) {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 24px !important;
+  text-align: center !important;
+}
+
+#view-user-profile .settings-user-profile-card > div:nth-child(2) > div:first-child {
+  width: 100% !important;
+  max-width: 280px !important;
+}
+
+#view-user-profile .settings-user-profile-card > div:nth-child(2) > div:last-child {
+  width: 100% !important;
+  max-width: 760px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+}
+
+#view-user-profile .settings-user-profile-card .form-group {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+}
+
+#view-user-profile .settings-user-profile-card .form-group .form-label {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+#view-user-profile .settings-user-profile-card .form-group .form-input,
+#view-user-profile .settings-user-profile-card .form-group .form-select,
+#view-user-profile .settings-user-profile-card .form-group .form-textarea {
+  width: 100% !important;
+}
+
+/* Center profile dropdowns below the button and let them expand */
+#prof-style-dd,
+#prof-exp-dd,
+#avatar-picker {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  min-width: 100% !important;
+  width: max-content !important;
+  max-width: min(100vw - 32px, 420px) !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+  z-index: 10000 !important;
+}
+
+/* Ensure dropdown option rows maintain content width */
+#prof-style-list > div,
+#prof-exp-list > div {
+  white-space: nowrap !important;
+}
+
+
 #view-user-profile {
   background: var(--bg) !important;
 }
@@ -3636,6 +3700,39 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   /* === CONTENT === */
   .content { padding: 10px; gap: 10px; }
+
+  /* Settings page timezone card mobile order swap */
+  #view-settings .timezone-grid {
+    grid-template-columns: 1fr !important;
+  }
+  #view-settings .timezone-grid .time-format-group {
+    order: -1;
+    grid-column: 1 / -1 !important;
+  }
+  #view-settings .timezone-grid .import-source-group {
+    order: 1;
+    grid-column: 1 / -1 !important;
+  }
+
+  /* Trading preferences card mobile dropdown fix - session only */
+  #view-settings #setting-session-dd {
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: max-content !important;
+    min-width: 180px !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+  #view-settings #setting-session-list > div {
+    white-space: normal !important;
+    word-break: break-word !important;
+  }
+
+  /* Hide keyboard shortcuts button in mobile view */
+  #kb-help-fab { display: none !important; }
+
+  /* Hide trader card in user profile on mobile */
+  #view-user-profile .settings-trader-card { display: none; }
 
   /* Accounts page active/passed/breached cards mobile carousel */
   #view-accounts .accounts-active-cards,

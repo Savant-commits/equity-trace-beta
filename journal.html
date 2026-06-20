@@ -2583,7 +2583,7 @@ window.addEventListener('DOMContentLoaded', function() {
               <div style="font-size:10px;color:var(--text3);font-family:var(--font-mono);margin-top:5px">Also your public URL: <span id="public-url-inline">/trader/username</span></div>
             </div>
             <div class="form-group">
-              <div class="form-label">Trading Style</div>
+              <div class="form-label">STYLE</div>
               <div style="position:relative" id="prof-style-wrap">
                 <button type="button" id="prof-style-btn" onclick="toggleSettingsTimezoneDropdown('prof-style')" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg4);border:1px solid var(--ac-20);border-radius:8px;padding:8px 11px;color:var(--text2);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s" onmouseenter="this.style.borderColor='var(--ac-45)'" onmouseleave="this.style.borderColor='var(--ac-20)'">
                   <span id="prof-style-btn-label" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Select style</span>
@@ -2738,9 +2738,9 @@ window.addEventListener('DOMContentLoaded', function() {
           <div style="width:32px;height:32px;border-radius:9px;background:rgba(46,204,138,.12);border:1px solid rgba(46,204,138,.25);display:flex;align-items:center;justify-content:center;font-size:15px; color:var(--green);display:flex;align-items:center;justify-content:center"><svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5C8 1.5 5.5 4 5.5 8s2.5 6.5 2.5 6.5S10.5 12 10.5 8 8 1.5 8 1.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><line x1="1.5" y1="8" x2="14.5" y2="8" stroke="currentColor" stroke-width="1.2"/></svg></div>
           <div><div style="font-family:var(--font-display);font-weight:700;font-size:14px">Timezone &amp; Date Format</div><div style="font-size:11px;color:var(--text3);font-family:var(--font-mono);margin-top:1px">Separate display time, trading time, and import source time</div></div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div class="form-group">
-            <div class="form-label">Display Timezone</div>
+            <div class="form-label">LOCAL TIMEZONE</div>
             <div style="position:relative" id="setting-timezone-wrap">
               <button type="button" id="setting-timezone-btn" onclick="toggleSettingsTimezoneDropdown('setting-timezone')" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg4);border:1px solid var(--ac-20);border-radius:8px;padding:8px 11px;color:var(--text2);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s">
                 <span id="setting-timezone-btn-label" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Select timezone</span>
@@ -2765,7 +2765,9 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
             <select id="setting-trading-timezone" class="form-select" onchange="applyTradingTimezone()" style="display:none"></select>
           </div>
-          <div class="form-group">
+        </div>
+        <div class="timezone-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+          <div class="form-group import-source-group">
             <div class="form-label">Import Source Default</div>
             <div style="position:relative" id="setting-import-timezone-wrap">
               <button type="button" id="setting-import-timezone-btn" onclick="toggleSettingsTimezoneDropdown('setting-import-timezone')" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg4);border:1px solid var(--ac-20);border-radius:8px;padding:8px 11px;color:var(--text2);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s">
@@ -2778,9 +2780,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
             <select id="setting-import-timezone" class="form-select" onchange="applyImportTimezoneSetting()" style="display:none"></select>
           </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
-          <div class="form-group">
+          <div class="form-group date-format-group">
             <div class="form-label">Date Format</div>
             <div style="position:relative" id="setting-date-format-wrap">
               <button type="button" id="setting-date-format-btn" onclick="toggleSettingsTimezoneDropdown('setting-date-format')" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg4);border:1px solid var(--ac-20);border-radius:8px;padding:8px 11px;color:var(--text2);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s">
@@ -2798,7 +2798,7 @@ window.addEventListener('DOMContentLoaded', function() {
               <option value="MMM DD, YYYY">Mar 15, 2026</option>
             </select>
           </div>
-          <div class="form-group">
+          <div class="form-group time-format-group" style="grid-column:1 / -1;">
             <div class="form-label">Time Format</div>
             <div style="position:relative" id="setting-time-format-wrap">
               <button type="button" id="setting-time-format-btn" onclick="toggleSettingsTimezoneDropdown('setting-time-format')" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--bg4);border:1px solid var(--ac-20);border-radius:8px;padding:8px 11px;color:var(--text2);font-size:12px;font-family:var(--font-body);cursor:pointer;transition:all .15s">
@@ -5289,7 +5289,7 @@ if ('serviceWorker' in navigator) {
             icon: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M2 7.5L8 3l6 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/><rect x="2" y="7.5" width="12" height="5" rx="1" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="4" y1="12" x2="4" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="8" y1="12" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><line x1="12" y1="12" x2="12" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/></svg>`
           },
           {
-            label: 'Report Page',
+            label: 'Report',
             view: 'reports',
             icon: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="2" y="10" width="12" height="4" rx="1.2" stroke="currentColor" stroke-width="1.5" fill="none" opacity=".9"/><line x1="8" y1="1.5" x2="8" y2="9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity=".9"/><polyline points="5,4.5 8,1.5 11,4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity=".9"/></svg>`
           }
