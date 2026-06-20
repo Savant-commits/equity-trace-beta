@@ -886,6 +886,24 @@ h1,h2,h3{letter-spacing:-.02em}
     0 4px 24px rgba(0,0,0,.36) !important;
 }
 
+#view-accounts .accounts-active-cards,
+#view-accounts .accounts-passed-cards,
+#view-accounts .accounts-breached-cards {
+  display: contents;
+  grid-column: 1 / -1;
+}
+
+@supports not (display: contents) {
+  #view-accounts .accounts-active-cards,
+  #view-accounts .accounts-passed-cards,
+  #view-accounts .accounts-breached-cards {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
 #view-accounts .acct-page-card:hover,
 #view-accounts #hidden-accounts-section > div:hover,
 #view-accounts #acct-select-bar:hover {
@@ -1377,6 +1395,15 @@ h1,h2,h3{letter-spacing:-.02em}
     inset 0 0 80px var(--ac-08),
     inset 0 1px 0 rgba(255,255,255,.05),
     0 6px 32px rgba(0,0,0,.42) !important;
+}
+
+@media (max-width: 760px) {
+  #view-tradelog .trade-record-card:hover,
+  #view-tradelog .stat-card:hover,
+  #view-tradelog #acct-dropdown:hover {
+    border-color: inherit !important;
+    box-shadow: inherit !important;
+  }
 }
 
 #view-tradelog button[style*='background:var(--bg4)'],
@@ -3587,16 +3614,69 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   /* === HAMBURGER: show === */
   #mob-ham-btn { display: flex; }
 
+  /* Accounts page add-trade card labels on mobile */
+  .acct-label-full { display: inline; }
+  .acct-label-short { display: none; }
+
+  @media (max-width: 768px) {
+    .acct-label-full { display: none; }
+    .acct-label-short { display: inline; }
+  }
+
   /* === TOPBAR: tighten === */
   .topbar { padding: 0 10px; gap: 6px; }
   #tz-switcher-wrap { display: none; }
   /* Hide clock/date widget */
+
+  /* Hide Add Account leverage section on mobile */
+  .acm-leverage-section { display: none; }
   .topbar > div:first-of-type { display: none !important; }
   .topbar-title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .topbar-right { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 
   /* === CONTENT === */
   .content { padding: 10px; gap: 10px; }
+
+  /* Accounts page active/passed/breached cards mobile carousel */
+  #view-accounts .accounts-active-cards,
+  #view-accounts .accounts-passed-cards,
+  #view-accounts .accounts-breached-cards {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 16px !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 10px !important;
+  }
+  #view-accounts .accounts-active-cards::-webkit-scrollbar,
+  #view-accounts .accounts-passed-cards::-webkit-scrollbar,
+  #view-accounts .accounts-breached-cards::-webkit-scrollbar {
+    display: none !important;
+  }
+  #view-accounts .accounts-active-cards,
+  #view-accounts .accounts-passed-cards,
+  #view-accounts .accounts-breached-cards {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+  #view-accounts .accounts-active-cards,
+  #view-accounts .accounts-passed-cards,
+  #view-accounts .accounts-breached-cards {
+    grid-column: 1 / -1 !important;
+  }
+  #view-accounts .accounts-active-cards > .acct-page-card,
+  #view-accounts .accounts-passed-cards > .acct-page-card,
+  #view-accounts .accounts-breached-cards > .acct-page-card {
+    flex: 0 0 min(100%, calc(100vw - 40px)) !important;
+    width: min(100%, calc(100vw - 40px)) !important;
+    max-width: min(100%, calc(100vw - 40px)) !important;
+    box-sizing: border-box !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+    margin-bottom: 0 !important;
+  }
 
   /* === BANNER: stack vertically === */
   .banner { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }

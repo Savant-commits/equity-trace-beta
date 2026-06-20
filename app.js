@@ -9001,7 +9001,7 @@ function renderAccountsPage() {
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(52,211,153,.35),transparent)"></div>
       </div>
     `;
-    sectionsHtml += activeAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('');
+    sectionsHtml += `<div class="accounts-active-cards">${activeAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('')}</div>`;
   }
 
   // ── Render Passed challenges section ──
@@ -9013,7 +9013,7 @@ function renderAccountsPage() {
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(184,145,245,.35),transparent)"></div>
       </div>
     `;
-    sectionsHtml += passedAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('');
+    sectionsHtml += `<div class="accounts-passed-cards">${passedAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('')}</div>`;
   }
 
   if (breachedAccounts.length > 0) {
@@ -9024,7 +9024,7 @@ function renderAccountsPage() {
         <div style="flex:1;height:1px;background:linear-gradient(90deg,rgba(239,68,68,.35),transparent)"></div>
       </div>
     `;
-    sectionsHtml += breachedAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('');
+    sectionsHtml += `<div class="accounts-breached-cards">${breachedAccounts.map(a => renderCardHtml(a, ACCOUNTS.findIndex(acc => acc.id === a.id) + 1)).join('')}</div>`;
   }
 
   grid.innerHTML = sectionsHtml;
