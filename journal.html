@@ -1905,7 +1905,7 @@ window.addEventListener('DOMContentLoaded', function() {
           </div>
           <!-- Chart -->
           <div style="padding:20px 20px 16px;position:relative">
-            <canvas id="ec-chart" height="110"></canvas>
+            <canvas id="ec-chart" height="300"></canvas>
             <!-- Hover tooltip -->
             <div id="ec-tooltip" style="display:none;position:absolute;pointer-events:none;background:var(--bg2);border:1px solid var(--ac-30);border-radius:8px;padding:8px 12px;font-family:var(--font-mono);font-size:10px;z-index:50;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)">
               <div style="color:var(--text3);margin-bottom:3px" id="ec-tt-date"></div>
@@ -1921,7 +1921,7 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <!-- â”€â”€ 02 MONTHLY P&L BARS â”€â”€ -->
-        <div class="panel" style="overflow:hidden;max-height:640px">
+        <div class="panel mobile-span" style="overflow:hidden;max-height:640px">
           <div class="panel-head" style="padding:14px 20px 13px">
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--blue)"></span>
@@ -1994,7 +1994,7 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <!-- â”€â”€ 05 WIN/LOSS STREAKS â”€â”€ -->
-        <div class="panel" style="overflow:hidden;max-height:640px">
+        <div class="panel mobile-span" style="overflow:hidden;max-height:640px">
           <div class="panel-head" style="padding:14px 20px 13px">
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--blue2,#4d8ef0)"></span>
@@ -2056,7 +2056,7 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
 
         <!-- â”€â”€ 05 SYMBOL BREAKDOWN â”€â”€ -->
-        <div class="panel" style="grid-column:span 2">
+        <div id="sb-panel" class="panel" style="grid-column:span 2">
           <div class="panel-head" style="padding:14px 20px 13px">
             <div class="panel-title">
               <span class="panel-title-accent" style="background:var(--purple)"></span>
@@ -2127,7 +2127,7 @@ window.addEventListener('DOMContentLoaded', function() {
             </div>
           </div>
           <div style="padding:20px 20px 12px;overflow-x:auto;overflow-y:hidden;">
-            <div id="time-heatmap" style="display:grid;grid-template-columns:72px repeat(24,minmax(0,1fr));gap:2px;min-width:1080px;"></div>
+            <div id="time-heatmap" style="display:grid;grid-template-columns:48px repeat(24,minmax(0,1fr));gap:2px;min-width:1080px;"></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;padding:0 20px 18px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:6px">

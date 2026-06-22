@@ -814,7 +814,8 @@ function initEquityCurve(period) {
       }
     }],
     options:{
-      responsive:true, maintainAspectRatio:true,
+      responsive:true, maintainAspectRatio:false,
+      layout:{padding:{left:0,right:0,top:0,bottom:0}},
       plugins:{ legend:{display:false},
         tooltip:{
           backgroundColor:light?'#ffffff':'#111318', titleColor:light?'#0a0b10':'#dde1ef',
@@ -842,11 +843,12 @@ function initEquityCurve(period) {
       scales:{
         x:{ grid:{color:light?'rgba(0,0,0,.12)':'rgba(255,255,255,.06)'}, ticks:{color:light?'#0a0b10':(document.documentElement.classList.contains('medium')?'#a0a8be':'#6a7090'),font:{family:'JetBrains Mono',size:9},maxTicksLimit:12} },
         y:{ min:yMin, max:yMax, grid:{color:light?'rgba(0,0,0,.12)':'rgba(255,255,255,.06)'},
+          title:{ display:false, text:'Balance', color:light?'#0a0b10':(document.documentElement.classList.contains('medium')?'#a0a8be':'#6a7090'), font:{family:'JetBrains Mono',size:10}, padding:{top:4, bottom:0, left:0, right:0}, align:'center' },
           ticks:{color:light?'#0a0b10':(document.documentElement.classList.contains('medium')?'#a0a8be':'#6a7090'),font:{family:'JetBrains Mono',size:9},
+            minRotation:90, maxRotation:90, padding:8,
             callback:v=>[profitTarget,baseline,dailyLossVal,maxLoss].includes(v)?'$'+v.toFixed(2):'',
             afterBuildTicks:axis=>{axis.ticks=[maxLoss,dailyLossVal,baseline,profitTarget].map(v=>({value:v}));}
           }
-        }
       }
     }
   });
@@ -1681,18 +1683,16 @@ function renderTimePerformanceHeatmap() {
   const sessionDividerHours = getTimeHeatmapSessionDividerHours(zone);
   const totalCols = 1 + visibleHours.length;
 
-  timeHeatmap.style.gridTemplateColumns = `72px repeat(${visibleHours.length},minmax(0,1fr))`;
+  timeHeatmap.style.gridTemplateColumns = `48px repeat(${visibleHours.length},minmax(0,1fr))`;
 
-  const hiddenColsRow = (hiddenHours.length || filterHasAny)
-    ? `<div style="grid-column:span ${Math.max(totalCols, 2)};display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:0 0 6px 0;">
-        <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3)">Hidden columns:</span>
-        ${hiddenHours.map(hour => `
-          <button type="button" onclick="toggleTimeHeatmapHourFilter(${hour})" style="height:20px;min-width:26px;padding:0 8px;border-radius:6px;border:1px solid var(--ac-30);background:var(--bg3);color:var(--text2);font-size:10px;font-family:var(--font-mono);cursor:pointer;transition:all .15s" title="Unhide ${hour}">
-            ${hour}
-          </button>
-        `).join('')}
-        <button type="button" onclick="clearTimeHeatmapFilters()" style="height:20px;padding:0 9px;border-radius:6px;border:1px solid var(--ac-30);background:var(--bg3);color:var(--text2);font-size:10px;font-family:var(--font-mono);cursor:pointer;transition:all .15s" title="Clear all heatmap filters">
-          Clear
+  const hiddenColsRow = hiddenHours.length > 0
+    ? `<div style="grid-column:1 / -1;display:flex;align-items:center;justify-content:space-between;padding:0 0 6px 0;gap:10px;">
+        <span style="font-size:10px;font-family:var(--font-mono);color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Hidden columns: ${hiddenHours.join(', ')}</span>
+        <button type="button" onclick="clearTimeHeatmapFilters()" style="display:flex;align-items:center;justify-content:center;height:28px;width:28px;border-radius:10px;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);cursor:pointer;transition:all .15s" title="Reveal hidden columns">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" style="width:14px;height:14px;display:block;">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z" stroke="currentColor" stroke-width="2" fill="none"/>
+            <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/>
+          </svg>
         </button>
       </div>`
     : '';
@@ -1737,9 +1737,14 @@ function renderTimePerformanceHeatmap() {
         bg = isLightMode ? 'rgba(20,24,36,0.08)' : 'rgba(255,255,255,0.08)';
         color = isLightMode ? 'var(--text2)' : 'var(--text3)';
       }
-      const text = avg !== null ? (avg === 0 ? '$0' : `${avg > 0 ? '+' : ''}$${avg.toFixed(0)}`) : '-';
+      const cellValue = avg !== null ? (avg === 0 ? '$0' : `${avg > 0 ? '+' : '-'}$${Math.abs(avg).toFixed(0)}`) : '-';
+      const text = avg !== null
+        ? avg === 0
+          ? '$0'
+          : `<span class="trade-cell-sign">${avg > 0 ? '+' : '-'}</span>$${Math.abs(avg).toFixed(0)}`
+        : '-';
       const title = avg !== null
-        ? `${day} ${hour.toString().padStart(2, '0')}h · avg ${text} · ${cell.count} trade${cell.count === 1 ? '' : 's'}`
+        ? `${day} ${hour.toString().padStart(2, '0')}h · avg ${cellValue} · ${cell.count} trade${cell.count === 1 ? '' : 's'}`
         : `${day} · no trades`;
       const clickable = cell.count > 0 && cell.ids.length > 0;
       const cellIds = clickable ? cell.ids.join(',') : '';
@@ -2125,7 +2130,6 @@ function initSymbolBreakdown() {
 
   // Pills
   const setEl = (id, txt, color) => { const el = $(id); if(el){el.textContent=txt; if(color)el.style.color=color;} };
-  setEl('sb-pill-symbols', symbols.length + ' symbol' + (symbols.length !== 1 ? 's' : ''));
   setEl('sb-pill-best',  'Best ' + bestSym,  'var(--green)');
   setEl('sb-pill-worst', 'Worst ' + worstSym, 'var(--red)');
   const bestPill = $('sb-pill-best');

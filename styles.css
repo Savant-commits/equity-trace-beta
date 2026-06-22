@@ -143,7 +143,7 @@ h1,h2,h3{letter-spacing:-.02em}
 .an-card{padding-top:27px!important;padding-bottom:27px!important;min-height:180px}
 /* Heatmap day cells */
 .hday{min-height:72px!important;padding-top:12px!important;padding-bottom:12px!important}
-#time-heatmap{display:grid;grid-template-columns:72px repeat(24,minmax(0,1fr));grid-auto-rows:minmax(52px,1fr);gap:2px;min-width:1080px}
+#time-heatmap{display:grid;grid-template-columns:48px repeat(24,minmax(0,1fr));grid-auto-rows:minmax(52px,1fr);gap:2px;min-width:1080px}
 #time-heatmap > div,
 #time-heatmap > div > div{display:flex;align-items:center;justify-content:center;text-align:center;padding:0 6px;min-height:52px;font-size:10px;font-family:var(--font-mono);border-radius:12px;border:1px solid rgba(255,255,255,.1);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 #time-heatmap .label-cell{position:relative}
@@ -184,6 +184,10 @@ h1,h2,h3{letter-spacing:-.02em}
 #time-heatmap .trade-cell::before{content:'';position:absolute;inset:0;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,0) 32%)}
 #time-heatmap .trade-cell:hover{transform:translateY(-1px) scale(1.01);box-shadow:inset 0 2px 6px rgba(255,255,255,.08),0 6px 14px rgba(0,0,0,.18),0 0 10px 2px var(--trade-glow,transparent)}
 #time-heatmap .trade-cell[data-ids]{cursor:pointer}
+#time-heatmap .trade-cell-sign{display:inline}
+@media (max-width: 768px) {
+  #time-heatmap .trade-cell-sign{display:none}
+}
 .light #time-heatmap .trade-cell{
   background:rgba(255,255,255,0.72);
   border-color:rgba(17,22,34,.12);
@@ -1144,14 +1148,6 @@ h1,h2,h3{letter-spacing:-.02em}
     inset 0 0 80px var(--ac-05),
     inset 0 1px 0 rgba(255,255,255,.04),
     0 4px 24px rgba(0,0,0,.36) !important;
-}
-
-#view-advanalytics .panel:hover {
-  border-color:var(--ac-25) !important;
-  box-shadow:
-    inset 0 0 80px var(--ac-08),
-    inset 0 1px 0 rgba(255,255,255,.05),
-    0 6px 32px rgba(0,0,0,.42) !important;
 }
 
 #view-advanalytics button[style*='background:var(--bg4)'],
@@ -3000,6 +2996,35 @@ body.summary-fullscreen{--topbar-offset:0}
 .hday-neg{background:rgba(232,80,74,.07);border-color:rgba(232,80,74,.2);box-shadow:inset 0 1px 0 rgba(232,80,74,.1)}
 .hday-neg:hover{box-shadow:0 4px 14px rgba(232,80,74,.14),inset 0 1px 0 rgba(232,80,74,.1)}
 .hday-neu{background:var(--bg4)}
+
+/* Mobile: reduce width and padding of day heatmap cells to fit narrow screens */
+@media (max-width: 760px) {
+  .heatmap-days {
+    grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+    gap:8px;
+    padding:12px 10px;
+  }
+
+  /* Slightly larger cell width (override inline width from JS) */
+  .heatmap-days .hday {
+    width:68px !important;
+    min-width:0 !important;
+    padding:8px 6px !important;
+    min-height:56px !important;
+    font-size:13px !important;
+  }
+
+  .heatmap-days .hday-name { font-size:9px !important; margin-bottom:6px !important; }
+  .heatmap-days .hday-val  { font-size:13px !important; }
+  .heatmap-days .hday-trades{ font-size:9px !important; margin-top:6px !important; }
+
+  /* Remove hover transform on touch devices to avoid layout shifts */
+  .heatmap-days .hday:hover { transform:none !important; }
+
+  /* Reduce gap specifically between Monday and Tuesday cells (first and second items) */
+  /* Moved 50x from original (-4px -> -200px) per request */
+  .heatmap-days .hday:nth-child(2) { margin-left: -200px !important; }
+}
 .distrib-wrap{padding:16px 18px 18px;display:flex;flex-direction:column;gap:10px}
 .distrib-item{display:flex;align-items:center;gap:10px}
 .distrib-label{font-size:10px;color:var(--text2);min-width:90px;font-family:var(--font-mono);letter-spacing:.04em;text-transform:uppercase}
@@ -3700,6 +3725,24 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   /* === CONTENT === */
   .content { padding: 10px; gap: 10px; }
+
+  /* === TIME HEATMAP: transpose axes on mobile === */
+  #time-heatmap {
+    grid-template-columns: 48px !important;
+    grid-template-rows: 48px repeat(24, minmax(52px, 1fr)) !important;
+    grid-auto-columns: minmax(0, 1fr) !important;
+    grid-auto-flow: column !important;
+    min-width: 0 !important;
+  }
+
+  /* Equity Curve: hide DD from peak stat on mobile */
+  #view-advanalytics #ec-mdd-label,
+  #view-advanalytics #ec-stat-mdd,
+  #view-advanalytics #ec-stat-mdd-pct,
+  #view-advanalytics #ec-dd-btn-peak,
+  #view-advanalytics #ec-dd-btn-init {
+    display: none !important;
+  }
 
   /* Settings page timezone card mobile order swap */
   #view-settings .timezone-grid {
@@ -4832,5 +4875,80 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
   
   .summary-card-value {
     font-size: 16px !important;
+  }
+}
+
+/* Trend report: mobile-only full-width panels */
+@media (max-width: 768px) {
+  #advan-grid .mobile-span { grid-column: span 2; }
+}
+
+/* Symbol Breakdown: make stats appear as separate card on mobile without affecting desktop */
+@media (max-width: 768px) {
+  /* Collapse the internal two-column layout so children stack */
+  #sb-panel > .panel-head + div {
+    display: block !important;
+  }
+
+  /* Ensure chart area is full-width */
+  #sb-panel canvas#sb-chart {
+    width: 100% !important;
+    height: 200px !important;
+  }
+
+  /* Ensure chart area is full-width */
+  #sb-panel canvas#sb-chart {
+    width: 100% !important;
+    height: 200px !important;
+  }
+
+  /* Style the symbol-stats container to look like a separate panel */
+  #sb-table-wrap {
+    background: var(--bg2) !important;
+    border: 1px solid var(--ac-16) !important;
+    border-radius: 12px !important;
+    box-shadow:
+      inset 0 0 40px rgba(0,0,0,0.04),
+      0 6px 20px rgba(0,0,0,0.12) !important;
+    margin: 12px 16px 0 16px !important;
+    padding: 14px !important;
+    max-height: none !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(255,255,255,0.36) rgba(255,255,255,0.08) !important;
+  }
+
+  #sb-table-wrap::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  #sb-table-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.36);
+    border-radius: 999px;
+  }
+
+  #sb-table-wrap::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.08);
+  }
+
+  /* Hide symbol count pill on mobile only */
+  #sb-pill-symbols {
+    display: inline-flex !important;
+  }
+
+  @media (max-width: 768px) {
+    #sb-pill-symbols {
+      display: none !important;
+    }
+  }
+
+  /* Make the table inside fill the new panel and allow overflow horizontally */
+  #sb-table-wrap table {
+    width: auto !important;
+    min-width: 100% !important;
+    border-collapse: collapse !important;
   }
 }
