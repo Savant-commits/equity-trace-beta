@@ -3363,6 +3363,32 @@ function updateAnalyticsCards() {
   if (alsub) alsub.textContent = losses.length + ' losing trade'  + (losses.length!==1?'s':'');
   if (rsub)  rsub.textContent  = rr ? 'avg win ÷ avg loss' : 'not enough data';
 
+  const anBestMobile = $('an-best-mobile');
+  const anBestSubMobile = $('an-best-sub-mobile');
+  const anWorstMobile = $('an-worst-mobile');
+  const anWorstSubMobile = $('an-worst-sub-mobile');
+  const anAvgWinMobile = $('an-avg-win-mobile');
+  const anAvgWinSubMobile = $('an-avg-win-sub-mobile');
+  const anAvgLossMobile = $('an-avg-loss-mobile');
+  const anAvgLossSubMobile = $('an-avg-loss-sub-mobile');
+  const anRrMobile = $('an-rr-mobile');
+  const anRrSubMobile = $('an-rr-sub-mobile');
+
+  if (best && anBestMobile) anBestMobile.textContent = best.pnl >= 0 ? '+$' + best.pnl.toFixed(2) : '-$' + Math.abs(best.pnl).toFixed(2);
+  else if (anBestMobile) anBestMobile.textContent = '—';
+  if (anBestSubMobile) anBestSubMobile.textContent = best ? best.symbol : 'No best trade yet';
+
+  if (worst && anWorstMobile) anWorstMobile.textContent = worst.pnl < 0 ? '-$' + Math.abs(worst.pnl).toFixed(2) : '+$' + worst.pnl.toFixed(2);
+  else if (anWorstMobile) anWorstMobile.textContent = '—';
+  if (anWorstSubMobile) anWorstSubMobile.textContent = worst ? worst.symbol : 'No worst trade yet';
+
+  if (anAvgWinMobile) anAvgWinMobile.textContent = wins.length ? '+$' + avgWin.toFixed(2) : '—';
+  if (anAvgWinSubMobile) anAvgWinSubMobile.textContent = wins.length ? wins.length + ' winning trade' + (wins.length !== 1 ? 's' : '') : '-';
+  if (anAvgLossMobile) anAvgLossMobile.textContent = losses.length ? '-$' + Math.abs(avgLoss).toFixed(2) : '—';
+  if (anAvgLossSubMobile) anAvgLossSubMobile.textContent = losses.length ? losses.length + ' losing trade' + (losses.length !== 1 ? 's' : '') : '-';
+  if (anRrMobile) anRrMobile.textContent = rr ? rr.toFixed(2) + 'R' : '—';
+  if (anRrSubMobile) anRrSubMobile.textContent = rr ? 'avg win ÷ avg loss' : 'not enough data';
+
   // ── Percentage labels ──
   const acctSz = getAccountSize() || 25000;
   const awPct  = $('an-avg-win-pct');

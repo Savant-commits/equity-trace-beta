@@ -1150,6 +1150,8 @@ h1,h2,h3{letter-spacing:-.02em}
     0 4px 24px rgba(0,0,0,.36) !important;
 }
 
+#view-advanalytics .advanalytics-mobile-carousel { display: none; }
+
 #view-advanalytics button[style*='background:var(--bg4)'],
 #view-advanalytics div[style*='background:var(--bg4)'][style*='border:1px solid var(--border)'],
 #view-advanalytics span[style*='background:var(--bg4)'][style*='border:1px solid var(--border)'] {
@@ -3725,6 +3727,22 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   /* === CONTENT === */
   .content { padding: 10px; gap: 10px; }
+
+  /* Trend report heading subtitle only on mobile */
+  #view-advanalytics .trend-report-subtitle { display: none !important; }
+
+  /* Trend Report mobile carousel */
+  #view-advanalytics .advanalytics-mobile-carousel { display: none; }
+  @media (max-width: 768px) {
+    #view-advanalytics .trend-report-subtitle { display: none !important; }
+    #view-advanalytics .advanalytics-mobile-carousel { display: flex !important; overflow-x: auto; gap: 12px; padding: 12px 10px 8px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    #view-advanalytics .advanalytics-mobile-carousel .stat-card { min-width: 140px !important; max-width: 160px !important; flex: 0 0 140px !important; scroll-snap-align: start; background: var(--bg2); border: 1px solid var(--border); border-radius: 18px; padding: 8px 10px !important; height: 110px !important; min-height: 110px !important; overflow: hidden; }
+    #view-advanalytics .advanalytics-mobile-carousel .stat-card:hover { transform: translateY(-1px); }
+    #view-advanalytics .advanalytics-mobile-carousel .stat-card { box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+    #view-advanalytics .advanalytics-mobile-carousel::-webkit-scrollbar { height: 6px; }
+    #view-advanalytics .advanalytics-mobile-carousel::-webkit-scrollbar-thumb { background: rgba(255,255,255,.16); border-radius: 999px; }
+    #view-advanalytics .advanalytics-mobile-carousel::-webkit-scrollbar-track { background: transparent; }
+  }
 
   /* === TIME HEATMAP: transpose axes on mobile === */
   #time-heatmap {

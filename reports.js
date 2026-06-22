@@ -20,7 +20,38 @@ const ALL_COLS = [
 // Always-visible columns
 const LOCKED_COLS = new Set(['symbol','pnl']);
 
+// Persisted hidden columns key
+const HIDDEN_COLS_KEY = 'et_hidden_cols_v1';
+
+// hiddenCols stores keys that are hidden (not visible)
 let hiddenCols = new Set();
+
+function saveHiddenCols() {
+  try {
+    localStorage.setItem(HIDDEN_COLS_KEY, JSON.stringify([...hiddenCols]));
+  } catch (e) { /* ignore storage errors */ }
+}
+
+function loadHiddenCols() {
+  try {
+    const raw = localStorage.getItem(HIDDEN_COLS_KEY);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return new Set(arr);
+    }
+  } catch (e) { /* ignore parse errors */ }
+  // Fallback: derive from current table DOM (useful on first run or after upgrades)
+  const derived = new Set();
+  ALL_COLS.forEach(col => {
+    const th = document.querySelector(`#trade-table thead th[data-col="${col.th}"]`);
+    if (th && th.style.display === 'none') derived.add(col.key);
+  });
+  return derived;
+}
+
+// Initialize hiddenCols from storage or derive from DOM, then apply
+hiddenCols = loadHiddenCols();
+applyColVisibility();
 
 function applyColVisibility() {
   ALL_COLS.forEach(col => {
@@ -81,12 +112,14 @@ function toggleCol(key) {
   if (knob) knob.style.left = checked ? '17px' : '2px';
   if (lbl) lbl.style.background = checked ? 'var(--ac-07)' : 'transparent';
   applyColVisibility();
+  saveHiddenCols();
 }
 
 function colResetAll() {
   hiddenCols.clear();
   openColumnEditor(); // re-render toggles
   applyColVisibility();
+  saveHiddenCols();
 }
 
 // Re-apply after every renderTrades

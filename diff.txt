@@ -1,0 +1,193 @@
+diff --git a/journal.html b/journal.html
+index 11052e3..21dfdc0 100644
+--- a/journal.html
++++ b/journal.html
+@@ -1478,7 +1478,7 @@ window.addEventListener('DOMContentLoaded', function() {
+       </div>
+ 
+       <!-- Live stat cards -->
+-      <div class="stat-row" style="grid-template-columns:repeat(5,1fr)">
++      <div class="stat-row" id="eb-stat-cards-container" style="grid-template-columns:repeat(5,1fr)">
+ 
+         <!-- Avg Win -->
+         <div class="stat-card an-card" style="padding:27px 20px;position:relative;overflow:hidden;cursor:pointer" onclick="navigateToLog({type:'result',value:'win'})" title="View winning trades">
+@@ -1858,6 +1858,78 @@ window.addEventListener('DOMContentLoaded', function() {
+         </div>
+       </div>
+ 
++      <!-- Mobile Edge Metrics Carousel -->
++      <div id="trend-metrics-carousel" class="trend-metrics-carousel-mobile">
++        <!-- Avg Win -->
++        <div class="stat-card an-card carousel-card" style="padding:27px 20px;position:relative;overflow:hidden;cursor:pointer;flex-shrink:0;min-width:280px" onclick="navigateToLog({type:'result',value:'win'})" title="View winning trades">
++          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green);border-radius:0 0 0 8px;opacity:.7"></div>
++          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
++            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Avg Win</div>
++            <div style="width:26px;height:26px;border-radius:7px;background:rgba(46,204,138,.1);display:flex;align-items:center;justify-content:center">
++              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 12L6 8l3 3 5-6" stroke="#2ecc8a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++            </div>
++          </div>
++          <div id="an-avg-win-m" style="font-family:var(--font-display);font-weight:700;font-size:28px;color:#2ecc8a;letter-spacing:-.02em;line-height:1">-</div>
++          <div id="an-avg-win-sub-m" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px">- winning trades</div>
++          <div id="an-avg-win-pct-m" style="font-family:var(--font-mono);font-size:10px;color:#2ecc8a;margin-top:4px;font-weight:600;opacity:.85"></div>
++        </div>
++
++        <!-- Avg Loss -->
++        <div class="stat-card an-card carousel-card" style="padding:27px 20px;position:relative;overflow:hidden;cursor:pointer;flex-shrink:0;min-width:280px" onclick="navigateToLog({type:'result',value:'loss'})" title="View losing trades">
++          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);border-radius:0 0 0 8px;opacity:.7"></div>
++          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
++            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Avg Loss</div>
++            <div style="width:26px;height:26px;border-radius:7px;background:rgba(232,80,74,.1);display:flex;align-items:center;justify-content:center">
++              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4L6 8l3-3 5 6" stroke="#e8504a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
++            </div>
++          </div>
++          <div id="an-avg-loss-m" style="font-family:var(--font-display);font-weight:700;font-size:28px;color:#e8504a;letter-spacing:-.02em;line-height:1">-</div>
++          <div id="an-avg-loss-sub-m" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px">- losing trades</div>
++          <div id="an-avg-loss-pct-m" style="font-family:var(--font-mono);font-size:10px;color:#e8504a;margin-top:4px;font-weight:600;opacity:.85"></div>
++        </div>
++
++        <!-- RR Ratio -->
++        <div class="stat-card an-card carousel-card" style="padding:27px 20px;position:relative;overflow:hidden;flex-shrink:0;min-width:280px">
++          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);border-radius:0 0 0 8px;opacity:.7"></div>
++          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
++            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Avg RR</div>
++            <div style="width:26px;height:26px;border-radius:7px;background:var(--ac-15);display:flex;align-items:center;justify-content:center">
++              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="8" width="4" height="7" rx="1" fill="#a97de8" opacity=".5"/><rect x="6" y="4" width="4" height="11" rx="1" fill="#a97de8" opacity=".7"/><rect x="11" y="1" width="4" height="14" rx="1" fill="#a97de8"/></svg>
++            </div>
++          </div>
++          <div id="an-rr-m" style="font-family:var(--font-display);font-weight:700;font-size:28px;color:var(--purple-light, #a97de8);letter-spacing:-.02em;line-height:1">-</div>
++          <div id="an-rr-sub-m" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px">avg win ÷ avg loss</div>
++        </div>
++
++        <!-- Best Trade -->
++        <div class="stat-card an-card carousel-card" id="an-best-card-m" style="padding:27px 20px;position:relative;overflow:hidden;cursor:pointer;flex-shrink:0;min-width:280px" onclick="anNavigateBestWorst('best')" title="Jump to best trade in Trade Log">
++          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green);border-radius:0 0 0 8px;opacity:.4"></div>
++          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
++            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Best Trade</div>
++            <div style="width:26px;height:26px;border-radius:7px;background:rgba(46,204,138,.1);display:flex;align-items:center;justify-content:center">
++              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.9 3.8 4.2.6-3 3 .7 4.2L8 10.5l-3.8 2 .7-4.2-3-3 4.2-.6z" stroke="#2ecc8a" stroke-width="1.5" stroke-linejoin="round"/></svg>
++            </div>
++          </div>
++          <div id="an-best-m" style="font-family:var(--font-display);font-weight:700;font-size:28px;color:#2ecc8a;letter-spacing:-.02em;line-height:1">-</div>
++          <div id="an-best-sub-m" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.5">-</div>
++          <div id="an-best-pct-m" style="font-family:var(--font-mono);font-size:10px;color:#2ecc8a;margin-top:4px;font-weight:600;opacity:.85"></div>
++        </div>
++
++        <!-- Worst Trade -->
++        <div class="stat-card an-card carousel-card" id="an-worst-card-m" style="padding:27px 20px;position:relative;overflow:hidden;cursor:pointer;flex-shrink:0;min-width:280px" onclick="anNavigateBestWorst('worst')" title="Jump to worst trade in Trade Log">
++          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);border-radius:0 0 0 8px;opacity:.4"></div>
++          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
++            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Worst Trade</div>
++            <div style="width:26px;height:26px;border-radius:7px;background:rgba(232,80,74,.1);display:flex;align-items:center;justify-content:center">
++              <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#e8504a" stroke-width="1.5"/><path d="M8 5v3.5" stroke="#e8504a" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11" r=".8" fill="#e8504a"/></svg>
++            </div>
++          </div>
++          <div id="an-worst-m" style="font-family:var(--font-display);font-weight:700;font-size:28px;color:#e8504a;letter-spacing:-.02em;line-height:1">-</div>
++          <div id="an-worst-sub-m" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.5">-</div>
++          <div id="an-worst-pct-m" style="font-family:var(--font-mono);font-size:10px;color:#e8504a;margin-top:4px;font-weight:600;opacity:.85"></div>
++        </div>
++      </div>
++
+       <!-- Charts grid -->
+       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="advan-grid">
+ 
+diff --git a/styles.css b/styles.css
+index f6f0f06..6f6176b 100644
+--- a/styles.css
++++ b/styles.css
+@@ -1164,6 +1164,11 @@ h1,h2,h3{letter-spacing:-.02em}
+   box-shadow:0 2px 12px rgba(0,0,0,.08) !important;
+ }
+ 
++/* Hide mobile carousel on desktop */
++#trend-metrics-carousel-mobile {
++  display: none !important;
++}
++
+ /* ═══════════════════════════════════════════════
+    EDGE BREAKDOWN — MATCH SETTINGS TYPOGRAPHY
+ ═══════════════════════════════════════════════ */
+@@ -2092,6 +2097,22 @@ h1,h2,h3{letter-spacing:-.02em}
+   letter-spacing:-.04em;
+ }
+ 
++@media (max-width: 768px) {
++  .trend-metrics-carousel-mobile .carousel-card {
++    min-width: 190px !important;
++    max-width: 260px;
++  }
++  .trend-metrics-carousel-mobile #an-avg-win-m,
++  .trend-metrics-carousel-mobile #an-avg-loss-m {
++    font-weight: 400 !important;
++    font-size: 20px !important;
++  }
++  .trend-metrics-carousel-mobile .carousel-card > div[id$='-m'] {
++    font-weight: 500 !important;
++    font-size: 20px !important;
++  }
++}
++
+ /* Summary page: grey card backgrounds with purple glow (dark mode only) */
+ :root:not(.light) #view-summary .summary-card,
+ :root:not(.light) #view-summary .summary-panel,
+@@ -3895,6 +3916,28 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
+   .analytics-wide { grid-column: span 1; }
+   .analytics-full { grid-column: span 1; }
+ 
++  /* === EDGE BREAKDOWN: hide stat cards on mobile === */
++  #eb-stat-cards-container { display: none !important; }
++
++  /* === TREND REPORT: mobile carousel for edge metrics === */
++  #trend-metrics-carousel-mobile {
++    display: flex !important;
++    flex-wrap: nowrap !important;
++    overflow-x: auto !important;
++    overflow-y: hidden !important;
++    scroll-snap-type: x mandatory !important;
++    gap: 12px !important;
++    margin: 0 -6px 16px -6px !important;
++    padding: 0 6px 8px 6px !important;
++    -webkit-overflow-scrolling: touch !important;
++  }
++  #trend-metrics-carousel-mobile .carousel-card {
++    scroll-snap-align: start !important;
++  }
++  #trend-metrics-carousel-mobile::-webkit-scrollbar {
++    display: none !important;
++  }
++
+   /* === TRADE TABLE: contained scroll === */
+   #tlog-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+   .trade-table { min-width: auto; }
+@@ -4854,6 +4897,32 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
+     padding: 18px 14px !important;
+   }
+   
++
++  /* Mobile carousel for Trend Report: show on small screens, hide desktop cards */
++  @media (max-width: 768px) {
++    .trend-metrics-carousel-mobile {
++      display: flex !important;
++      gap: 12px;
++      overflow-x: auto;
++      padding: 12px 8px;
++      scroll-snap-type: x mandatory;
++      -webkit-overflow-scrolling: touch;
++    }
++    .trend-metrics-carousel-mobile .carousel-card {
++      scroll-snap-align: center;
++      flex: 0 0 auto;
++      min-width: 76%;
++      max-width: 420px;
++      border-radius: 12px;
++    }
++    /* Hide Edge Breakdown desktop stat row on mobile */
++    #eb-stat-cards-container { display: none !important; }
++  }
++
++  /* Hide mobile carousel on desktop */
++  @media (min-width: 769px) {
++    .trend-metrics-carousel-mobile { display: none !important; }
++  }
+   .summary-card-value {
+     font-size: 18px !important;
+   }

@@ -1850,11 +1850,59 @@ window.addEventListener('DOMContentLoaded', function() {
       <div style="display:flex;align-items:center;gap:12px;margin-left:6px;margin-right:6px;flex-wrap:nowrap">
         <div style="font-family:var(--font-body);font-weight:700;font-size:18px;letter-spacing:.01em;text-transform:uppercase;color:var(--text);border-left:3px solid var(--purple);padding-left:12px;min-width:0">Trend Report</div>
         <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:nowrap;justify-content:flex-end;min-width:0;flex-shrink:0">
-          <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;display:flex;align-items:center;gap:6px">
+          <div class="trend-report-subtitle" style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;display:flex;align-items:center;gap:6px">
             <span style="width:6px;height:6px;border-radius:50%;background:var(--purple);display:inline-block;box-shadow:0 0 6px var(--ac-70)"></span>
             Charts update with your trade data
           </div>
           <div style="position:relative;width:fit-content;flex-shrink:0" id="an-acct-bar-p4"></div>
+        </div>
+      </div>
+
+      <!-- Trend Report mobile carousel -->
+      <div class="advanalytics-mobile-carousel" aria-label="Trend Report overview cards">
+        <div class="stat-card an-card" onclick="anNavigateBestWorst('best')" title="Jump to best trade in Trade Log" style="padding:22px 18px;min-width:220px;flex:0 0 220px;position:relative;overflow:hidden;cursor:pointer;scroll-snap-align:start;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green);border-radius:0 0 0 8px;opacity:.4"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Best Trade</div>
+          </div>
+          <div id="an-best-mobile" style="font-family:var(--font-display);font-weight:450;font-size:24px;color:#2ecc8a;letter-spacing:-.02em;line-height:1">-</div>
+          <div id="an-best-sub-mobile" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.4">-</div>
+        </div>
+
+        <div class="stat-card an-card" onclick="anNavigateBestWorst('worst')" title="Jump to worst trade in Trade Log" style="padding:22px 18px;min-width:220px;flex:0 0 220px;position:relative;overflow:hidden;cursor:pointer;scroll-snap-align:start;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);border-radius:0 0 0 8px;opacity:.4"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Worst Trade</div>
+          </div>
+          <div id="an-worst-mobile" style="font-family:var(--font-display);font-weight:450;font-size:24px;color:#e8504a;letter-spacing:-.02em;line-height:1">-</div>
+          <div id="an-worst-sub-mobile" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.4">-</div>
+        </div>
+
+        <div class="stat-card an-card" style="padding:22px 18px;min-width:220px;flex:0 0 220px;position:relative;overflow:hidden;scroll-snap-align:start;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--green);border-radius:0 0 0 8px;opacity:.7"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Avg Win</div>
+          </div>
+          <div id="an-avg-win-mobile" style="font-family:var(--font-display);font-weight:450;font-size:24px;color:#2ecc8a;letter-spacing:-.02em;line-height:1">-</div>
+          <div id="an-avg-win-sub-mobile" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.4">- winning trades</div>
+        </div>
+
+        <div class="stat-card an-card" style="padding:22px 18px;min-width:220px;flex:0 0 220px;position:relative;overflow:hidden;scroll-snap-align:start;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--red);border-radius:0 0 0 8px;opacity:.7"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Avg Loss</div>
+          </div>
+          <div id="an-avg-loss-mobile" style="font-family:var(--font-display);font-weight:450;font-size:24px;color:#e8504a;letter-spacing:-.02em;line-height:1">-</div>
+          <div id="an-avg-loss-sub-mobile" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.4">- losing trades</div>
+        </div>
+
+        <div class="stat-card an-card" style="padding:22px 18px;min-width:220px;flex:0 0 220px;position:relative;overflow:hidden;scroll-snap-align:start;">
+          <div style="position:absolute;top:0;left:0;width:3px;height:100%;background:var(--purple);border-radius:0 0 0 8px;opacity:.7"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3)">Avg RR</div>
+          </div>
+          <div id="an-rr-mobile" style="font-family:var(--font-display);font-weight:450;font-size:24px;color:var(--purple-light, #a97de8);letter-spacing:-.02em;line-height:1">-</div>
+          <div id="an-rr-sub-mobile" style="font-family:var(--font-mono);font-size:9px;color:var(--text3);margin-top:8px;line-height:1.4">avg win ÷ avg loss</div>
         </div>
       </div>
 
@@ -5263,11 +5311,7 @@ if ('serviceWorker' in navigator) {
             view: 'tradelog',
             icon: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="2.5" rx="1.2" fill="currentColor" opacity=".9"/><rect x="1" y="6.75" width="14" height="2.5" rx="1.2" fill="currentColor" opacity=".9"/><rect x="1" y="11.5" width="14" height="2.5" rx="1.2" fill="currentColor" opacity=".9"/></svg>`
           },
-          {
-            label: 'Edge Breakdown',
-            view: 'analytics',
-            icon: `<svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1" y="9" width="3" height="6" rx="1" fill="currentColor" opacity=".9"/><rect x="6" y="5" width="3" height="10" rx="1" fill="currentColor" opacity=".9"/><rect x="11" y="1" width="3" height="14" rx="1" fill="currentColor" opacity=".9"/></svg>`
-          },
+          
           {
             label: 'Trend Report',
             view: 'advanalytics',

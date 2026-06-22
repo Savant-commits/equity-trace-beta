@@ -594,6 +594,10 @@ function refreshAdvAnalytics() {
   if (typeof renderTimePerformanceHeatmap === 'function') {
     requestAnimationFrame(() => renderTimePerformanceHeatmap());
   }
+
+  if (typeof updateAnalyticsCards === 'function') {
+    updateAnalyticsCards();
+  }
 }
 
 // ══════════════════════════════════════════════
