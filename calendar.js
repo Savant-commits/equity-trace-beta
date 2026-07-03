@@ -858,7 +858,7 @@ function initEquityCurve(period) {
         }
       }
     }
-  });
+  })
   window.ecChartInst = ecChartInst;
 }
 
