@@ -616,12 +616,6 @@ function ecSetPeriod(btn, period) {
   initEquityCurve(ecCurrentPeriod);
 }
 
-function getAcctStartBal(acctName) {
-  if (!acctName) return ACCOUNT_SIZE || 25000;
-  const match = ACCOUNTS.find(a => (a.key || a.phase) === acctName);
-  return match ? match.startBal : (ACCOUNT_SIZE || 25000);
-}
-
 function initEquityCurve(period) {
   const canvas = $('ec-chart');
   if (!canvas) return;
@@ -849,6 +843,7 @@ function initEquityCurve(period) {
             callback:v=>[profitTarget,baseline,dailyLossVal,maxLoss].includes(v)?'$'+v.toFixed(2):'',
             afterBuildTicks:axis=>{axis.ticks=[maxLoss,dailyLossVal,baseline,profitTarget].map(v=>({value:v}));}
           }
+        }
       }
     }
   });
