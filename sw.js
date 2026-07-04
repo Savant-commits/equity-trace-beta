@@ -1,7 +1,7 @@
 // ═══ EQUITY TRACE SERVICE WORKER ═══
 // Version 1.0.0
 
-const CACHE_NAME = 'equity-trace-v2';
+const CACHE_NAME = 'equity-trace-v3';
 const urlsToCache = [
   '/',
   '/index.html',
