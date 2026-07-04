@@ -4225,6 +4225,10 @@ span.flatpickr-weekday{background:transparent!important;color:var(--text4)!impor
 
   #view-calendar #cal-grid-body > div {
     grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    display: grid !important;
+  }
+  #view-calendar #cal-grid-body > div > div:last-child {
+    display: none !important;
   }
 
   #view-calendar #cal-grid-body .cal-day-cell {
