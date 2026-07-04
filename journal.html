@@ -5134,12 +5134,13 @@ async function reloadAppDataFromSupabase() {
     if (typeof renderTrades === 'function')        renderTrades(window.filteredTrades || []);
     if (typeof populateDashboard === 'function')   populateDashboard();
     if (typeof renderAccountsPage === 'function')  renderAccountsPage();
+    if (typeof refreshAdvAnalytics === 'function') refreshAdvAnalytics();
 
     console.log('OK App data reloaded from Supabase');
   } catch(e) {
     console.error('reloadAppDataFromSupabase error:', e);
   }
-}
+} 
 
 /*
 // ══ PWA SERVICE WORKER REGISTRATION ══

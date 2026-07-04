@@ -3313,8 +3313,10 @@ function updateAnalyticsCards() {
   });
   const avgWin  = wins.length   ? wins.reduce((s,t)=>s+t.pnl,0)/wins.length    : 0;
   const avgLoss = losses.length ? losses.reduce((s,t)=>s+t.pnl,0)/losses.length : 0;
-  const best    = wins.length ? wins.reduce((b,t)=>t.pnl>b.pnl?t:b, wins[0]) : null;
-  const worst   = losses.length ? losses.reduce((w,t)=>t.pnl<w.pnl?t:w, losses[0]) : null;
+  const positives = trades.filter(t => Number.isFinite(t.pnl) && t.pnl > 0);
+  const negatives = trades.filter(t => Number.isFinite(t.pnl) && t.pnl < 0);
+  const best    = positives.length ? positives.reduce((b,t)=>t.pnl>b.pnl?t:b, positives[0]) : null;
+  const worst   = negatives.length ? negatives.reduce((w,t)=>t.pnl<w.pnl?t:w, negatives[0]) : null;
   const rr      = (avgWin && avgLoss) ? (avgWin / Math.abs(avgLoss)) : null;
 
   const aw = $('an-avg-win');
