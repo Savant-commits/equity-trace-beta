@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | Equity Trace</title>
+  <meta name="description" content="Get in touch with Equity Trace for support, feedback, questions, or feature requests." />
+  <link rel="icon" type="image/png" href="logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=cabinet-grotesk@300,400,500,700,800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --font-display: 'Clash Display', 'Outfit', 'Space Grotesk', system-ui, sans-serif;
+      --font-body: 'Cabinet Grotesk', 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+      --bg: #020208;
+      --bg2: #080c18;
+      --bg3: #0e1322;
+      --bg4: #161d30;
+      --border: rgba(255, 255, 255, 0.08);
+      --border2: rgba(255, 255, 255, 0.14);
+      --text: #eef2ff;
+      --text2: #c7cfdf;
+      --text3: #8794ae;
+      --purple: #995dff;
+      --purple-strong: #7b3aed;
+      --green: #2ecc8a;
+      --red: #e8504a;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-body);
+      background:
+        radial-gradient(circle at top left, rgba(153, 93, 255, 0.16), transparent 28%),
+        linear-gradient(135deg, var(--bg), var(--bg2));
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font: inherit; }
+    img { max-width: 100%; display: block; }
+
+    .page {
+      position: relative;
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 48px;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      background: rgba(2, 2, 8, 0.72);
+      backdrop-filter: blur(22px) saturate(1.2);
+      border-bottom: 1px solid rgba(153, 93, 255, 0.14);
+    }
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.03em;
+    }
+    .nav-brand .brand-mark {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: transparent;
+      box-shadow: none;
+    }
+    .nav-brand .brand-mark img,
+    .nav-brand .brand-mark .brand-logo {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      display: block;
+      border-radius: 6px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 18px;
+      color: var(--text2);
+      font-size: 0.95rem;
+    }
+    .nav-links a:hover { color: white; }
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .nav-cta:hover { transform: translateY(-1px); border-color: rgba(153, 93, 255, 0.32); }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 40px 24px 0;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: start;
+      padding: 24px 0 32px;
+    }
+    .hero-copy {
+      padding: 18px 0;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(153, 93, 255, 0.09);
+      border: 1px solid rgba(153, 93, 255, 0.22);
+      color: #c9a8ff;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .eyebrow .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--purple);
+      box-shadow: 0 0 0 0 rgba(153, 93, 255, 0.35);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(153, 93, 255, 0.35); }
+      70% { box-shadow: 0 0 0 8px rgba(153, 93, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(153, 93, 255, 0); }
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-weight: 300;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin: 0 0 14px;
+    }
+    .hero-copy p {
+      font-size: 1.05rem;
+      color: var(--text2);
+      margin: 0 0 18px;
+      max-width: 620px;
+    }
+    .support-card, .form-card, .faq-card {
+      background: linear-gradient(155deg, rgba(8, 12, 24, 0.94), rgba(14, 19, 34, 0.96));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+    }
+    .support-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .support-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(153, 93, 255, 0.14), transparent 38%);
+      pointer-events: none;
+    }
+    .support-card h2 {
+      font-size: 1.15rem;
+      margin: 0;
+      font-family: var(--font-display);
+    }
+    .support-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: white;
+      font-weight: 600;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+      width: fit-content;
+    }
+    .support-link svg { flex-shrink: 0; }
+    .support-note {
+      color: var(--text3);
+      font-size: 0.95rem;
+      margin: 0;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    .form-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      width: min(100%, 860px);
+    }
+    .form-card h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-family: var(--font-display);
+      font-weight: 300;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 0;
+    }
+    .field.full { grid-column: 1 / -1; }
+    label {
+      font-size: 0.92rem;
+      color: var(--text2);
+      font-weight: 600;
+    }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      padding: 12px 14px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+    select, select option {
+      color: var(--text);
+      background-color: var(--bg3);
+    }
+    select option {
+      padding: 10px 12px;
+    }
+    textarea { min-height: 130px; resize: vertical; }
+    input::placeholder, textarea::placeholder { color: var(--text3); }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: rgba(153, 93, 255, 0.42);
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow: 0 0 0 3px rgba(153, 93, 255, 0.13);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: 1px solid rgba(153, 93, 255, 0.32);
+      background: linear-gradient(135deg, var(--purple-strong), var(--purple));
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 10px 24px rgba(123, 58, 237, 0.24);
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 14px 30px rgba(123, 58, 237, 0.3); }
+    .form-status {
+      min-height: 24px;
+      font-size: 0.95rem;
+      color: var(--text2);
+      border-radius: 10px;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid transparent;
+    }
+    .form-status.error {
+      color: #ffd0cc;
+      background: rgba(232, 80, 74, 0.1);
+      border-color: rgba(232, 80, 74, 0.2);
+    }
+    .form-status.success {
+      color: #d5f7e4;
+      background: rgba(46, 204, 138, 0.12);
+      border-color: rgba(46, 204, 138, 0.22);
+    }
+
+    .socials {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .social-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text2);
+      background: rgba(255, 255, 255, 0.03);
+      transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+    .social-item:hover {
+      transform: translateY(-1px);
+      border-color: rgba(153, 93, 255, 0.26);
+      color: white;
+    }
+
+    .faq-card {
+      margin-top: 24px;
+      padding: 24px;
+    }
+    .faq-card h3 { margin: 0 0 12px; font-size: 1.18rem; font-family: var(--font-display); font-weight: 300; }
+
+    .faq-list {
+      display: grid;
+      gap: 12px;
+    }
+    .faq-item {
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+    .faq-item summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: white;
+      list-style: none;
+    }
+    .faq-item summary::-webkit-details-marker { display: none; }
+    .faq-item p {
+      margin: 8px 0 0;
+      color: var(--text2);
+      font-size: 0.95rem;
+    }
+
+    .notice {
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text2);
+      font-size: 0.96rem;
+    }
+    .notice a { color: #c9a8ff; text-decoration: underline; text-underline-offset: 2px; }
+
+    .footer {
+      max-width: 1180px;
+      margin: 36px auto 0;
+      padding: 0 24px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      color: var(--text3);
+      font-size: 0.95rem;
+      flex-wrap: wrap;
+    }
+    .footer-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-links a:hover { color: var(--text2); }
+
+    @media (max-width: 920px) {
+      .hero, .layout { grid-template-columns: 1fr; }
+      .hero { gap: 18px; }
+    }
+
+    @media (max-width: 640px) {
+      .nav { padding: 14px 16px; }
+      .nav-links { display: none; }
+      .container { padding: 20px 16px 0; }
+      .form-card, .faq-card, .support-card { padding: 18px; border-radius: 18px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .footer { padding: 0 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <nav class="nav" aria-label="Primary">
+      <a class="nav-brand" href="index.html">
+        <span class="brand-mark" aria-hidden="true"><img src="logo.png" alt="Equity Trace logo" class="brand-logo" /></span>
+        <span>Equity Trace</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Home</a>
+        <a href="help.html">Help</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+      </div>
+      <a class="nav-cta" href="journal.html?auth=signin" target="_blank" rel="noopener noreferrer">Open Journal</a>
+    </nav>
+
+    <main class="container">
+      <section class="hero" aria-labelledby="contact-title">
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="dot"></span>contact support</div>
+          <h1 id="contact-title">Contact Us</h1>
+          <p>Have a question, feedback, or need help? We’d be happy to assist. Fill out the form below or reach out via email, and we’ll get back to you as soon as possible.</p>
+
+          <div class="support-card" aria-label="Support email information">
+            <h2>Support Email</h2>
+            <a class="support-link" href="mailto:support@equitytrace.in">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path>
+                <path d="m22 8-10 7L2 8"></path>
+              </svg>
+              support@equitytrace.in
+            </a>
+            <p class="support-note">We typically respond within 24–48 business hours.</p>
+          </div>
+        </div>
+
+        <div class="layout">
+          <form class="form-card" id="contact-form" novalidate>
+            <h3>Send us a message</h3>
+            <div class="form-grid">
+              <div class="field">
+                <label for="full-name">Full Name</label>
+                <input id="full-name" name="name" type="text" autocomplete="name" placeholder="Alex Morgan" required />
+              </div>
+              <div class="field">
+                <label for="email">Email Address</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="alex@example.com" required />
+              </div>
+              <div class="field">
+                <label for="subject">Subject</label>
+                <input id="subject" name="subject" type="text" placeholder="How can we help?" required />
+              </div>
+              <div class="field">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                  <option value="">Select a category</option>
+                  <option>General Inquiry</option>
+                  <option>Technical Support</option>
+                  <option>Bug Report</option>
+                  <option>Feature Request</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="message">Message</label>
+                <textarea id="message" name="message" placeholder="Tell us what you need help with..." required></textarea>
+              </div>
+            </div>
+            <button class="btn" type="submit">Send Message</button>
+            <div class="form-status" id="form-status" aria-live="polite"></div>
+          </form>
+        </div>
+      </section>
+
+      <section class="faq-card" aria-labelledby="faq-title">
+        <h3 id="faq-title">Frequently asked questions</h3>
+        <div class="faq-list">
+          <details class="faq-item">
+            <summary>How long does support take to respond?</summary>
+            <p>Most inquiries are answered within 24–48 business hours.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Where can I report a bug?</summary>
+            <p>Use the contact form and select “Bug Report” so it reaches the right team quickly.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How can I request a new feature?</summary>
+            <p>Select “Feature Request” in the category dropdown and include the workflow you’d like to see.</p>
+          </details>
+        </div>
+      </section>
+
+      <div class="notice">
+        Information submitted through this form is used solely to respond to your inquiry. For more information about how your data is handled, please read our <a href="legal docs/privacy policy.html">Privacy Policy</a>.
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div>© 2026 Equity Trace · Trading Journal</div>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="help.html">Help</a>
+        <a href="legal docs/privacy policy.html">Privacy Policy</a>
+        <a href="legal docs/Terms & Conditions.html">Terms &amp; Conditions</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const statusBox = document.getElementById('form-status');
+    
+    // ── SUPABASE EDGE FUNCTION URL ──
+    // Replace with your Supabase project URL
+    const SUPABASE_URL = 'https://gxvuemshiulgwnboyswn.supabase.co';
+    const EDGE_FUNCTION_URL = `${SUPABASE_URL}/functions/v1/contact-mail`;
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const name = document.getElementById('full-name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const subject = document.getElementById('subject').value.trim();
+      const category = document.getElementById('category').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      // Validation
+      if (!name || !email || !subject || !category || !message) {
+        statusBox.textContent = 'Please fill in every required field so we can follow up properly.';
+        statusBox.className = 'form-status error';
+        return;
+      }
+
+      if (!emailPattern.test(email)) {
+        statusBox.textContent = 'Please enter a valid email address so we can reply to you.';
+        statusBox.className = 'form-status error';
+        return;
+      }
+
+      if (message.length < 12) {
+        statusBox.textContent = 'Please share a bit more detail so we can assist you more effectively.';
+        statusBox.className = 'form-status error';
+        return;
+      }
+
+      statusBox.textContent = 'Sending your message...';
+      statusBox.className = 'form-status';
+
+      try {
+        const response = await fetch(EDGE_FUNCTION_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            subject,
+            category,
+            message
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Failed to send email');
+        }
+
+        statusBox.textContent = 'Thanks! Your message has been sent successfully. We\'ll get back to you within 24–48 business hours.';
+        statusBox.className = 'form-status success';
+        form.reset();
+      } catch (error) {
+        console.error('Email send error:', error);
+        statusBox.textContent = `Error sending message: ${error.message}. Please try again or contact support directly at support@equitytrace.in`;
+        statusBox.className = 'form-status error';
+      }
+    });
+  </script>
+</body>
+</html>
